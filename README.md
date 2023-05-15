@@ -1,3 +1,3 @@
-# majiup-waziapp
+# Majiup-waziapp
 Add readme file on the steps to running the application and installing any dependencies.
 You can also upload the screenshot of the expected UI
