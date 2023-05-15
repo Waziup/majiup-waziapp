@@ -10,7 +10,7 @@ import { Logout } from '@mui/icons-material';
 import { Report, WaterDrop, Money, Settings, Notes } from '@mui/icons-material';
 export default function SideNavigation() {
   return (
-    <Box sx={{ width: '100%', height: '100%', maxWidth: 360, color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+    <Box sx={{ width: '100%', height: '100%', maxWidth: 360, color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
         <Box>
             <Box sx={{ display:'flex', alignItems:'center', width: '100%', color: 'white' }}>
                 <h1>MajiUp</h1>
