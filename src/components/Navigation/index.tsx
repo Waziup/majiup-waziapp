@@ -14,8 +14,8 @@ function NavigationIndex() {
             </div>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', width: '40%', alignItems: 'center'}}>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
-                    <AddCircle sx={{color: 'black', fontSize: 30}} />
-                    <h4>Add Device</h4>
+                    <AddCircle sx={{color: '#1a73e8', fontSize: 30}} />
+                    <h4 style={{color: '#1a73e8'}}>Add Device</h4>
                 </Box>
                 <BadgeComponent/>
                 <Box sx={{display: 'flex', alignItems: 'center'}}>

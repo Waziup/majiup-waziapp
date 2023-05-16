@@ -16,8 +16,8 @@ export default function SearchComponent() {
   };
 
   return (
-	<FormControl sx={{ m: 1, width: '100%' }} variant="outlined">
-		<InputLabel htmlFor="outlined-adornment-password">Search</InputLabel>
+	<FormControl sx={{ m: 1, width: '100%', }} variant="outlined">
+		<InputLabel htmlFor="outlined-adornment-password">Search Device</InputLabel>
 			<OutlinedInput
 			id="outlined-adornment-password"
 			type={showPassword ? 'text' : 'password'}
