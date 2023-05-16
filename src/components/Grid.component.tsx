@@ -3,6 +3,7 @@ import SideNavigation from './SideNavigation';
 import NavigationIndex from './Navigation';
 import { useState } from 'react';
 import ModalComponent from './Modal/Modal.component';
+import { ExpandMoreOutlined } from '@mui/icons-material';
 type Props = {
     owner: string,
     amount: number,
@@ -37,7 +38,7 @@ const ItemCard = ({owner,amount, litresPercent}: Props) => {
             <ModalComponent handleOpen={handleOpen}  open={open} handleClose={handleClose} />
             <Box>
                 <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '10px 20px', width:'100%'}}>
-                    <Box sx={{border: '3px solid gray',position: 'relative',  width: '50%', textAlign: 'center', height: '250px',borderTopLeftRadius: '9px', borderTopRightRadius: '9px' }}>
+                    <Box sx={{border: '3px solid gray',position: 'relative',  width: '50%', textAlign: 'center', height: '250px',borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}>
                         <Box sx={{bgcolor:'#1a73e8', height: `${litresPercent}%`, position: 'absolute', width: '100%', bottom: 0, left: 0, color: '#fff', fontSize: '20px'}}>{amount} %</Box>
                     </Box>
                     <Box style={{width: '45%',margin: '16px 0'}}>
@@ -49,7 +50,7 @@ const ItemCard = ({owner,amount, litresPercent}: Props) => {
 
                 <Box sx={{display: 'flex', alignItems:'center', justifyContent: 'space-evenly', padding: '10px 20px', width:'100%'}}>
                     <h4 style={{color: '#2C2D38'}}>570 litres</h4>
-                    <h4 style={{color: '#2C2D38', fontSize: '20px'}}> &#8964; </h4>
+                    <ExpandMoreOutlined style={{color: '#2C2D38', cursor: 'pointer'}}/>
                     <h4 style={{color: '#2C2D38'}}>More</h4>
                 </Box>
             </Box>
