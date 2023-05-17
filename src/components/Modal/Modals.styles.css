@@ -1,0 +1,10 @@
+.modalBox{
+    width: 300; 
+    height: 300;
+    background-color: 'background.paper';
+    padding: 2; border-radius: '10px'; 
+    position: 'absolute';
+    top: '50%';
+    left: '50%';
+    transform: 'translate(-50%, -50%)' ;
+}
