@@ -3,6 +3,10 @@ import SideNavigation from "../SideNavigation";
 import NavigationIndex from "../Navigation";
 import { useState } from "react";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
+const BoxStyle={ 
+    bgcolor: "#fff", 
+    borderRadius: "10px" 
+}
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
@@ -16,7 +20,7 @@ function GridComponent() {
                 <NavigationIndex />
                 <Grid container spacing={2}>
                     <Grid item xs={6}>
-                        <Box sx={{ bgcolor: "#fff", borderRadius: "10px" }}>
+                        <Box sx={BoxStyle}>
                             <ItemCardComponent
                                 amount={75}
                                 owner="NGO Tank"
@@ -28,7 +32,7 @@ function GridComponent() {
                         </Box>
                     </Grid>
                     <Grid item xs={6}>
-                        <Box sx={{ bgcolor: "#fff", borderRadius: "10px" }}>
+                        <Box sx={BoxStyle}>
                             <ItemCardComponent
                                 amount={50}
                                 owner="KISUMU Polytechnic"
@@ -44,5 +48,4 @@ function GridComponent() {
         </Grid>
     );
 }
-
 export default GridComponent;
