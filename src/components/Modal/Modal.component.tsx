@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Box, Switch, Modal, styled, SwitchProps, Stack, TextField} from '@mui/material';
+import './Modals.styles.css'
 type ModalComponentProps = {
     open: boolean;
     handleClose: () => void;
@@ -67,10 +68,9 @@ function ModalComponent({open, handleClose, handleOpen}: ModalComponentProps) {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
                 >
-                <Box sx={{ width: 300, height: 300, bgcolor: 'background.paper', p: 2, borderRadius: '10px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                <Box className="modalBox">
                     <h4 id="modal-modal-title">Edit Device</h4>
                     <Box>
-                    
                         <IOSSwitch sx={{ m: 4 }} defaultChecked />
                     </Box>
                 </Box>
