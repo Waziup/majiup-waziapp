@@ -1,4 +1,3 @@
-import GridComponent from "./components/GridComponent/Grid.component";
 import LoginPage from "./pages/LoginPage";
 import BillingsPage from "./pages/BillingsPage";
 import ReportsPage from "./pages/ReportsPage";
@@ -6,6 +5,7 @@ import SettingsPage from "./pages/SettingsPage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ProductsPage from "./pages/ProductsPage";
 import DashboardPage from "./pages/DashboardPage";
+import SignUpPage from "./pages/SignupPage";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -35,6 +35,10 @@ const router = createBrowserRouter([
         path: "/settings",
         element: <SettingsPage />,
     },
+    {
+        path: '/sign-up',
+        element: <SignUpPage/>
+    }
 ]);
 function App() {
     return (

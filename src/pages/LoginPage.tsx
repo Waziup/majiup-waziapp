@@ -38,7 +38,11 @@ function LoginPage() {
                         <h2 style={{color: 'black'}}>MajiUp</h2>
                         <WaterDrop style={{fontSize: 30, color: 'black'}}/>
                     </Box>
-                    <Button sx={ButtonStyle} variant="outlined">SIGN UP</Button>
+                        <Link style={{textDecoration: 'none', color: 'white'}} to={'/sign-up'}>
+                            <Button sx={ButtonStyle} variant="outlined">
+                                SIGN UP
+                            </Button>
+                        </Link>
                 </Box>
                 <Box sx={{bgcolor: '#fff',height: '100vh', textAlign: 'center', position: 'relative' }}>
                     <Box sx={FormHolder}>
