@@ -1,4 +1,3 @@
-import GridComponent from "./components/GridComponent/Grid.component";
 import LoginPage from "./pages/LoginPage";
 import BillingsPage from "./pages/BillingsPage";
 import ReportsPage from "./pages/ReportsPage";
