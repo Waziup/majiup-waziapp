@@ -5,48 +5,53 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
-import { SettingsAccessibilityOutlined, Home } from '@mui/icons-material';
+import {  Home } from '@mui/icons-material';
 import { Logout } from '@mui/icons-material';
-import { Report, WaterDrop, Money, Settings, Notes } from '@mui/icons-material';
+import { Report,  Settings } from '@mui/icons-material';
 import { Link } from '@mui/material';
 export default function SideNavigation() {
   return (
-    <Box sx={{ width: '100%', height: '110%', 
+    <Box sx={{ width: '100%', height: '100vh', 
             maxWidth: 360, 
             color: 'white', 
             display: 'flex', flexDirection: 'column', 
-            justifyContent: 'space-around',
-            marginLeft: '2vw',
+            justifyContent: 'flex-start',
          }}>
-        <Box>
-            <Box sx={{ display:'flex', alignItems:'center', width: '100%', color: 'white' }}>
-                <h1>MajiUp</h1>
-                <WaterDrop style={{fontSize: 40}}/>
-            </Box>
-        </Box>
+    
         <nav aria-label="main mailbox folders">
             <List>
                 <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none', width: '80%'}} color={'inherit'} href="/dashboard">
+                    <Link style={{textDecoration: 'none', width: '100%',borderTopRightRadius: '25px',borderBottomRightRadius: '25px', backgroundColor:'#E46B26'}} color={'inherit'} href="/dashboard">
                         <ListItemButton>
                             <ListItemIcon>
                                 <Home sx={{color: 'white'}}/>
                             </ListItemIcon>
                             <ListItemText primary="Dashboards" />
+                            <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', width: '16px', background: '#fff', color: '#E46B26'}}>5</h4>
                         </ListItemButton>
                     </Link>
                 </ListItem>
                 <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none',width: '80%'}} color={'inherit'} href="/reports">
+                    <Link style={{textDecoration: 'none',width: '100%', color: 'black'}}  href="/settings">
                         <ListItemButton>
                             <ListItemIcon>
-                                <Report sx={{color: 'white'}}/>
+                                <Settings sx={{color: 'black'}}/>
                             </ListItemIcon>
-                            <ListItemText primary="Reports" />
+                            <ListItemText primary="Settings" />
                         </ListItemButton>
                     </Link>
                 </ListItem>
                 <ListItem disablePadding>
+                    <Link style={{textDecoration: 'none',width: '100%', color: 'black'}} color={'inherit'} href="/reports">
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Report sx={{color: 'black'}}/>
+                            </ListItemIcon>
+                            <ListItemText primary="Generate Reports" />
+                        </ListItemButton>
+                    </Link>
+                </ListItem>
+                {/* <ListItem disablePadding>
                     <Link style={{textDecoration: 'none',width: '80%'}} color={'inherit'} href="/products">
                         <ListItemButton>
                             <ListItemIcon>
@@ -55,8 +60,8 @@ export default function SideNavigation() {
                             <ListItemText primary="Products" />
                         </ListItemButton>
                     </Link>
-                </ListItem>
-                <ListItem disablePadding>
+                </ListItem> */}
+                {/* <ListItem disablePadding>
                     <Link style={{textDecoration: 'none',width: '80%'}} color={'inherit'} href="/billings">
                         <ListItemButton>
                             <ListItemIcon>
@@ -65,8 +70,8 @@ export default function SideNavigation() {
                             <ListItemText primary="Billings" />
                         </ListItemButton>
                     </Link>
-                </ListItem>
-                <ListItem disablePadding>
+                </ListItem> */}
+                {/* <ListItem disablePadding>
                     <Link style={{textDecoration: 'none',width: '80%'}} color={'inherit'} href="/invoices">
                         <ListItemButton>
                             <ListItemIcon>
@@ -75,17 +80,8 @@ export default function SideNavigation() {
                             <ListItemText primary="Invoices" />
                         </ListItemButton>
                     </Link>
-                </ListItem>
-                <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none',width: '80%'}} color={'inherit'} href="/settings">
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <Settings sx={{color: 'white'}}/>
-                            </ListItemIcon>
-                            <ListItemText primary="Settings" />
-                        </ListItemButton>
-                    </Link>
-                </ListItem>
+                </ListItem> */}
+                
             </List>
         </nav>
         <Box>

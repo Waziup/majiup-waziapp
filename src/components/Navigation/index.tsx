@@ -1,33 +1,31 @@
-import { ArrowBack} from '@mui/icons-material'
+
 import { Box } from '@mui/material';
 import SearchComponent from './Search.component';
-import BadgeComponent from './Badge.component';
-import { AddCircle } from '@mui/icons-material';
 import {Avatar} from '@mui/material';
+import {WaterDrop} from '@mui/icons-material';
 function NavigationIndex() {
-    const num=3;
     return (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center'}}>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-                <ArrowBack/>
+        <Box sx={{ bgcolor: '#fff', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center'}}>
+            <Box sx={{display: 'flex', alignItems: 'center'}}>
+                <WaterDrop style={{fontSize: 40, color: '#4592F6'}}/>
+                <h1>MajiUp</h1>
+            </Box>
+            <Box sx={{width: '45%'}}>
                 <SearchComponent/>
-            </div>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', width: '40%', alignItems: 'center'}}>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
-                    <AddCircle sx={{color: '#040273', fontSize: 30}} />
-                    <h4 style={{color: '#040273'}}>Add Device</h4>
-                </Box>
-                <BadgeComponent/>
-                <Box sx={{display: 'flex', alignItems: 'center'}}>
+            </Box>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
+                {/* <BadgeComponent/> */}
+                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <h4 style={{ fontSize: '30px' }} >&#128276; </h4>
                     <Avatar
                         alt="Oliver Kem"
                         src="https://mui.com/static/images/avatar/1.jpg"
-                        sx={{ width: 56, height: 56 }}
+                        sx={{ width:32, height: 32 }}
                     />
                     <Box sx={{margin: '0 15px'}}>
-                        <h4>Oliver Kem</h4>
-                        <p>{num} device{num>1? 's':''}</p>
+                        <h4>John Doe</h4>
                     </Box>
+                    <h4 style={{ fontSize: '20px' }} >&#x25BC;</h4>
                 </Box>
                 
             </Box>

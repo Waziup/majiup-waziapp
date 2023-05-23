@@ -5,7 +5,7 @@ type Props={
 }
 function InputComponent({placeholder,type}: Props) {
     return (
-        <input className="input_box" type={type} placeholder={placeholder} />
+        <input style={{backgroundColor: '#F6F6F6',}} className="input_box" type={type} placeholder={placeholder} />
     );
 }
 export default InputComponent;
