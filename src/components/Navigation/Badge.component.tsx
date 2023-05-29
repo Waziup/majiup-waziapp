@@ -1,9 +1,9 @@
 import { Badge } from '@mui/material';
-import { AddAlarm, } from '@mui/icons-material';
+import {Notifications } from '@mui/icons-material';
 function BadgeComponent() {
     return (
-        <Badge badgeContent={1} color="primary">
-            <AddAlarm color="action" />
+        <Badge sx={{margin: '0 20px'}} badgeContent={3} color="success">
+            <Notifications color="action" />
         </Badge>
     );
 }

@@ -1,7 +1,7 @@
 import {Stack,Box, styled, Switch} from '@mui/material';
-import WaterTank from '../../assets/waterTank.png'
 import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome } from "@mui/icons-material";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip } from 'recharts';
+import WatertankComponent from '../WaterTank/Watertank.component';
 type Props={
     owner: string,
     liters: number,
@@ -10,7 +10,7 @@ type Props={
     waterQuality: string,
     on: boolean
 }
-const Android12Switch = styled(Switch)(({ theme }) => ({
+export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
     '& .MuiSwitch-track': {
       borderRadius: 22 / 2,
@@ -46,7 +46,9 @@ const BoxStyle={
     bgcolor: "#fff", 
     borderRadius: "10px",
     margin: "10px 0",
+	position: 'relative'
 }
+const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
 const data = [
     {
       name: '12AM',
@@ -90,50 +92,57 @@ const data = [
       amt: 2100,
     },
 ];
+import NotificationsIcon from '@mui/icons-material/Notifications';
 function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
     return (
         <Stack sx={BoxStyle} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             <h3 style={{display: 'inline-block'}}>{owner}</h3>
-            <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '1px 2px 1px rgba(0, 0, 0, 0.15)',}}>
-                <p style={{display: 'inline-flex'}}>
-                    <FireHydrantAlt style={{fontSize: 25, color: '#4592F6'}}/>Water Pump Control
+            <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
+                <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
+                    <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>
+					Water Pump Control
 				</p>
                 <Android12Switch checked />
             </Box>
-            <Box alt="water Tank." sx={{width: '200px'}} component="img" src={WaterTank}/>
-            <Stack spacing={2} alignItems={'center'} flexWrap={'wrap'} direction="row">
-                <Box sx={{padding: '6px 10px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                    <p style={{fontSize: '12px',}}>
-                        <WaterDrop style={{fontSize: 25, display: 'inline-block', color: '#4592F6'}}/>
+			<WatertankComponent percentage={Math.round((liters/500)*100)} />
+            <Box sx={{display: 'flex',flexWrap:'wrap', marginTop:'10px', justifyContent: 'space-between',alignItems: 'center',width: '80%',}}>
+                <Box sx={TankDetails}>
+                    <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
+                        <WaterDrop style={{fontSize: 12,  color: '#4592F6'}}/>
                         Water Amount
                     </p>
                     <p style={{fontSize: '24px',}}>{liters} Ltr</p>
                 </Box>
-                <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                    <p style={{fontSize: '12px',}}>
-                        <DeviceThermostatSharp style={{fontSize: 18, display: 'inline-block', color: '#1C1B1F'}}/>
+                <Box sx={TankDetails}>
+                    <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
+                        <DeviceThermostatSharp style={{fontSize: 12, display: 'inline-block', color: '#1C1B1F'}}/>
                         Temperature
                     </p>
                     <p style={{fontSize: '24px',}}>{waterTemp}&#8451;</p>
                 </Box>
-                <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                    <p style={{fontSize: '12px',}}>
-                        <AutoAwesome style={{fontSize: 25, display: 'inline-block', }}/>
+                <Box sx={TankDetails}>
+                    <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
+                        <AutoAwesome style={{fontSize: 12, display: 'inline-block', }}/>
                         Water Quality
                     </p>
                     <p style={{fontSize: '24px',}}>{waterQuality}</p>
                 </Box>
-                <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                    <p style={{fontSize: '12px',}}>
-                        <WaterDrop style={{fontSize: 25, display: 'inline-block', color: '#2C2D38'}}/>
+                <Box sx={TankDetails}>
+                    <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
+                        <WaterDrop style={{fontSize: 12, display: 'inline-block', color: '#2C2D38'}}/>
                         Water Leakage
                     </p>
                     <p style={{fontSize: '24px',}}>No</p>
                 </Box>
-            </Stack>
+            </Box>
             <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '1px 2px 1px rgba(0, 0, 0, 0.15)',}}>
-                <p style={{display: 'inline-block'}}>Notification</p>
-                <Android12Switch checked/>
+                {/* <p style={{display: 'inline-block'}}>Notification</p>
+                <Android12Switch checked/> */}
+				<p style={{fontSize: '14px',display: 'inline-flex', alignItems:'center'}}>
+                    <NotificationsIcon style={{fontSize: 14,  }}/>
+                    Notification
+                </p>
+				<Android12Switch checked/>
             </Box>
             <Box sx={{ display: 'flex',flexDirection: 'column', alignItems:'flex-start', cursor: 'pointer', transition: '.5s',  }}>
                 <p style={{fontSize: '16px',fontWeight: 'bold', textAlign: 'center'}}>WATER CONSUMPTION</p>
@@ -152,7 +161,7 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
                     <XAxis dataKey="name" />
                     <YAxis  />
                     {/* <Tooltip /> */}
-                    <Legend />
+                    {/* <Legend /> */}
                     <Line
                         type="monotone"
                         dataKey="time"

@@ -4,12 +4,30 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import {  Home } from '@mui/icons-material';
-import { Logout } from '@mui/icons-material';
-import { Report,  Settings } from '@mui/icons-material';
-import { Link } from '@mui/material';
+import { Settings, Language, InsertChart,Dashboard } from '@mui/icons-material';
+import { Link, NavLink } from 'react-router-dom';
+const LinkStyle={
+    textDecoration: 'none', 
+    width: '100%',
+    borderTopRightRadius: '25px',
+    borderBottomRightRadius: '25px',
+    // backgroundColor:'#E46B26'
+}
+type FuncProps={
+    isActive: boolean,
+    isPending: boolean
+}
 export default function SideNavigation() {
+    const stylingFunc =({isActive, isPending}: FuncProps)=>{
+        return{
+            backgroundColor: isActive? '#E46B26':'none',
+            textDecoration: 'none', 
+            width: '100%',
+            borderTopRightRadius: '25px',
+            borderBottomRightRadius: '25px',
+            color: isActive? 'white':'#1C1B1F'
+        }
+    }
   return (
     <Box sx={{ width: '100%', height: '100vh', 
             maxWidth: 360, 
@@ -20,85 +38,51 @@ export default function SideNavigation() {
     
         <nav aria-label="main mailbox folders">
             <List>
-                <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none', width: '100%',borderTopRightRadius: '25px',borderBottomRightRadius: '25px', backgroundColor:'#E46B26'}} color={'inherit'} href="/dashboard">
+                <ListItem>
+                    {/* // eslint-disable-next-line @typescript-eslint/no-unused-vars */}
+                    <NavLink style={stylingFunc}  to="/dashboard">
                         <ListItemButton>
                             <ListItemIcon>
-                                <Home sx={{color: 'white'}}/>
+                                <Dashboard sx={{color: 'inherit'}}/>
                             </ListItemIcon>
                             <ListItemText primary="Dashboards" />
-                            <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', width: '16px', background: '#fff', color: '#E46B26'}}>5</h4>
+                            <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', padding:'0 2%', background: '#fff', color: '#E46B26'}}>3</h4>
                         </ListItemButton>
-                    </Link>
+                    </NavLink>
                 </ListItem>
-                <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none',width: '100%', color: 'black'}}  href="/settings">
+                <ListItem >
+                    <NavLink style={stylingFunc}  to="/analytics">
                         <ListItemButton>
                             <ListItemIcon>
-                                <Settings sx={{color: 'black'}}/>
+                                <InsertChart />
+                            </ListItemIcon>
+                            <ListItemText primary="Analytics" />
+                            
+                        </ListItemButton>
+                    </NavLink>
+                </ListItem>
+                <ListItem>
+                    <NavLink style={stylingFunc}  to="/settings">
+                        <ListItemButton color='initial'>
+                            <ListItemIcon color='initial'>
+                                <Settings sx={{color: 'inherit'}}/>
                             </ListItemIcon>
                             <ListItemText primary="Settings" />
                         </ListItemButton>
-                    </Link>
+                    </NavLink>
                 </ListItem>
-                <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none',width: '100%', color: 'black'}} color={'inherit'} href="/reports">
+                <ListItem>
+                    <NavLink style={stylingFunc} color={'inherit'} to="/community">
                         <ListItemButton>
                             <ListItemIcon>
-                                <Report sx={{color: 'black'}}/>
+                                <Language sx={{color: 'inherit'}}/>
                             </ListItemIcon>
-                            <ListItemText primary="Generate Reports" />
+                            <ListItemText primary="Community" />
                         </ListItemButton>
-                    </Link>
+                    </NavLink>
                 </ListItem>
-                {/* <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none',width: '80%'}} color={'inherit'} href="/products">
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <SettingsAccessibilityOutlined sx={{color: 'white'}} />
-                            </ListItemIcon>
-                            <ListItemText primary="Products" />
-                        </ListItemButton>
-                    </Link>
-                </ListItem> */}
-                {/* <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none',width: '80%'}} color={'inherit'} href="/billings">
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <Money sx={{color: 'white'}} />
-                            </ListItemIcon>
-                            <ListItemText primary="Billings" />
-                        </ListItemButton>
-                    </Link>
-                </ListItem> */}
-                {/* <ListItem disablePadding>
-                    <Link style={{textDecoration: 'none',width: '80%'}} color={'inherit'} href="/invoices">
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <Notes sx={{color: 'white'}} />
-                            </ListItemIcon>
-                            <ListItemText primary="Invoices" />
-                        </ListItemButton>
-                    </Link>
-                </ListItem> */}
-                
             </List>
         </nav>
-        <Box>
-            <Divider sx={{bgcolor: 'white'}} />
-            <nav aria-label="secondary mailbox folders">
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <Logout sx={{color: 'white'}}/>
-                            </ListItemIcon>
-                            <ListItemText primary="Logout" />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
-            </nav>
-        </Box>
     </Box>
   );
 }

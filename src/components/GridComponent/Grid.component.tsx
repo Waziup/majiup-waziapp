@@ -5,7 +5,7 @@ import ItemCardComponent from "../ItemCard/ItemCard.component";
 import { useState } from "react";import TankDetailComponent from "../TankDetail/TankDetail.component";
 
 const BoxStyle={ 
-    // bgcolor: "#fff", 
+    bgcolor: "#fff", 
     borderRadius: "10px",
     margin: "10px 0",
 }
@@ -18,7 +18,6 @@ type Tank = {
     on?: boolean,
     isSelect?: boolean,
 }
-// #F0AC85
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
@@ -74,7 +73,7 @@ function GridComponent() {
                 <Grid item xs={6}>
                     {
                         tanks.map((tank: Tank,i: number) => (
-                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#F0AC85'}:{bgcolor: '#fff'}]}>
+                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}>
                                 <ItemCardComponent
                                     isOn={tank.on|| false}
                                     amount={tank.liters}
@@ -88,7 +87,6 @@ function GridComponent() {
                             </Box>
                         ))
                     }
-                    
                 </Grid>
                 <Grid item xs={3.4}>
                     {
