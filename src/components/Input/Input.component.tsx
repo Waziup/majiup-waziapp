@@ -5,7 +5,13 @@ type Props={
 }
 function InputComponent({placeholder,type}: Props) {
     return (
-        <input className="input_box" type={type} placeholder={placeholder} />
+        <input style={{outline: 'none',
+        width: '100%',
+        height: '30px',
+        borderRadius: '0px',
+        border: '1px solid #ccc',
+        marginBottom: '10px',
+        padding: '5px'}} type={type} placeholder={placeholder} />
     );
 }
 export default InputComponent;

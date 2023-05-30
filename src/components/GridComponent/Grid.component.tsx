@@ -7,13 +7,14 @@ const BoxStyle={
     bgcolor: "#fff", 
     borderRadius: "10px" 
 }
+import './Grid.styles.css'
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     return (
         <Grid container spacing={2}>
-            <Grid className="side_nav_container" item  xs={2.5} >
+            <Grid sx={{height: "635px",background: "#040273"}} className="side_nav_container" item  xs={2.5} >
                 <SideNavigation />
             </Grid>
             <Grid item xs={9}>
