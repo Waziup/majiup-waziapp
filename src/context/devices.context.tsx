@@ -57,19 +57,13 @@ const DEVICES: Device[]=[
 // Referer: http://wazigate.local/docs/
 // Sec-GPC: 1
 const fetchAllDevices = async ()=>{
-    const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJjbGllbnQiOiI2MDE3YzcyMTc4NDUyNDAwMDY4NDExYmUiLCJleHAiOjE2ODUyNjgzNDB9.1vIplb8reiwTVJ2ef40nnjbo5F0IOTb-E7bzyT4K4xE";
-    // axios.defaults.headers.common['Cookie'] = `Token=${token}`;
-    const res = await axios.post('http://wazigate.local/devices',{
+    const res = await axios.post('http://wazigate.local/auth/token',{
+        username:"admin",
+        "password":"loragateway"
+    },{
         headers: {
-            'accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Access-Control-Allow-Origin': '*',
-            // 'Content-Type': 'text/plain',
-            // 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-            // 'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
-            'Cookie': `Token=${token}`,
-            "Allow ": "GET, POST, HEAD, OPTIONS"
+            Accept:'text/plain; charset=utf-8',
+            "Content-Type":'application/json;charset=utf-8'
         }
     });
     console.log(res.data);
