@@ -25,7 +25,7 @@ function BillingsPage() {
                 <Grid style={{margin: '10px'}} item xs={9}>
                     <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                         <h3 style={{fontSize: '24px'}}>Usage Volume</h3>
-                        <p style={{color: '#fff',fontSize: '12px', borderRadius: '20px', padding: '8px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
+                        <p style={{color: '#fff',fontSize: '12px',cursor:'pointer', borderRadius: '20px', padding: '8px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
                             <Visibility sx={{fontSize: 12, margin:'0 4px'}}/>
                             View Analytics
                         </p>
