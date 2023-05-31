@@ -27,7 +27,7 @@ function SettingsPage() {
                 <Grid style={{margin: '10px'}} item xs={9}>
                     <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                         <h3 style={{fontSize: '24px',margin:'10px 0'}}>Setup Device</h3>
-                        <p style={{color: '#fff',fontSize: 16, borderRadius: '20px', padding:'10px 12px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
+                        <p style={{color: '#fff',fontSize: 16,cursor:'pointer', borderRadius: '20px', padding:'10px 12px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
                             <Add sx={{fontSize: 16, margin:'0 4px'}}/>
                             New Device
                         </p>

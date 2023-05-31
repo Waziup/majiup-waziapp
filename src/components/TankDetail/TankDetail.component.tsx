@@ -1,7 +1,10 @@
 import {Stack,Box, styled, Switch} from '@mui/material';
 import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome } from "@mui/icons-material";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, } from 'recharts';
 import WatertankComponent from '../WaterTank/Watertank.component';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+
+import { useState } from 'react';
 type Props={
     owner: string,
     liters: number,
@@ -12,6 +15,11 @@ type Props={
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
+	bgcolor: '#FF5C00',
+	
+	'.MuiSwitch-checked':{
+		bgcolor: '#FF5C00'
+	},
     '& .MuiSwitch-track': {
       borderRadius: 22 / 2,
       '&:before, &:after': {
@@ -21,8 +29,7 @@ export const Android12Switch = styled(Switch)(({ theme }) => ({
         transform: 'translateY(-50%)',
         width: 16,
         height: 16,
-      },
-      '&:before': {
+      },'&:before': {
         backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
           theme.palette.getContrastText(theme.palette.secondary.main),
         )}" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>')`,
@@ -92,8 +99,8 @@ const data = [
       amt: 2100,
     },
 ];
-import NotificationsIcon from '@mui/icons-material/Notifications';
 function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
+	const [isChecked, setIsChecked] = useState(false);
     return (
         <Stack sx={BoxStyle} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             <h3 style={{display: 'inline-block'}}>{owner}</h3>
@@ -102,7 +109,7 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
                     <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>
 					Water Pump Control
 				</p>
-                <Android12Switch checked />
+                <Android12Switch onClick={()=>setIsChecked(!isChecked)} checked={isChecked} sx={{color:'#FF5C00'}}  />
             </Box>
 			<WatertankComponent percentage={Math.round((liters/500)*100)} />
             <Box sx={{display: 'flex',flexWrap:'wrap', marginTop:'10px', justifyContent: 'space-between',alignItems: 'center',width: '80%',}}>

@@ -11,7 +11,7 @@ function NavigationIndex() {
                 <WaterDrop style={{fontSize: 'calc(20px + 1vw)', color: '#4592F6'}}/>
                 <h1 style={{fontSize: 'calc(20px + 1vw)', fontWeight:'normal'}}>MajiUp</h1>
             </Box>
-            <Box sx={{width: '45%'}}>
+            <Box sx={{width: '50%'}}>
                 <SearchComponent/>
             </Box>
             <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>

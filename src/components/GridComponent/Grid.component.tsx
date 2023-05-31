@@ -47,6 +47,14 @@ function GridComponent() {
             on: true,
             isSelect: false,
         },
+        {
+            name: 'Restaurant Tank',
+            waterTemp: 24,
+            waterQuality: 'Turbidity',
+            liters: 500,
+            on: true,
+            isSelect: false,
+        },
     ]);
     const [selectedTank, setSelectedTank] = useState<Tank>(tanks[0])
     const handleSelectedTank = ( tank: Tank) => {
