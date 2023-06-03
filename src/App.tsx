@@ -1,10 +1,10 @@
 import LoginPage from "./pages/LoginPage";
 import BillingsPage from "./pages/BillingsPage";
-import ReportsPage from "./pages/ReportsPage";
+import CommunityPage from "./pages/CommunityPage";
 import SettingsPage from "./pages/SettingsPage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ProductsPage from "./pages/ProductsPage";
 import DashboardPage from "./pages/DashboardPage";
+import { DevicesProvider } from "./context/devices.context";
 import SignUpPage from "./pages/SignupPage";
 const router = createBrowserRouter([
     {
@@ -16,40 +16,26 @@ const router = createBrowserRouter([
         element: <DashboardPage />,
     },
     {
-        path: "/billings",
+        path: "/analytics",
         element: <BillingsPage />,
-    },
-    {
-        path: "/products",
-        element: <ProductsPage />,
-    },
-    {
-        path: "/invoices",
-        element: <ProductsPage />,
-    },
-    {
-        path: "/reports",
-        element: <ReportsPage />,
     },
     {
         path: "/settings",
         element: <SettingsPage />,
     },
     {
+        path: "/community",
+        element: <CommunityPage />,
+    },
         path: '/sign-up',
         element: <SignUpPage/>
     }
 ]);
 function App() {
     return (
-        <>
+        <DevicesProvider>
             <RouterProvider router={router} />
-            {/* <GridComponent /> */}
-            {/* <BillingsPage /> */}
-            {/* <ReportsPage /> */}
-            {/* <SettingsPage /> */}
-            {/* <LoginPage /> */}
-        </>
+        </DevicesProvider>
     );
 }
 
