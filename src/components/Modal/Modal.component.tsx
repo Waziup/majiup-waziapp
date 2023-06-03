@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import { Box, Switch, Modal, styled, SwitchProps, Stack, TextField} from '@mui/material';
+import { Box, Switch, Modal, styled, SwitchProps} from '@mui/material';
 import './Modals.styles.css'
 type ModalComponentProps = {
     open: boolean;
@@ -57,7 +56,7 @@ const IOSSwitch = styled((props: SwitchProps) => (
       }),
     },
 }));
-function ModalComponent({open, handleClose, handleOpen}: ModalComponentProps) {
+function ModalComponent({open, handleClose}: ModalComponentProps) {
     
     return (
         <Box>

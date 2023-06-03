@@ -5,6 +5,7 @@ import SettingsPage from "./pages/SettingsPage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import { DevicesProvider } from "./context/devices.context";
+import SignUpPage from "./pages/SignupPage";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -26,6 +27,9 @@ const router = createBrowserRouter([
         path: "/community",
         element: <CommunityPage />,
     },
+        path: '/sign-up',
+        element: <SignUpPage/>
+    }
 ]);
 function App() {
     return (
