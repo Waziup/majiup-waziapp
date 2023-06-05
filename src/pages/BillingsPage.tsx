@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import NavigationIndex from '../components/Navigation';
 import SideNavigation from '../components/SideNavigation';
 import { Grid,Box, } from '@mui/material';
@@ -6,6 +7,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import ChatFlow from '../assets/chart _flow.png';
 import StickyHeadTable from '../components/TableComponent/Table.component';
 import DownloadSVG from '../assets/download.svg';
+import ModalComponent from '../components/Modal/Modal.component';
 const ReportsActiveText={
     cursor: 'pointer', 
     color: '#2C2D38',
@@ -13,6 +15,7 @@ const ReportsActiveText={
 }
 const ReportsText={cursor: 'pointer',color: '#9291A5',padding: '0 .4vw' }
 function BillingsPage() {
+    const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
     return (
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item  xs={12} >
@@ -23,13 +26,14 @@ function BillingsPage() {
                     <SideNavigation />
                 </Grid>
                 <Grid style={{margin: '10px'}} item xs={9}>
-                    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <Box onClick={()=>setIsOpenModal(!isOpenModal)} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                         <h3 style={{fontSize: '24px'}}>Usage Volume</h3>
                         <p style={{color: '#fff',fontSize: '12px',cursor:'pointer', borderRadius: '20px', padding: '8px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
                             <Visibility sx={{fontSize: 12, margin:'0 4px'}}/>
                             View Analytics
                         </p>
                     </Box>
+                    <ModalComponent  handleClose={()=>setIsOpenModal(!isOpenModal)} open={isOpenModal} />
                     <Box sx={{display: 'flex',margin: '10px 0', flexWrap: 'wrap', alignItems: 'center'}}>
                         <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0', minWidth: '200px', width: '20%', borderRadius: '20px'}}>
                             <label style={{background: '#E8E8E8',fontSize: '18',fontWeight: '500', color: '#2C2D38', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Device:</label>
