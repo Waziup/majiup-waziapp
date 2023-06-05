@@ -36,9 +36,10 @@ A step by step series of examples that tell you how to get a development env run
     docker build -t majiup .
     ```
 2. Deploy to Docker Hub
+    ** before you deploy to docker hub, just ensure your have an account and have created a project with the name ``waziup/mazjiup:1.0.0``, feel free to give a tag of your own liking. 
     ```
-    docker tag majiup:latest waziup/majiup:latest
-    docker push waziup/majiup:latest
+    docker tag majiup:latest waziup/majiup:1.0.0
+    docker push waziup/majiup:1.0.0
     ```
     Then copy the name
 3. Launch your Wazigate and go to the Waziup dashboard
