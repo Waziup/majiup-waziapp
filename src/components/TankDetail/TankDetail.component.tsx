@@ -1,9 +1,8 @@
 import {Stack,Box, styled, Switch} from '@mui/material';
-import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome } from "@mui/icons-material";
+import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome, DeviceThermostat, Opacity } from "@mui/icons-material";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, } from 'recharts';
 import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-
 import { useState } from 'react';
 type Props={
     owner: string,
@@ -101,6 +100,7 @@ const data = [
 ];
 function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
 	const [isChecked, setIsChecked] = useState(false);
+	const [toggleHot, setToggleHot] = useState(false);
     return (
         <Stack sx={BoxStyle} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             <h3 style={{display: 'inline-block'}}>{owner}</h3>
@@ -111,8 +111,8 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
 				</p>
                 <Android12Switch onClick={()=>setIsChecked(!isChecked)} checked={isChecked} sx={{color:'#FF5C00'}}  />
             </Box>
-			<WatertankComponent percentage={Math.round((liters/500)*100)} />
-            <Box sx={{display: 'flex',flexWrap:'wrap', marginTop:'10px', justifyContent: 'space-between',alignItems: 'center',width: '80%',}}>
+			<WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/500)*100)} />
+            <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '80%',}}>
                 <Box sx={TankDetails}>
                     <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
                         <WaterDrop style={{fontSize: 12,  color: '#4592F6'}}/>
@@ -141,7 +141,7 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
                     </p>
                     <p style={{fontSize: '24px',}}>No</p>
                 </Box>
-            </Box>
+            </Stack>
             <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '1px 2px 1px rgba(0, 0, 0, 0.15)',}}>
                 {/* <p style={{display: 'inline-block'}}>Notification</p>
                 <Android12Switch checked/> */}
@@ -151,8 +151,14 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
                 </p>
 				<Android12Switch checked/>
             </Box>
-            <Box sx={{ display: 'flex',flexDirection: 'column', alignItems:'flex-start', cursor: 'pointer', transition: '.5s',  }}>
-                <p style={{fontSize: '16px',fontWeight: 'bold', textAlign: 'center'}}>WATER CONSUMPTION</p>
+            <Box sx={{ display: 'flex',flexDirection: 'column', alignItems:'center',  transition: '.5s',  }}>
+                <Box sx={{ display: 'flex',flexDirection: 'row', alignItems:'center', justifyContent:'space-between',  transition: '.5s',width:'75%'  }}>
+					<p style={{fontSize: 16,fontWeight: '600', textAlign: 'center'}}>WATER {toggleHot?'TEMPERATURE':'CONSUMPTION'}</p>
+					<Box onClick={()=>setToggleHot(!toggleHot)} pt={.3} bgcolor={'#E8E8E8'} sx={{borderRadius:'20px', width: '20%', textAlign:'center'}} >
+						<Opacity style={!toggleHot? { cursor: 'pointer', color:'#fff',borderRadius:'50%', backgroundColor:'#4592F6' }:{ cursor: 'pointer', color:'#888992',borderRadius:'50%', }}/>
+						<DeviceThermostat style={toggleHot?{ color:'#fff',cursor: 'pointer', borderRadius:'50%',backgroundColor:'#FF5C00'}:{ color:'#888992',cursor: 'pointer', }}/>
+					</Box>
+				</Box>
                 <LineChart
                     width={400}
                     height={300}

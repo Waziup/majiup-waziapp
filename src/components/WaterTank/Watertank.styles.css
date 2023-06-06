@@ -19,6 +19,36 @@
     z-index: 1000;
     font-weight: 500;
 }
+.circle .bacteria{
+    position: absolute;
+    bottom: 0;
+    right: 20%;
+    transform: translate(-50%, -50%);
+    height: 30px;
+    color: #000;
+    z-index: 1000;
+    font-weight: 500;
+}
+.circle .dirt{
+    position: absolute;
+    bottom: 14%;
+    right: 30%;
+    transform: translate(-50%, -50%);
+    height: 15px;
+    color: #000;
+    z-index: 1000;
+    font-weight: 500;
+}
+.circle .dirt1{
+    position: absolute;
+    bottom: 7%;
+    right: 35%;
+    transform: translate(-50%, -50%);
+    height: 15px;
+    color: #000;
+    z-index: 1000;
+    font-weight: 500;
+}
 .wave{
     position: relative;
     width: 100%;
@@ -34,7 +64,7 @@
     position: absolute;
     width: 200%;
     height: 200%;
-    top: 0%;
+    top: 10%;
     left: 50%;
     transform: translate(-50%, -75%);
 }

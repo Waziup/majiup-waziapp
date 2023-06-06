@@ -43,7 +43,7 @@ function GridComponent() {
         {
             name: 'Cattle Tank',
             waterTemp: 44,
-            waterQuality: 'Good',
+            waterQuality: 'Turbidity',
             liters: 290,
             on: true,
             isSelect: false,

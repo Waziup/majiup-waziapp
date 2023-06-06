@@ -5,26 +5,22 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Settings, Language, InsertChart,Dashboard } from '@mui/icons-material';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink, } from 'react-router-dom';
 const LinkStyle={
     textDecoration: 'none', 
     width: '100%',
     borderTopRightRadius: '25px',
     borderBottomRightRadius: '25px',
-    // backgroundColor:'#E46B26'
 }
 type FuncProps={
     isActive: boolean,
     isPending: boolean
 }
 export default function SideNavigation() {
-    const stylingFunc =({isActive, isPending}: FuncProps)=>{
+    const stylingFunc =({isActive, }: FuncProps)=>{
         return{
-            backgroundColor: isActive? '#E46B26':'none',
-            textDecoration: 'none', 
-            width: '100%',
-            borderTopRightRadius: '25px',
-            borderBottomRightRadius: '25px',
+            backgroundColor: isActive? '#E46B26':'inherit',
+            ...LinkStyle,
             color: isActive? 'white':'#1C1B1F'
         }
     }
@@ -40,7 +36,8 @@ export default function SideNavigation() {
             <List>
                 <ListItem>
                     {/* // eslint-disable-next-line @typescript-eslint/no-unused-vars */}
-                    <NavLink style={stylingFunc}  to="/dashboard">
+                    
+                    <NavLink style={stylingFunc} replace  to="/dashboard">
                         <ListItemButton>
                             <ListItemIcon>
                                 <Dashboard sx={{color: 'inherit'}}/>
@@ -51,7 +48,7 @@ export default function SideNavigation() {
                     </NavLink>
                 </ListItem>
                 <ListItem >
-                    <NavLink style={stylingFunc}  to="/analytics">
+                    <NavLink style={stylingFunc} replace  to="/analytics">
                         <ListItemButton>
                             <ListItemIcon>
                                 <InsertChart />
@@ -62,7 +59,7 @@ export default function SideNavigation() {
                     </NavLink>
                 </ListItem>
                 <ListItem>
-                    <NavLink style={stylingFunc}  to="/settings">
+                    <NavLink style={stylingFunc} replace  to="/settings">
                         <ListItemButton color='initial'>
                             <ListItemIcon color='initial'>
                                 <Settings sx={{color: 'inherit'}}/>
@@ -72,7 +69,7 @@ export default function SideNavigation() {
                     </NavLink>
                 </ListItem>
                 <ListItem>
-                    <NavLink style={stylingFunc} color={'inherit'} to="/community">
+                    <NavLink style={stylingFunc} replace color={'inherit'} to="/community">
                         <ListItemButton>
                             <ListItemIcon>
                                 <Language sx={{color: 'inherit'}}/>
