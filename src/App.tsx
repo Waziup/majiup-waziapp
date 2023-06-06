@@ -7,6 +7,8 @@ import DashboardPage from "./pages/DashboardPage";
 import { DevicesProvider } from "./context/devices.context";
 import LayoutComponent from "./components/Layout/Layout.component";
 
+import SignUpPage from "./pages/SignupPage";
+
 function App() {
     return (
         <DevicesProvider>

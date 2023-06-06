@@ -11,6 +11,13 @@ function InputComponent({placeholder,type}: Props) {
             <input style={{height: '100%',paddingLeft:'10px', outline:'none',border: 'none', background: '#F6F6F6', width: '95%', borderRadius: 'inherit'}} className="input_box" type={type} placeholder={placeholder} />
             <SearchIcon style={{color: 'black',cursor:'pointer'}}/>
         </Box>
+        <input style={{outline: 'none',
+        width: '100%',
+        height: '30px',
+        borderRadius: '0px',
+        border: '1px solid #ccc',
+        marginBottom: '10px',
+        padding: '5px'}} type={type} placeholder={placeholder} />
     );
 }
 export default InputComponent;

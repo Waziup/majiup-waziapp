@@ -63,6 +63,19 @@ function LoginPage() {
             <Box sx={{bgcolor: '#F6F6F6',height: '100vh',}}>
                 <Box src={MajiUpIcon} component='img' sx={{height: 80,width: 80, }} />
                 <Box sx={{height: '80%', textAlign: 'center', position: 'relative' }}>
+            <Box sx={{}}>
+                <Box sx={ContainerStyle} >
+                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                        <h2 style={{color: 'black'}}>MajiUp</h2>
+                        <WaterDrop style={{fontSize: 30, color: 'black'}}/>
+                    </Box>
+                        <Link style={{textDecoration: 'none', color: 'white'}} to={'/sign-up'}>
+                            <Button sx={ButtonStyle} variant="outlined">
+                                SIGN UP
+                            </Button>
+                        </Link>
+                </Box>
+                <Box sx={{bgcolor: '#fff',height: '100vh', textAlign: 'center', position: 'relative' }}>
                     <Box sx={FormHolder}>
                         <h2 style={{fontSize:'36px', color: 'rgba(black,black,black,.7)'}}>Welcome!</h2>
                         <form onSubmit={submitLoginHandler}>
