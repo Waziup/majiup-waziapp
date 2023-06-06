@@ -2,35 +2,23 @@ import LoginPage from "./pages/LoginPage";
 import BillingsPage from "./pages/BillingsPage";
 import CommunityPage from "./pages/CommunityPage";
 import SettingsPage from "./pages/SettingsPage";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {  Routes, Route } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import { DevicesProvider } from "./context/devices.context";
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <LoginPage />,
-    },
-    {
-        path: "/dashboard",
-        element: <DashboardPage />,
-    },
-    {
-        path: "/analytics",
-        element: <BillingsPage />,
-    },
-    {
-        path: "/settings",
-        element: <SettingsPage />,
-    },
-    {
-        path: "/community",
-        element: <CommunityPage />,
-    },
-]);
+import LayoutComponent from "./components/Layout/Layout.component";
+
 function App() {
     return (
         <DevicesProvider>
-            <RouterProvider router={router} />
+            <Routes>
+                <Route path="/" element={ <LoginPage/> }/>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route element={<LayoutComponent />} >
+                    <Route path="/analytics" element={<BillingsPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/community" element={<CommunityPage/>} />
+                </Route>
+            </Routes>
         </DevicesProvider>
     );
 }
