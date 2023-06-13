@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, } from '@mui/material';
+import { Box} from '@mui/material';
 import { Visibility} from '@mui/icons-material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ChatFlow from '../assets/chart _flow.png';
@@ -14,8 +14,9 @@ const ReportsActiveText={
 const ReportsText={cursor: 'pointer',color: '#9291A5',padding: '0 .4vw' }
 function BillingsPage() {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+    
     return (
-        <>
+        <Box pl={2} pr={2}>
             <Box onClick={()=>setIsOpenModal(!isOpenModal)} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <h3 style={{fontSize: '24px'}}>Usage Volume</h3>
                 <p style={{color: '#fff',fontSize: '12px',cursor:'pointer', borderRadius: '20px', padding: '8px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
@@ -34,7 +35,7 @@ function BillingsPage() {
                         <option value="tank3">Tank 3</option>
                     </select>
                 </Box>
-                <Box sx={{border: '1px solid #ccc',margin:'5px', padding:'5px 0',minWidth: '200px', width: '20%', borderRadius: '20px'}}>
+                <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0',minWidth: '200px', width: '20%', borderRadius: '20px'}}>
                     <label style={{background: '#E8E8E8',fontWeight: '500', color: '#2C2D38', fontSize: '18', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Plots:</label>
                     <select style={{border: 'none',outline: 'none',width: '70%', background: 'none'}} name="devs" id="devs">
                         <option value="all">Custom</option>
@@ -76,7 +77,7 @@ function BillingsPage() {
                 </Box>
                 <StickyHeadTable />
             </Box>
-        </>
+        </Box>
     );
 }
 
