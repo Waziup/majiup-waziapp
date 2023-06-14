@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, } from 'recharts';
 import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useState } from 'react';
+import MapComponent from '../MapComponent/Map.component';
 type Props={
     owner: string,
     liters: number,
@@ -183,6 +184,13 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
                     />
                     {/* <Line type="monotone" dataKey="uv" stroke="#82ca9d" /> */}
                 </LineChart>
+				<MapComponent 
+					googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places"
+					loadingElement={<div style={{ height: `200px` }} />}
+					containerElement={<div style={{ height: `400px` }} />}
+					mapElement={<div style={{ height: `200px` }} />}
+					
+				/>
             </Box>
         </Stack>
     );

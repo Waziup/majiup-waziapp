@@ -12,7 +12,7 @@ type Props={
     matches: boolean
 }
 function NavigationIndex({matches}:Props) {
-    const {user, toggleModal, isOpenNav} = useContext(DevicesContext);
+    const {user, toggleModal,} = useContext(DevicesContext);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const isOpen = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {

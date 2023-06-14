@@ -1,10 +1,11 @@
+/* eslint-disable react-refresh/only-export-components */
 import {Marker, GoogleMap, withGoogleMap, withScriptjs } from 'react-google-maps';
 type Props={
     isMarkedShow: boolean,
     lat: number,
     lng: number
 }
-function MapComponent({isMarkedShow, lat, lng}: Props): JSX.Element {
+function MapComponent({isMarkedShow=true, lat=5, lng=-5}: Props): JSX.Element {
     return (
         <GoogleMap
             defaultZoom={8}

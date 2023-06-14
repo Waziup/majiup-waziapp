@@ -12,6 +12,7 @@ type Props = {
 import TankSVG from '../../assets/tank.svg'
 function ItemCardComponent({owner,amount,temp,isOn,}: Props) {
     return (
+        
         <Box  sx={{ ":hover":{bgcolor:'#FFE6D9'},cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '100%',boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',}}>
             <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px'}}>
                 <Stack direction={'row'}>
