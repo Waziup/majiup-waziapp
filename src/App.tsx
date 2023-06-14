@@ -8,7 +8,8 @@ import { DevicesProvider } from "./context/devices.context";
 import LayoutComponent from "./components/Layout/Layout.component";
 
 import SignUpPage from "./pages/SignupPage";
-
+import DevicesPage from "./pages/DevicesPage";
+// import { ConfirmationNumberTwoTone } from "@mui/icons-material";
 function App() {
     return (
         <DevicesProvider>
@@ -19,7 +20,20 @@ function App() {
                     <Route path="/analytics" element={<BillingsPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/community" element={<CommunityPage/>} />
+                    <Route
+                        path="/devices/:id"
+                        loader={async ({params})=>{
+                            console.log('Parameters passed to',params.id);
+                            return [{id:2}]
+                        }}
+                        action={(data)=>{
+                            console.log('Data received in action',data)
+                            return 1;
+                        }}
+                        element={<DevicesPage/>}
+                    />
                 </Route>
+                <Route path="/signup" element={<SignUpPage/>} />
             </Routes>
         </DevicesProvider>
     );
