@@ -3,7 +3,7 @@ import axios from 'axios';
 type Props={
     children: ReactNode
 }
-type Device={
+export type Device={
     name: string,
     waterTemp: number,
     waterQuality: string,
@@ -18,13 +18,15 @@ type ContextValues={
     setUser:(user: string)=>void,
     toggleModal: ()=>void,
     isOpenNav?: boolean,
+    setTanks: (devices: Device[])=>void,
 }
 export const DevicesContext = createContext<ContextValues>({
     devices: [],
     user:'',
     setUser: (user)=>{console.log(user);},
     toggleModal: ()=>{console.log("");},
-    isOpenNav: false
+    isOpenNav: false,
+    setTanks: (devices)=>{console.log(devices);},
 });
 const DEVICES: Device[]=[
     {
@@ -34,7 +36,7 @@ const DEVICES: Device[]=[
         liters: 300,
         on: true,
         isSelect: true,
-        id: 'Gateway: Majiup23052023'
+        id: '623052023'
     },
     {
         name: 'Home Tank',
@@ -43,7 +45,7 @@ const DEVICES: Device[]=[
         liters: 490,
         on: false,
         isSelect: false,
-        id: 'Gateway: Majiup25152023'
+        id: '53425152023'
     },
     {
         name: 'Cattle Tank',
@@ -52,8 +54,16 @@ const DEVICES: Device[]=[
         liters: 290,
         on: true,
         isSelect: false,
-        id: 'Gateway: Majiup28052023'
-
+        id: '094342023'
+    },
+    {
+        name: 'Restaurant Tank',
+        waterTemp: 24,
+        waterQuality: 'Turbidity',
+        liters: 500,
+        on: true,
+        isSelect: false,
+        id:"6465t232324"
     },
 ]
 
@@ -74,6 +84,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     const [user,setUser]=useState<string>('');
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
+    const setTanks = (devices: Device[])=> setDevices(devices);
     useEffect(()=>{
         setDevices(DEVICES);
         fetchAllDevices();
@@ -83,7 +94,8 @@ export const  DevicesProvider = ({children}: Props)=>{
         user, 
         setUser,
         isOpenNav,
-        toggleModal
+        toggleModal,
+        setTanks
     }
     return(
         <DevicesContext.Provider value={value}>
