@@ -14,9 +14,17 @@ type Device={
 }
 type ContextValues={
     devices: Device[],
+    user: string,
+    setUser:(user: string)=>void,
+    toggleModal: ()=>void,
+    isOpenNav?: boolean,
 }
 export const DevicesContext = createContext<ContextValues>({
-    devices: []
+    devices: [],
+    user:'',
+    setUser: (user)=>{console.log(user);},
+    toggleModal: ()=>{console.log("");},
+    isOpenNav: false
 });
 const DEVICES: Device[]=[
     {
@@ -48,14 +56,7 @@ const DEVICES: Device[]=[
 
     },
 ]
-// accept: application/json
-// Accept-Encoding: gzip, deflate
-// Accept-Language: en-US,en;q=0.8
-// Connection: keep-alive
-// Cookie: Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJjbGllbnQiOiI2MDE3YzcyMTc4NDUyNDAwMDY4NDExYmUiLCJleHAiOjE2ODUyNjY4OTh9.ReLy1UwYjcOGcHh_rMPDi6qKUgC80EQCm7vGyYKIwrk
-// Host: wazigate.local
-// Referer: http://wazigate.local/docs/
-// Sec-GPC: 1
+
 const fetchAllDevices = async ()=>{
     const res = await axios.post('http://wazigate.local/auth/token',{
         username:"admin",
@@ -69,13 +70,21 @@ const fetchAllDevices = async ()=>{
     console.log(res.data);
 }
 export const  DevicesProvider = ({children}: Props)=>{
-    const [devices,setDevices] = useState<Device[]>()
+    const [devices,setDevices] = useState<Device[]>();
+    const [user,setUser]=useState<string>('');
+    const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
+    const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     useEffect(()=>{
         setDevices(DEVICES);
-        fetchAllDevices()
-
+        fetchAllDevices();
     },[])
-    const value={devices: devices??[]}
+    const value={
+        devices: devices??[], 
+        user, 
+        setUser,
+        isOpenNav,
+        toggleModal
+    }
     return(
         <DevicesContext.Provider value={value}>
             {children}

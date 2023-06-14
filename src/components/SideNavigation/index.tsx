@@ -6,6 +6,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Settings, Language, InsertChart,Dashboard } from '@mui/icons-material';
 import { NavLink, } from 'react-router-dom';
+import { useContext } from 'react';
+import { DevicesContext } from '../../context/devices.context';
 const LinkStyle={
     textDecoration: 'none', 
     width: '100%',
@@ -24,62 +26,62 @@ export default function SideNavigation() {
             color: isActive? 'white':'#1C1B1F'
         }
     }
-  return (
-    <Box sx={{ width: '100%', height: '100vh', 
-            maxWidth: 360, 
-            color: 'white', 
-            display: 'flex', flexDirection: 'column', 
-            justifyContent: 'flex-start',
-         }}>
-    
-        <nav aria-label="main mailbox folders">
-            <List>
-                <ListItem>
-                    {/* // eslint-disable-next-line @typescript-eslint/no-unused-vars */}
-                    
-                    <NavLink style={stylingFunc} replace  to="/dashboard">
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <Dashboard sx={{color: 'inherit'}}/>
-                            </ListItemIcon>
-                            <ListItemText primary="Dashboards" />
-                            <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', padding:'0 2%', background: '#fff', color: '#E46B26'}}>3</h4>
-                        </ListItemButton>
-                    </NavLink>
-                </ListItem>
-                <ListItem >
-                    <NavLink style={stylingFunc} replace  to="/analytics">
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <InsertChart />
-                            </ListItemIcon>
-                            <ListItemText primary="Analytics" />
-                            
-                        </ListItemButton>
-                    </NavLink>
-                </ListItem>
-                <ListItem>
-                    <NavLink style={stylingFunc} replace  to="/settings">
-                        <ListItemButton color='initial'>
-                            <ListItemIcon color='initial'>
-                                <Settings sx={{color: 'inherit'}}/>
-                            </ListItemIcon>
-                            <ListItemText primary="Settings" />
-                        </ListItemButton>
-                    </NavLink>
-                </ListItem>
-                <ListItem>
-                    <NavLink style={stylingFunc} replace color={'inherit'} to="/community">
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <Language sx={{color: 'inherit'}}/>
-                            </ListItemIcon>
-                            <ListItemText primary="Community" />
-                        </ListItemButton>
-                    </NavLink>
-                </ListItem>
-            </List>
-        </nav>
-    </Box>
-  );
+    const {toggleModal} = useContext(DevicesContext)
+    return (
+        <Box sx={{ width: '100%', height: '100vh', 
+                maxWidth: 360, 
+                color: 'white', 
+                display: 'flex', flexDirection: 'column', 
+                justifyContent: 'flex-start',
+            }}>
+        
+            <nav aria-label="main mailbox folders">
+                <List>
+                    <ListItem onClick={toggleModal}>
+                        {/* // eslint-disable-next-line @typescript-eslint/no-unused-vars */}  
+                        <NavLink style={stylingFunc} replace  to="/dashboard">
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <Dashboard sx={{color: 'inherit'}}/>
+                                </ListItemIcon>
+                                <ListItemText primary="Dashboards" />
+                                <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', padding:'0 2%', background: '#fff', color: '#E46B26'}}>3</h4>
+                            </ListItemButton>
+                        </NavLink>
+                    </ListItem>
+                    <ListItem onClick={toggleModal}>
+                        <NavLink style={stylingFunc} replace  to="/analytics">
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <InsertChart />
+                                </ListItemIcon>
+                                <ListItemText primary="Analytics" />
+                                
+                            </ListItemButton>
+                        </NavLink>
+                    </ListItem>
+                    <ListItem onClick={toggleModal}>
+                        <NavLink style={stylingFunc} replace  to="/settings">
+                            <ListItemButton color='initial'>
+                                <ListItemIcon color='initial'>
+                                    <Settings sx={{color: 'inherit'}}/>
+                                </ListItemIcon>
+                                <ListItemText primary="Settings" />
+                            </ListItemButton>
+                        </NavLink>
+                    </ListItem>
+                    <ListItem onClick={toggleModal}>
+                        <NavLink style={stylingFunc} replace color={'inherit'} to="/community">
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <Language sx={{color: 'inherit'}}/>
+                                </ListItemIcon>
+                                <ListItemText  primary="Community" />
+                            </ListItemButton>
+                        </NavLink>
+                    </ListItem>
+                </List>
+            </nav>
+        </Box>
+    );
 }

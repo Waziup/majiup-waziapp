@@ -72,13 +72,8 @@ function GridComponent() {
     }
     return (
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
-            <Grid item  xs={12} >
-        <Grid container spacing={2}>
-            <Grid sx={{height: "635px",background: "#040273"}} className="side_nav_container" item  xs={2.5} >
-                <SideNavigation />
-            </Grid>
-            <Grid item xs={9}>
-                <NavigationIndex />
+            <Grid item xs={12}>
+                <NavigationIndex matches={true} />
             </Grid>
             <Grid container spacing={2}>       
                 <Grid item xs={2.5}>
