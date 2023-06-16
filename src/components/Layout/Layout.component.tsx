@@ -14,7 +14,7 @@ function LayoutComponent() {
                 <NavigationIndex matches={matches} />
             </Grid>
             <Grid container spacing={2}>
-                {isOpenNav&&(
+                {isOpenNav && !matches &&(
                     <Box sx={{position:'absolute', height:'100vh', width:'110vw',bgcolor:'rgba(0,0,0,.25)'}}></Box>
                 )}
                 {

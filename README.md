@@ -46,3 +46,4 @@ A step by step series of examples that tell you how to get a development env run
 3. Launch your Wazigate and go to the Waziup dashboard
 4. Go to the ***Apps*** tab and click on **Install new app**
 5. Paste the name you had copied and click on "Install"
+6. You can run the application now.
