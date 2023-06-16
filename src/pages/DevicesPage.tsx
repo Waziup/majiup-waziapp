@@ -12,7 +12,6 @@ function DevicesPage() {
         <Box pl={2} pr={2}>
            <NavigateBefore sx={{cursor:'pointer', border: '1px solid #000',borderRadius:'50%'}} onClick={()=>navigate(-1)} /> 
             <TankDetailComponent
-                waterLevel={data.state.liters}
                 liters={data.state.liters}
                 on={data.state.on}
                 owner={data.state.name}
