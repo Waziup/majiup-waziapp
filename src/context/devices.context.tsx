@@ -19,6 +19,8 @@ type ContextValues={
     toggleModal: ()=>void,
     isOpenNav?: boolean,
     setTanks: (devices: Device[])=>void,
+    selectedDevice: Device | undefined,
+    setSelectedDevice: (device: Device)=>void
 }
 export const DevicesContext = createContext<ContextValues>({
     devices: [],
@@ -27,6 +29,8 @@ export const DevicesContext = createContext<ContextValues>({
     toggleModal: ()=>{console.log("");},
     isOpenNav: false,
     setTanks: (devices)=>{console.log(devices);},
+    selectedDevice: undefined,
+    setSelectedDevice(device) {console.log(device)},
 });
 const DEVICES: Device[]=[
     {
@@ -80,22 +84,32 @@ const fetchAllDevices = async ()=>{
     console.log(res.data);
 }
 export const  DevicesProvider = ({children}: Props)=>{
-    const [devices,setDevices] = useState<Device[]>();
+    const [devices,setDevices] = useState<Device[]>([]);
+    const [selectedTank, setSelectedTank] = useState<Device>()
     const [user,setUser]=useState<string>('');
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     const setTanks = (devices: Device[])=> setDevices(devices);
     useEffect(()=>{
         setDevices(DEVICES);
+        
         fetchAllDevices();
-    },[])
+    },[]);
+    useEffect(()=>{
+        if ((devices !==undefined) && selectedTank === undefined) {
+            setSelectedTank(devices[0])
+        }
+    },[devices, selectedTank]);
+    const setSelectedDevice = (device: Device)=> setSelectedTank(device)
     const value={
-        devices: devices??[], 
+        devices, 
         user, 
         setUser,
         isOpenNav,
         toggleModal,
-        setTanks
+        setTanks,
+        selectedDevice: selectedTank,
+        setSelectedDevice
     }
     return(
         <DevicesContext.Provider value={value}>
