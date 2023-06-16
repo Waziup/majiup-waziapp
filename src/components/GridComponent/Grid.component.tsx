@@ -11,25 +11,16 @@ const BoxStyle={
     borderRadius: "10px",
     margin: "10px 0",
 }
-type Tank = {
-    name: string,
-    amount?: number,
-    waterTemp: number,
-    waterQuality: string,
-    liters: number,
-    on?: boolean,
-    isSelect?: boolean,
-    id: string
-}
+
 import './Grid.styles.css'
 import { DevicesContext } from "../../context/devices.context";
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const { isOpenNav, devices,setTanks } = useContext(DevicesContext)
+    const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
-    const [selectedTank, setSelectedTank] = useState<Tank>(devices[0])
+    
     const handleSelectedTank = ( tank: Device) => {
         
         const newTanks = devices.map((item: Device) => {
@@ -49,7 +40,8 @@ function GridComponent() {
             return;
         }
         setTanks(newTanks);
-        setSelectedTank(tank);
+        // setSelectedTank(tank);
+        setSelectedDevice(tank);
     }
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
@@ -60,7 +52,7 @@ function GridComponent() {
                 <NavigationIndex matches={matches} />
             </Grid>
             <Grid container spacing={2}>
-                {isOpenNav&&(
+                {isOpenNav && !matches &&(
                     <Box sx={{position:'absolute', height:'100vh', width:'110vw',bgcolor:'rgba(0,0,0,.25)'}}></Box>
                 )}
                 {
@@ -96,14 +88,24 @@ function GridComponent() {
                     matches&&(
                         <Grid item xs={3.4}>
                             {
-                                selectedTank &&(
+                                // selectedTank &&(
+                                //     <TankDetailComponent
+                                //         waterLevel={selectedTank.amount??50}
+                                //         owner={selectedTank.name}
+                                //         waterTemp={selectedTank.waterTemp}
+                                //         waterQuality={selectedTank.waterQuality}
+                                //         liters={selectedTank.liters}
+                                //         on={selectedTank.on??false}
+                                //     />
+                                // )
+                                selectedDevice &&(
                                     <TankDetailComponent
-                                        waterLevel={selectedTank.amount??50}
-                                        owner={selectedTank.name}
-                                        waterTemp={selectedTank.waterTemp}
-                                        waterQuality={selectedTank.waterQuality}
-                                        liters={selectedTank.liters}
-                                        on={selectedTank.on??false}
+                                        // waterLevel={selectedDevice.amount??50}
+                                        owner={selectedDevice.name}
+                                        waterTemp={selectedDevice.waterTemp}
+                                        waterQuality={selectedDevice.waterQuality}
+                                        liters={selectedDevice.liters}
+                                        on={selectedDevice.on??false}
                                     />
                                 )
                             }
