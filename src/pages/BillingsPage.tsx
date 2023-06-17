@@ -1,26 +1,57 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useRef, useContext, useEffect } from 'react';
 import { Box} from '@mui/material';
 import { Visibility} from '@mui/icons-material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import ChatFlow from '../assets/chart _flow.png';
+// import ChatFlow from '../assets/chart _flow.png';
 import StickyHeadTable from '../components/TableComponent/Table.component';
 import DownloadSVG from '../assets/download.svg';
 import ModalComponent from '../components/Modal/Modal.component';
 import jsPDF from 'jspdf';
 import { DevicesContext } from '../context/devices.context';
+import CanvasJSReact from '@canvasjs/react-charts';
 const ReportsActiveText={
     cursor: 'pointer', 
     color: '#2C2D38',
     padding: '0 .4vw',
     fontSize: '13px'
 }
+type SelectedTankInfo = {
+    name: string,
+    litres: number,
+    id: string,
+    consumption: {
+        x: number,
+        y: number
+    }[]
+}
 const ReportsText={cursor: 'pointer',color: '#9291A5',padding: '0 .4vw',fontSize: '13px' }
 function BillingsPage() {
+    const { devices,} = useContext(DevicesContext)
+    const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]})
+    const [optionsToRender, setOptionsToRender] = useState({})
+    const options = {
+        axisX:{
+            gridThickness: 0,
+            tickLength: 0,
+            interval: 2,
+        },
+
+        axisY:{
+            interval: 2,
+            gridLegend: 'none',
+        },
+        data: [
+        {
+            type: "column",
+            dataPoints: selectedTank.consumption? selectedTank?.consumption.filter((_,i)=>i%2):[]
+            
+        }
+        ]
+    }
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 	const reportTemplateRef = useRef<HTMLDivElement>(null);
     
-    const { devices,  } = useContext(DevicesContext)
-    const [selectedTank, setSelectedTank] = useState({name: '', litres:0, id: ''})
     const handleGeneratePdf = () => {
         console.log('reportTemplateRef')
         console.log('REf current state is: ',reportTemplateRef.current?.innerHTML)
@@ -39,24 +70,48 @@ function BillingsPage() {
 		});
 	};
     useEffect(()=>{
+        setOptionsToRender(options)
+    },[])
+    useEffect(()=>{
         if (devices.length>=1) {
             console.log('Devicces', devices[0])
-            setSelectedTank({name: devices[0].name, litres:devices[0].liters, id: devices[0].id})
+            setSelectedTank({name: devices[0].name, litres:devices[0].liters, id: devices[0].id, consumption: devices[0].consumption})
         }
-        
     },[devices])
     useEffect(()=>{
+        if(selectedTank.id==='All'){
+            console.log('All tanks');
+            setSelectedTank({
+                ...selectedTank,
+                consumption: devices[0].consumption,
+                litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)
+            });
+            setOptionsToRender({...options, data: devices.map((d)=>({
+                type: "spline",
+                dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
+            }))})
+            return;
+            // setSelectedTank({...selectedTank, litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)})
+        }
         console.log('Tank ID has changed', selectedTank.id)
         const device = devices.filter((d)=>d.id===selectedTank.id);
         if (device) {
-            console.log(device);
-            setSelectedTank({...selectedTank, name: device[0]?.name, litres: device[0]?.liters})
+            setSelectedTank({...selectedTank, consumption: device[0]?.consumption, name: device[0]?.name, litres: device[0]?.liters})
+            setOptionsToRender({
+                ...options, 
+                data: [{
+                    // Change type to "doughnut", "line", "splineArea", etc.
+                    type: "column",
+                    dataPoints: selectedTank?.consumption.filter((_,i)=>i%2),
+                }]
+            })
             return;
         }
-        setSelectedTank({name: devices[0].name, litres:devices[0].liters, id: devices[0].id})
+        setSelectedTank({...selectedTank, name: devices[0].name, litres:devices[0].liters, id: devices[0].id})
         return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectedTank.id])
+    const CanvasJSChart = CanvasJSReact.CanvasJSChart;
     return (
         <Box pl={2} pr={2}>
             <Box onClick={()=>setIsOpenModal(!isOpenModal)} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -72,6 +127,7 @@ function BillingsPage() {
                 <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0', minWidth: '200px', width: '20%', borderRadius: '20px'}}>
                     <label style={{background: '#E8E8E8',fontSize: '18',fontWeight: '500', color: '#2C2D38', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Device:</label>
                     <select onChange={(event)=>{setSelectedTank({...selectedTank, id: event.target.value})}} style={{border: 'none',outline: 'none',width: '65%', background: 'none'}} name="tanks" id="tanks">
+                    <option value='All'>All</option>
                         {
                             devices.map((device)=>(
                                 <option value={device.id}>{device.name}</option>
@@ -99,7 +155,8 @@ function BillingsPage() {
                     </Box>
                 </Box>
                 <h2 style={{ fontSize: 'calc(10px + 1.8vw)'}} >{selectedTank.litres} Litres</h2>
-                <Box alt="water Tank." sx={{width: '100%'}} component="img" src={ChatFlow}/>
+                {/* <Box alt="water Tank." sx={{width: '100%'}} component="img" src={ChatFlow}/> */}
+                <CanvasJSChart options = {optionsToRender}/>
             </Box>
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>
