@@ -20,7 +20,7 @@ function LayoutComponent() {
                 {
                     (matches || isOpenNav)&&(
                         <Grid sx={!matches?{zIndex:6,position:'absolute', bgcolor:'#fff',transition:.5, width:'500px', height: '95vh', mt:2}:{}} item xs={matches?2.5:9}>
-                            <SideNavigation />
+                            <SideNavigation matches={matches} />
                         </Grid>
                     )
                 }
