@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@canvasjs/react-charts':
+    specifier: ^1.0.0
+    version: 1.0.0(@canvasjs/charts@3.7.9)(react@18.2.0)
   '@emotion/react':
     specifier: ^11.11.0
     version: 11.11.0(@types/react@18.2.2)(react@18.2.0)
@@ -126,6 +129,20 @@ packages:
       '@babel/helper-string-parser': 7.21.5
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+    dev: false
+
+  /@canvasjs/charts@3.7.9:
+    resolution: {integrity: sha512-d+iSIo1rKZVv+PZJS3/MB8d4A2MlGaoB+GZBrZy07VUA2cxONSeNIDqbnGx77QSs7BYmJS83U/JmXk+8raPFqA==}
+    dev: false
+
+  /@canvasjs/react-charts@1.0.0(@canvasjs/charts@3.7.9)(react@18.2.0):
+    resolution: {integrity: sha512-wGI675kz65owAwXZWzJULK9GXKCrPV59+CCawXP801f4rmYGmPskdtGrczgJhA8ThFEgIvq3K4qrkpLDPSmxCQ==}
+    peerDependencies:
+      '@canvasjs/charts': ^3.7.5
+      react: '>=16.0.0'
+    dependencies:
+      '@canvasjs/charts': 3.7.9
+      react: 18.2.0
     dev: false
 
   /@emotion/babel-plugin@11.11.0:
