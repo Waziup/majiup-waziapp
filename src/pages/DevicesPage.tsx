@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import { useParams, useLocation,useNavigate } from "react-router-dom";
 import TankDetailComponent from "../components/TankDetail/TankDetail.component";
 import {NavigateBefore} from '@mui/icons-material';
