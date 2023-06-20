@@ -2,7 +2,7 @@
 // @ts-nocheck
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useState, useRef, useContext, useEffect } from 'react';
+import { useState, useRef, useContext,useLayoutEffect, useEffect } from 'react';
 import { Box} from '@mui/material';
 import { Visibility} from '@mui/icons-material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -72,21 +72,60 @@ function BillingsPage() {
 			},
 		});
 	};
-    useEffect(()=>{
-        setOptionsToRender(options)
+    useLayoutEffect(()=>{
+        console.log('Component mounted');
+        setSelectedTank({
+            ...selectedTank,
+            id: 'All',
+        });
+       
     },[])
     useEffect(()=>{
         if (devices.length>=1) {
-            console.log('Devicces', devices[0])
+            console.log('Devices to be loaded re', selectedTank)
+            if(selectedTank.id==='All'){
+                console.log('All tanks',selectedTank);
+                setSelectedTank({
+                    ...selectedTank,
+                    consumption: devices[0].consumption,
+                    // consumption:[],
+                    litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)
+                });
+                setOptionsToRender({...options, data: devices.map((d)=>({
+                    type: "spline",
+                    dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
+                }))})
+                return;
+                // setSelectedTank({...selectedTank, litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)})
+            }
+            console.log('Devicces', devices.length)
+            setSelectedTank({
+                ...selectedTank,
+                consumption: devices[0].consumption,    
+                litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)
+            });
+            setOptionsToRender({...options, data: devices.map((d)=>({
+                type: "spline",
+                dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
+            }))})
             setSelectedTank({name: devices[0].name, litres:devices[0].liters, id: devices[0].id, consumption: devices[0].consumption})
+            setOptionsToRender({
+                ...options,
+                data: [{
+                    // Change type to "doughnut", "line", "splineArea", etc.
+                    type: "column",
+                    dataPoints: devices[0]?.consumption.filter((_,i)=>i%2),
+                }]
+            })
         }
-    },[devices])
+    },[devices.length])
     useEffect(()=>{
         if(selectedTank.id==='All'){
             console.log('All tanks');
             setSelectedTank({
                 ...selectedTank,
                 consumption: devices[0].consumption,
+                // consumption:[],
                 litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)
             });
             setOptionsToRender({...options, data: devices.map((d)=>({
@@ -132,8 +171,8 @@ function BillingsPage() {
                     <select onChange={(event)=>{setSelectedTank({...selectedTank, id: event.target.value})}} style={{border: 'none',outline: 'none',width: '65%', background: 'none'}} name="tanks" id="tanks">
                     <option value='All'>All</option>
                         {
-                            devices.map((device)=>(
-                                <option value={device.id}>{device.name}</option>
+                            devices.map((device,idx)=>(
+                                <option key={idx} value={device.id}>{device.name}</option>
                             ))
                         }
                     </select>
