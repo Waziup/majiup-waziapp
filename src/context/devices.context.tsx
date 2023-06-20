@@ -60,6 +60,112 @@ const data: Consumption[] = [
         y: 20,
     },
 ];
+const data1: Consumption[] = [
+    {
+        x: 0,
+        y: 21,
+    },
+    {
+        x : 1,
+        y : 22,
+    },
+    {
+        x: 2,
+        y: 24,
+    },
+    {
+        x: 3,
+        y: 25,
+    },
+    {
+        x: 4,
+        y: 23,
+    },
+    {
+        x: 5,
+        y: 21,
+    },
+    {
+        x: 6,
+        y: 22,
+    },
+    {
+        x: 7,
+        y: 19,
+    },
+    {
+        x: 8,
+        y: 20,
+    },{
+        x: 9,
+        y: 22,
+    },
+    {
+        x: 10,
+        y: 23,
+    },
+    {
+        x: 11,
+        y: 22,
+    },
+    {
+        x: 12,
+        y: 20,
+    },
+];
+const data2: Consumption[] = [
+    {
+        x: 0,
+        y: 22,
+    },
+    {
+        x : 1,
+        y : 23,
+    },
+    {
+        x: 2,
+        y: 25,
+    },
+    {
+        x: 3,
+        y: 22,
+    },
+    {
+        x: 4,
+        y: 20,
+    },
+    {
+        x: 5,
+        y: 23,
+    },
+    {
+        x: 6,
+        y: 22,
+    },
+    {
+        x: 7,
+        y: 19,
+    },
+    {
+        x: 8,
+        y: 23,
+    },{
+        x: 9,
+        y: 24,
+    },
+    {
+        x: 10,
+        y: 22,
+    },
+    {
+        x: 11,
+        y: 21,
+    },
+    {
+        x: 12,
+        y: 23,
+    },
+];
 export type Device={
     name: string,
     waterTemp: number,
@@ -113,7 +219,7 @@ const DEVICES: Device[]=[
         on: false,
         isSelect: false,
         id: '53425152023',
-        consumption: data,
+        consumption: data1,
 
     },
     {
@@ -124,7 +230,7 @@ const DEVICES: Device[]=[
         on: true,
         isSelect: false,
         id: '094342023',
-        consumption: data,
+        consumption: data2,
 
     },
     {
