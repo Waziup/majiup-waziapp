@@ -37,6 +37,9 @@ const SensorContainer = {
     alignItems: 'center', 
     flexWrap:'wrap'
 }
+function getLitres(capacity: number, height: number,level: number): number{
+    return (level/height)*capacity;
+}
 function SettingsPage() {
     const { devices } = useContext(DevicesContext);
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -127,7 +130,7 @@ function SettingsPage() {
                                         <p style={{fontSize: '20px',}}>Height</p>
                                     </Box>
                                     <Box>
-                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{device.liters}
+                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{getLitres(device.capacity,device.height,device.sensors[0].value)}
                                             <span>litres</span>
                                         </h3>
                                         <p style={{fontSize: '20px',}}>
