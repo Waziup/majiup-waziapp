@@ -12,7 +12,7 @@ type Props={
     matches: boolean
 }
 function NavigationIndex({matches}:Props) {
-    const {user, toggleModal,} = useContext(DevicesContext);
+    const {user, toggleModal,devices} = useContext(DevicesContext);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const isOpen = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -50,7 +50,7 @@ function NavigationIndex({matches}:Props) {
                         <Box onClick={isOpen?handleClose:handleClick} sx={{display: 'flex',width:'20%',height:'100%', cursor:'pointer', ":hover":{bgcolor:'#f5f5f5'}, alignItems: 'center', justifyContent: 'space-around', }}>
                             <Box sx={{position:'relative'}} >
                                 <NotificationsNone sx={{fontWeight:'light',color:'#000'}} />
-                                <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>3</h3>
+                                <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>{devices.reduce((acc,device)=>acc+device.notification.length,0)}</h3>
                             </Box>
                             <Box mr={2} sx={{display: 'flex',width:'100%', cursor:'pointer',  alignItems: 'center', justifyContent: 'space-evenly', height:'100%'}}>
                                 <Avatar
