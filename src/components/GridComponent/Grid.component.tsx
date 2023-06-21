@@ -5,7 +5,7 @@ import ItemCardComponent from "../ItemCard/ItemCard.component";
 import { useContext, useState } from "react";import TankDetailComponent from "../TankDetail/TankDetail.component";
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
-import { Device } from "../../context/devices.context";
+import { X as Device } from "../../context/devices.context";
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
@@ -14,6 +14,9 @@ const BoxStyle={
 
 import './Grid.styles.css'
 import { DevicesContext } from "../../context/devices.context";
+function getLitres(capacity: number, height: number,level: number): number{
+    return (level/height)*capacity;
+}
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
@@ -21,9 +24,9 @@ function GridComponent() {
     const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
     
-    const handleSelectedTank = ( tank: Device) => {
-        
+    const handleSelectedTank = (tank: Device) => {
         const newTanks = devices.map((item: Device) => {
+            
             if(item.name === tank.name){
                 item.isSelect = true;
             }else{
@@ -45,6 +48,7 @@ function GridComponent() {
     }
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
+    console.log('Devices Loaded: ',devices)
     return (
         
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
@@ -68,17 +72,17 @@ function GridComponent() {
                 
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
-                        devices.map((tank: Device,i: number) => (
+                        devices.map((tank,i: number) => (
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}>
                                 <ItemCardComponent
-                                    isOn={tank.on|| false}
-                                    amount={tank.liters}
+                                    isOn={tank.on??false}
+                                    amount={getLitres(tank.capacity,tank.height,tank.sensors[1].value)}
                                     owner={tank.name}
-                                    litresPercent={tank.liters}
+                                    litresPercent={getLitres(tank.capacity,tank.height,tank.sensors[1].value)}
                                     handleClose={handleClose}
                                     handleOpen={handleOpen}
                                     open={open}
-                                    temp={tank.waterTemp}
+                                    temp={tank.sensors[0].value}
                                 />
                             </Box>
                         ))
@@ -102,9 +106,9 @@ function GridComponent() {
                                     <TankDetailComponent
                                         // waterLevel={selectedDevice.amount??50}
                                         owner={selectedDevice.name}
-                                        waterTemp={selectedDevice.waterTemp}
-                                        waterQuality={selectedDevice.waterQuality}
-                                        liters={selectedDevice.liters}
+                                        waterTemp={selectedDevice.sensors[0].value}
+                                        waterQuality={'Turbidity'}
+                                        liters={getLitres(selectedDevice.capacity,selectedDevice.height,selectedDevice.sensors[1].value)}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
                                     />
