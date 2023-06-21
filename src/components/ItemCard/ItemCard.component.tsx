@@ -24,11 +24,21 @@ function ItemCardComponent({owner,amount,temp,isOn,}: Props) {
                             marginRight: '10px',
                         }}
                     />
-                    <Box>
-                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{owner}</h3>
-                        <p style={{fontSize: '14px',}}>Litre</p>
-                        <p>Temperature:</p>
-                    </Box>
+                    {
+                        isOn?(
+                            <Box>
+                                <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{owner}</h3>
+                                <p style={{fontSize: '14px',}}>Litre</p>
+                                <p>Temperature:</p>
+                            </Box>
+                        ):(
+                            <Box>
+                                <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{owner}</h3>
+                                <p style={{fontSize: '14px', color: '#888992'}}>Last Update</p>
+                            </Box>
+                        )
+                    }
+                    
                 </Stack>
                 <Box>
                     <h3 style={
@@ -43,7 +53,9 @@ function ItemCardComponent({owner,amount,temp,isOn,}: Props) {
                                 <p style={{fontSize: '14px', color: '#E46B26'}}>{temp}&#8451;</p>
                             </>
                         ):(
-                            <p style={{fontSize: '14px', color: '#888992'}}>3hrs Ago</p>
+                            <>
+                                <p style={{fontSize: '14px', color: '#888992'}}>3hrs Ago</p>
+                            </>
                         )
                     }
                     {/* <p style={{fontSize: '14px', color: '#E46B26'}}>{amount}</p> */}
