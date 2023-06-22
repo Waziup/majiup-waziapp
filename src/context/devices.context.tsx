@@ -233,8 +233,8 @@ export interface X extends Device {
 // }
 type ContextValues={
     devices: X[],
-    user: string,
-    setUser:(user: string)=>void,
+    user: {token:string,name:string},
+    setUser:(user: string,token: string)=>void,
     toggleModal: ()=>void,
     isOpenNav?: boolean,
     setTanks: (devices: X[])=>void,
@@ -243,8 +243,8 @@ type ContextValues={
 }
 export const DevicesContext = createContext<ContextValues>({
     devices: [],
-    user:'',
-    setUser: (user)=>{console.log(user);},
+    user:{token:'',name:''},
+    setUser: (user,)=>{console.log(user);},
     toggleModal: ()=>{console.log("");},
     isOpenNav: false,
     setTanks: (devices)=>{console.log(devices);},
@@ -372,7 +372,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     // const [devices,setDevices] = useState<Device[]>([]);
     const [devices,setDevices] = useState<X[]>([]);
     const [selectedTank, setSelectedTank] = useState<X>()
-    const [user,setUser]=useState<string>('');
+    const [user,setLoggedUser]=useState<{name: string,token:string}>({name:'',token:''});
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     const setTanks = (devices: X[])=> setDevices(devices);
@@ -402,7 +402,8 @@ export const  DevicesProvider = ({children}: Props)=>{
             setSelectedTank(devices[0])
         }
     },[devices, selectedTank]);
-    const setSelectedDevice = (device: X)=> setSelectedTank(device)
+    const setSelectedDevice = (device: X)=> setSelectedTank(device);
+    const setUser = (userName: string,token:string)=>setLoggedUser({name:userName,token})
     const value={
         devices, 
         user, 
@@ -413,6 +414,23 @@ export const  DevicesProvider = ({children}: Props)=>{
         selectedDevice: selectedTank,
         setSelectedDevice
     }
+    // setInterval(()=>{
+    //    fetchRetoken()
+    // },1000*60*10)
+    // function fetchRetoken(){
+    //     axios.post('https//wazigate.local/auth/retoken',{
+    //         token:'',
+    //     },{
+    //         headers:{
+    //             Authorization:''
+    //         }
+    //     }).then((res)=>{
+    //         console.log(res);
+    //     })
+    //     .catch(err=>{
+    //         console.log(err);
+    //     })
+    // }
     return(
         <DevicesContext.Provider value={value}>
             {children}
