@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Visibility, WaterDrop } from '@mui/icons-material';
 import { useContext, useState } from 'react';
 import { DevicesContext } from '../context/devices.context';
-
+import axios from 'axios';
 const FormInput={
     border:'1px solid #ccc',
     outline: 'none',
@@ -50,7 +50,23 @@ function SignUpPage() {
     })
     function submitLoginHandler(e: React.SyntheticEvent){
         e.preventDefault();
-        setUser(userData.name)
+        axios.post('http//wazigate.local/auth/token',{
+            username:userData.name,
+            password:userData.password,
+        },{
+            headers:{
+                'Content-Type':'text/plain'
+            }
+        }).then((res)=>{
+            console.log(res);
+            setUser(userData.name,res.data);
+        }).catch((err)=>{
+            console.log('====================================');
+            console.log(err);
+            setUser(userData.name,'gffgg');
+            console.log('====================================');
+        })
+        navigate('/dashboard')
         navigate('/dashboard')
     }
     function handleInputChange(e: React.FormEvent<HTMLInputElement>){

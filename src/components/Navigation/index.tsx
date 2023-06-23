@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
 import SearchComponent from './Search.component';
-import {Avatar} from '@mui/material';
 import {WaterDrop, NotificationsNone} from '@mui/icons-material';
 import ArrowDropDownSVG from '../../assets/arrow_drop_down.svg';
 import {useContext} from 'react';
 import { DevicesContext } from '../../context/devices.context';
 import IconMenuComponent from '../IconMenu/IconMenu.component';
 import {redirect} from 'react-router-dom';
+import AvatarComponent from '../AvatarComponent/Avatar.component';
 type Props={
     matches: boolean
 }
@@ -53,13 +53,8 @@ function NavigationIndex({matches}:Props) {
                                 <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>{devices.reduce((acc,device)=>acc+device.notification.length,0)}</h3>
                             </Box>
                             <Box mr={2} sx={{display: 'flex',width:'100%', cursor:'pointer',  alignItems: 'center', justifyContent: 'space-evenly', height:'100%'}}>
-                                <Avatar
-                                    alt={user}
-                                    src="https://mui.com/static/images/avatar/1.jpg"
-                                    sx={{ width:32, height: 32, }}
-                                    title={user}
-                                />
-                                <h3 style={{fontSize: 'calc(12px + .2vw)', fontWeight:'normal'}}>{user}</h3>
+                                <AvatarComponent name={user.name} src='"https://mui.com/static/images/avatar/1.jpg"' />
+                                <h3 style={{fontSize: 'calc(12px + .2vw)', fontWeight:'normal'}}>{user.name}</h3>
                                 <Box component='img' src={ArrowDropDownSVG} />
                             </Box>
                         </Box>

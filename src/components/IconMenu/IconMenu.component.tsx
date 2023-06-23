@@ -10,7 +10,7 @@ interface Props {
 export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props) {
     const {setUser, user} = useContext(DevicesContext)
     const handleLogout = () => {
-        setUser('')
+        setUser('','')
         handleClose();
     }
     return (
@@ -19,7 +19,7 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
                 <ListItemIcon color='#000'>
                     <AccountCircle fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>{user}</ListItemText>
+                <ListItemText>{user.name}</ListItemText>
                 
             </MenuItem>
             <MenuItem onClick={handleClose}>

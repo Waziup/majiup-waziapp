@@ -12,7 +12,7 @@ import IconMenuComponent from '../IconMenu/IconMenu.component';
 import ArrowDropDownSVG from '../../assets/arrow_drop_down.svg';
 import React from 'react';
 import {redirect} from 'react-router-dom';
-import { Avatar } from '@mui/material';
+import AvatarComponent from '../AvatarComponent/Avatar.component';
 const LinkStyle={
     textDecoration: 'none', 
     width: '100%',
@@ -114,13 +114,9 @@ export default function SideNavigation({matches}: Props) {
                                             <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>{devices.reduce((acc,device)=>acc+device.notification.length,0)}</h3>
                                         </Box>
                                         <Box mr={2} sx={{display: 'flex',width:'100%', cursor:'pointer',  alignItems: 'center', justifyContent: 'space-evenly', height:'100%'}}>
-                                            <Avatar
-                                                alt={user}
-                                                src="https://mui.com/static/images/avatar/1.jpg"
-                                                sx={{ width:32, height: 32, }}
-                                                title={user}
-                                            />
-                                            <h3 style={{fontSize: 'calc(12px + .2vw)', fontWeight:'normal'}}>{user}</h3>
+                                            <AvatarComponent name={user.name} src='"https://mui.com/static/images/avatar/1.jpg"' />
+                                            
+                                            <h3 style={{fontSize: 'calc(12px + .2vw)', fontWeight:'normal'}}>{user.name}</h3>
                                             <Box component='img' src={ArrowDropDownSVG} />
                                         </Box>
                                     </Box>
