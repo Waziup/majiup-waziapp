@@ -244,7 +244,7 @@ type ContextValues={
 export const DevicesContext = createContext<ContextValues>({
     devices: [],
     user:{token:'',name:''},
-    setUser: (user,)=>{console.log(user);},
+    setUser: (user,token)=>{console.log(user,token);},
     toggleModal: ()=>{console.log("");},
     isOpenNav: false,
     setTanks: (devices)=>{console.log(devices);},
