@@ -1,16 +1,21 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Stack,Box, styled, Switch} from '@mui/material';
 import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome, DeviceThermostat, Opacity } from "@mui/icons-material";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, } from 'recharts';
 import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useState } from 'react';
+import MapComponent from '../MapComponent/Map.component';
+import CanvasJSReact from '@canvasjs/react-charts'
 type Props={
     owner: string,
     liters: number,
     waterTemp: number,
-    waterLevel: number,
+    // waterLevel: number,
     waterQuality: string,
-    on: boolean
+    on: boolean,
+	consumption: any[],
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
@@ -55,52 +60,41 @@ const BoxStyle={
 	position: 'relative'
 }
 const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
-const data = [
-    {
-      name: '12AM',
-      time: 400,
-      amt: 2400,
-    },
-    {
-      name: '2AM',
-      uv: 3000,
-      time: 1398,
-      amt: 2210,
-    },
-    {
-      name: '4AM',
-      uv: 2000,
-      time: 9800,
-      amt: 2290,
-    },
-    {
-      name: '6AM',
-      uv: 2780,
-      time: 3908,
-      amt: 2000,
-    },
-    {
-      name: '8AM',
-      uv: 1890,
-      time: 4800,
-      amt: 2181,
-    },
-    {
-      name: '10AM',
-      uv: 2390,
-      time: 3800,
-      amt: 2500,
-    },
-    {
-      name: '12PM',
-      uv: 3490,
-      time: 4300,
-      amt: 2100,
-    },
-];
-function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
+
+
+function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption}:Props) {
 	const [isChecked, setIsChecked] = useState(false);
 	const [toggleHot, setToggleHot] = useState(false);
+	// const CanvasJS = CanvasJSReact.CanvasJS;
+	const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+	console.log(consumption)
+	const options = {
+		// animationEnabled: true,
+		// exportEnabled: true,
+		// theme: "light2", // "light1", "dark1", "dark2"
+		title:{
+			// text: "Bounce Rate by Week of Year"
+		},
+		toolTip:{
+			// shared: true,
+		},
+		axisY: {
+			// title: "Bounce Rate",
+			// suffix: "%"
+			interval: 2
+		},
+		axisX: {
+			// title: "Week of Year",
+			suffix: "AM",
+			interval: 2
+		},
+		data: [{
+			type: "line",
+			yValueFormatString: "#,##0.0#\"%\"",
+			// toolTipContent: "Week {x}: {y}%",
+			dataPoints: consumption
+		}]
+	}
     return (
         <Stack sx={BoxStyle} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             <h3 style={{display: 'inline-block'}}>{owner}</h3>
@@ -159,30 +153,10 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,}:Props) {
 						<DeviceThermostat style={toggleHot?{ color:'#fff',cursor: 'pointer', borderRadius:'50%',backgroundColor:'#FF5C00'}:{ color:'#888992',cursor: 'pointer', }}/>
 					</Box>
 				</Box>
-                <LineChart
-                    width={400}
-                    height={300}
-                    data={data}
-                    margin={{
-                        top: 5,
-                        right: 30,
-                        // left: 35,
-                        bottom: 5
-                    }}
-                    >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis  />
-                    {/* <Tooltip /> */}
-                    {/* <Legend /> */}
-                    <Line
-                        type="monotone"
-                        dataKey="time"
-                        stroke="#1A73E8"
-                        activeDot={{ r: 1 }}
-                    />
-                    {/* <Line type="monotone" dataKey="uv" stroke="#82ca9d" /> */}
-                </LineChart>
+				<CanvasJSChart style={{innerHeighteight:'200px'}}  options = {options}
+				/>
+				
+				<MapComponent />
             </Box>
         </Stack>
     );

@@ -12,6 +12,7 @@ type Props = {
 import TankSVG from '../../assets/tank.svg'
 function ItemCardComponent({owner,amount,temp,isOn,}: Props) {
     return (
+        
         <Box  sx={{ ":hover":{bgcolor:'#FFE6D9'},cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '100%',boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',}}>
             <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px'}}>
                 <Stack direction={'row'}>
@@ -23,11 +24,21 @@ function ItemCardComponent({owner,amount,temp,isOn,}: Props) {
                             marginRight: '10px',
                         }}
                     />
-                    <Box>
-                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{owner}</h3>
-                        <p style={{fontSize: '14px',}}>Litre</p>
-                        <p>Temperature:</p>
-                    </Box>
+                    {
+                        isOn?(
+                            <Box>
+                                <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{owner}</h3>
+                                <p style={{fontSize: '14px',}}>Litre</p>
+                                <p>Temperature:</p>
+                            </Box>
+                        ):(
+                            <Box>
+                                <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{owner}</h3>
+                                <p style={{fontSize: '14px', color: '#888992'}}>Last Update</p>
+                            </Box>
+                        )
+                    }
+                    
                 </Stack>
                 <Box>
                     <h3 style={
@@ -42,7 +53,9 @@ function ItemCardComponent({owner,amount,temp,isOn,}: Props) {
                                 <p style={{fontSize: '14px', color: '#E46B26'}}>{temp}&#8451;</p>
                             </>
                         ):(
-                            <p style={{fontSize: '14px', color: '#888992'}}>3hrs Ago</p>
+                            <>
+                                <p style={{fontSize: '14px', color: '#888992'}}>3hrs Ago</p>
+                            </>
                         )
                     }
                     {/* <p style={{fontSize: '14px', color: '#E46B26'}}>{amount}</p> */}
