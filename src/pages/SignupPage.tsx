@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { Visibility, WaterDrop } from '@mui/icons-material';
 import { useContext, useState } from 'react';
@@ -48,6 +48,7 @@ function SignUpPage() {
         name:'',
         password:''
     })
+    const [err,setErr] = useState<string>('');
     function submitLoginHandler(e: React.SyntheticEvent){
         e.preventDefault();
         axios.post('http//wazigate.local/auth/token',{
@@ -62,15 +63,16 @@ function SignUpPage() {
             setUser(userData.name,res.data);
         }).catch((err)=>{
             console.log('====================================');
+            setErr(err.response.data)
             console.log(err);
             setUser(userData.name,'gffgg');
             console.log('====================================');
         })
         navigate('/dashboard')
-        navigate('/dashboard')
     }
     function handleInputChange(e: React.FormEvent<HTMLInputElement>){
         setUserData({...userData, [e.currentTarget.name]: e.currentTarget.value});
+        setErr('');
     }
     return (
         <Box>
@@ -108,6 +110,12 @@ function SignUpPage() {
                                             <Visibility onClick={()=>setIsText(!isText)} sx={{color:'#979797', cursor: 'pointer'}} />
                                         </Stack>
                                     </Box>
+                                    {
+                                        err && <Typography sx={{color: 'red', fontSize: '12px', textAlign: 'left', padding: '10px 0'}}>{err}</Typography>
+                                    }
+                                    
+                                {/* <Link to="/" style={{textDecoration: 'none',padding: '10px', fontWeight:'lighter', color: '#7692DB'}}>Forgot Password?</Link> */}
+                                    
                                     <Button type='submit' sx={{color: 'black',height: 46, bgcolor: '#E46B26', width: '90%', borderRadius: '24px', padding: '4px', marginTop: '20px'}} variant="contained">
                                         {/* <Link to="/dashboard" style={{textDecoration: 'none', color: 'white'}}> */}
                                         LOGIN
