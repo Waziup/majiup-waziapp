@@ -33,9 +33,11 @@ A step by step series of examples that tell you how to get a development env run
     ```
 ## Installing in Wazigate
 1. Build the docker image
+    Inside the application directory, run the following command
     ```
-    docker build -t majiup .
+    docker build --platform linux/arm64  -t majiup_waziapp:1.1.0 .
     ```
+    With this command, you will build the docker image for the application to work on the Wazigate, which only supports arm64 architecture arm arm64, aarch64 and arm64/v8.
 2. Deploy to Docker Hub
     ** before you deploy to docker hub, just ensure your have an account and have created a project with the name ``waziup/mazjiup:1.0.0``, feel free to give a tag of your own liking. 
     ```
@@ -46,3 +48,4 @@ A step by step series of examples that tell you how to get a development env run
 3. Launch your Wazigate and go to the Waziup dashboard
 4. Go to the ***Apps*** tab and click on **Install new app**
 5. Paste the name you had copied and click on "Install"
+6. You can run the application now.
