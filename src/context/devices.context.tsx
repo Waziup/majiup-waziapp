@@ -1,3 +1,4 @@
+import axios from "axios";
 import { ReactNode, createContext, useEffect, useState } from "react";
 // import axios from 'axios';
 type Props={
@@ -376,26 +377,57 @@ export const  DevicesProvider = ({children}: Props)=>{
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     const setTanks = (devices: X[])=> setDevices(devices);
+    
     useEffect(()=>{
         // setDevices(DEVICES);
-        setDevices(devices2.map((device)=>{ 
-            return{
-                ...device,
-                consumption: device.sensors.map((sensor)=>{
-                    return{
-                        x: sensor.value,
-                        y: sensor.modified.getHours(),
-
-                    }
-                }),
-                isSelect: false,
-                location: {
-                    lat: 0,
-                    lng: 0
-                },
-                on: true,
+        axios.get('http://localhost/devices',{
+            headers:{
+                'Accept': 'application/json',
             }
-        }));
+        })
+        .then((res)=>{
+            console.log(res.data);
+            setDevices(res.data.map((device: X)=>{
+                return{
+                    ...device,
+                    consumption: device.sensors.map((sensor: Sensor)=>{
+                        if (sensor.name.includes('Water Level Sensor'.toLowerCase())) {
+                            return{
+                                x: sensor.value ?? 10,
+                                y: sensor.modified.getHours(),
+                            }
+                        }
+                    }),
+                    isSelect: false,
+                    location: {
+                        lat: 0,
+                        lng: 0
+                    },
+                    on: true,
+                }
+            }));
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+        // setDevices(devices2.map((device)=>{ 
+        //     return{
+        //         ...device,
+        //         consumption: device.sensors.map((sensor)=>{
+        //             return{
+        //                 x: sensor.value,
+        //                 y: sensor.modified.getHours(),
+
+        //             }
+        //         }),
+        //         isSelect: false,
+        //         location: {
+        //             lat: 0,
+        //             lng: 0
+        //         },
+        //         on: true,
+        //     }
+        // }));
     },[]);
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {
