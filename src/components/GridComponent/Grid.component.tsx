@@ -31,27 +31,27 @@ function GridComponent() {
     //
     
     useEffect(()=>{
-        fetch('http://localhost/devices', {
-            headers: {            
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-            // throw new Error('Network response was not ok');
-                console.error("ERROR IN CONNECTION");
-            }
-            return response.json();
-        })
-        .then(data => {
-            data.splice(0,1);
-            console.log("Loaded Tanks =>",data)
-            setTankDevice(data);
-        })
-        .catch(error => {
-            // Handle any errors that occurred during the request
-            console.error('Error Occured  =>  ', error);
-        });
+        // fetch('http://localhost/devices', {
+        //     headers: {            
+        //         'Accept': 'application/json',
+        //     }
+        // })
+        // .then(response => {
+        //     if (!response.ok) {
+        //     // throw new Error('Network response was not ok');
+        //         console.error("ERROR IN CONNECTION");
+        //     }
+        //     return response.json();
+        // })
+        // .then(data => {
+        //     data.splice(0,1);
+        //     console.log("Loaded Tanks =>",data)
+        //     setTankDevice(data);
+        // })
+        // .catch(error => {
+        //     // Handle any errors that occurred during the request
+        //     console.error('Error Occured  =>  ', error);
+        // });
     }, [])
     
     const handleSelectedTank = (tank: Device) => {
@@ -100,18 +100,18 @@ function GridComponent() {
                 
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
-                        tankDevice.map((tank,i: number) => (
+                        devices.map((tank,i: number) => (
                             <Box key={i} onClick={()=>handleSelectedTank(tank)}> 
                                 {/* sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]} */}
                                 <ItemCardComponent
-                                    isOn={false}
-                                    amount={1000}
+                                    isOn={tank.on}
+                                    amount={ 1000}
                                     owner={tank.name}
                                     litresPercent={78}
                                     handleClose={handleClose}
                                     handleOpen={handleOpen}
                                     open={open}
-                                    temp={23.0}
+                                    temp={tank.sensors[0].value}
                                 />
                             </Box>
                         ))
