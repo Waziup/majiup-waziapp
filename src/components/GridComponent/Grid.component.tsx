@@ -6,6 +6,8 @@ import { useContext, useState } from "react";import TankDetailComponent from "..
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
 import { X as Device } from "../../context/devices.context";
+import {useEffect} from 'react';
+
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
@@ -23,9 +25,37 @@ function GridComponent() {
     const handleClose = () => setOpen(false);
     const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
+
+    //
+    const [tankDevice, setTankDevice]  = useState([]);
+    //
+    
+    useEffect(()=>{
+        fetch('http://localhost/devices', {
+            headers: {            
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+            // throw new Error('Network response was not ok');
+                console.error("ERROR IN CONNECTION");
+            }
+            return response.json();
+        })
+        .then(data => {
+            data.splice(0,1);
+            console.log("Loaded Tanks =>",data)
+            setTankDevice(data);
+        })
+        .catch(error => {
+            // Handle any errors that occurred during the request
+            console.error('Error Occured  =>  ', error);
+        });
+    }, [])
     
     const handleSelectedTank = (tank: Device) => {
-        const newTanks = devices.map((item: Device) => {
+        const newTanks = tankDevice.map((item: Device) => {
             
             if(item.name === tank.name){
                 item.isSelect = true;
@@ -37,8 +67,7 @@ function GridComponent() {
         if(!matches){
             setTanks(newTanks);
             navigate(`/devices/${tank.id}`,{
-                state: tank,
-                
+                state: tank,                
             });
             return;
         }
@@ -48,9 +77,8 @@ function GridComponent() {
     }
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
-    console.log('Devices Loaded: ',devices)
-    return (
-        
+    // console.log('Devices Loaded: ',devices)
+    return (        
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
                 <NavigationIndex matches={matches} />
@@ -72,17 +100,18 @@ function GridComponent() {
                 
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
-                        devices.map((tank,i: number) => (
-                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}>
+                        tankDevice.map((tank,i: number) => (
+                            <Box key={i} onClick={()=>handleSelectedTank(tank)}> 
+                                {/* sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]} */}
                                 <ItemCardComponent
-                                    isOn={tank.on??false}
-                                    amount={getLitres(tank.capacity,tank.height,tank.sensors[1].value)}
+                                    isOn={false}
+                                    amount={1000}
                                     owner={tank.name}
-                                    litresPercent={getLitres(tank.capacity,tank.height,tank.sensors[1].value)}
+                                    litresPercent={78}
                                     handleClose={handleClose}
                                     handleOpen={handleOpen}
                                     open={open}
-                                    temp={tank.sensors[0].value}
+                                    temp={23.0}
                                 />
                             </Box>
                         ))
@@ -185,8 +214,8 @@ function GridComponent() {
                     )
                 }
             </Grid>
-        </Grid>
-        
+        </Grid>        
     );
 }
+
 export default GridComponent;

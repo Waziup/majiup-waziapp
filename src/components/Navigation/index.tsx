@@ -28,7 +28,7 @@ function NavigationIndex({matches}:Props) {
             return;
         }
     }, [user]);
-    console.log('Matches is: ',matches)
+    // console.log('Matches is: ',matches)
     return (
         <Box  sx={{padding: '10px 0', bgcolor: '#fff', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center'}}>
             <Box sx={{display: 'flex', alignItems: 'center'}}>

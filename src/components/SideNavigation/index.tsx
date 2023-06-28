@@ -50,7 +50,7 @@ export default function SideNavigation({matches}: Props) {
             return;
         }
     }, [user]);
-    console.log('Matches in side nav', matches)
+    // console.log('Matches in side nav', matches)
     return (
         <Box sx={{ width: '100%', height: '100vh', 
                 maxWidth: 360, 
