@@ -256,118 +256,19 @@ export const DevicesContext = createContext<ContextValues>({
 //extract the first row and add it as current waterTemp, waterQuality, liters, etc.
 //add the rest of the rows as consumption data
 
-const devices2: Device[] =[
-    {
-        actuators:[
-            {
-                created: new Date(),
-                id: '',
-                meta:{},
-                modified: new Date(),
-                name: 'Pump',
-                value: false,
-                time: null,
-            }
-        ],
-        capacity: 500,
-        created: new Date(),
-        height: 300,
-        id:'hgnhgnfgsdfgv',
-        length:0,
-        meta:{},
-        modified: new Date(),
-        name: 'NGO Tank',
-        notification:[{
-            id:'gffgfg',
-            message:'Power Low',
-            meta:{},
-            date: new Date(),
-        }],
-        radius:0,
-        sensors:[{
-                created: new Date(),
-                id: '',
-                kind: 'Temperature',
-                meta:{},
-                modified: new Date(),
-                name: 'Temperature sensor',
-                quantity: 0,
-                time: null,
-                unit: '',
-                value:10.5,
-            },
-            {
-                created: new Date(),
-                id: '',
-                kind: 'Water Level',
-                meta:{},
-                modified: new Date(),
-                name: 'Water Level sensor',
-                quantity: 0,
-                time: null,
-                unit: '',
-                value:10.5,
-            }
-        ],
-        width:0,
-    },
-]
-// const DEVICES: Device[]=[
-//     {
-//         name: 'NGO Tank',
-//         waterTemp: 75,
-//         waterQuality: 'Good',
-//         liters: 300,
-//         on: true,
-//         isSelect: true,
-//         id: '623052023',
-//         consumption: data,
-//     },
-//     {
-//         name: 'Home Tank',
-//         waterTemp: 50,
-//         waterQuality: 'Good',
-//         liters: 490,
-//         on: false,
-//         isSelect: false,
-//         id: '53425152023',
-//         consumption: data1,
-
-//     },
-//     {
-//         name: 'Cattle Tank',
-//         waterTemp: 44,
-//         waterQuality: 'Good',
-//         liters: 290,
-//         on: true,
-//         isSelect: false,
-//         id: '094342023',
-//         consumption: data2,
-
-//     },
-//     {
-//         name: 'Restaurant Tank',
-//         waterTemp: 24,
-//         waterQuality: 'Turbidity',
-//         liters: 500,
-//         on: true,
-//         isSelect: false,
-//         id:"6465t232324",
-//         consumption: data,
-//     },
-// ]
-// const fetchAllDevices = async ()=>{
-//     const res = await axios.post('http://wazigate.local/auth/token',{
-//         username:"admin",
-//         "password":"loragateway"
-//     },{
-//         headers: {
-//             Accept:'text/plain; charset=utf-8',
-//             "Content-Type":'application/json;charset=utf-8'
-//         }
-//     });
-//     console.log(res.data);
-// }
+const fetchToken = async ()=>{
+    const res = await axios.post('http://192.168.1.102:80/auth/token',{
+        username:"admin",
+        "password":"loragateway"
+    },{
+        headers: {
+            Accept:'text/plain;charset=utf-8',
+            "Content-Type":'application/json;charset=utf-8'
+        }
+    });
+    console.log(res.data);
+    return res.data;
+}
 
 export const  DevicesProvider = ({children}: Props)=>{
     // const [devices,setDevices] = useState<Device[]>([]);
@@ -377,58 +278,73 @@ export const  DevicesProvider = ({children}: Props)=>{
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     const setTanks = (devices: X[])=> setDevices(devices);
-    
     useEffect(()=>{
-        // setDevices(DEVICES);
-        axios.get('http://localhost/devices',{
-            headers:{
-                'Accept': 'application/json',
-            }
-        })
-        .then((res)=>{
-            console.log(res.data);
-            setDevices(res.data.map((device: X)=>{
-                return{
-                    ...device,
-                    consumption: device.sensors.map((sensor: Sensor)=>{
-                        if (sensor.name.includes('Water Level Sensor'.toLowerCase())) {
-                            return{
-                                x: sensor.value ?? 10,
-                                y: sensor.modified.getHours(),
-                            }
-                        }
-                    }),
-                    isSelect: false,
-                    location: {
-                        lat: 0,
-                        lng: 0
-                    },
-                    on: true,
+        fetchToken()
+        .then((token)=>{
+            console.log(token);
+            axios.get('http://192.168.1.102:80/devices',{
+                headers:{
+                    'Accept': 'application/json',
+                    Authorization:'Bearer '+token
                 }
-            }));
-        })
-        .catch((err)=>{
+            }).then((devices)=>{
+                console.log(devices);
+            })
+        }).catch((err)=>{
             console.log(err);
         })
-        // setDevices(devices2.map((device)=>{ 
-        //     return{
-        //         ...device,
-        //         consumption: device.sensors.map((sensor)=>{
-        //             return{
-        //                 x: sensor.value,
-        //                 y: sensor.modified.getHours(),
+    },[])
+    // useEffect(()=>{
+    //     // setDevices(DEVICES);
+    //     axios.get('http://localhost/devices',{
+    //         headers:{
+    //             'Accept': 'application/json',
+    //         }
+    //     })
+    //     .then((res)=>{
+    //         console.log(res.data);
+    //         setDevices(res.data.map((device: X)=>{
+    //             return{
+    //                 ...device,
+    //                 consumption: device.sensors.map((sensor: Sensor)=>{
+    //                     if (sensor.name.includes('Water Level Sensor'.toLowerCase())) {
+    //                         return{
+    //                             x: sensor.value ?? 10,
+    //                             y: sensor.modified.getHours(),
+    //                         }
+    //                     }
+    //                 }),
+    //                 isSelect: false,
+    //                 location: {
+    //                     lat: 0,
+    //                     lng: 0
+    //                 },
+    //                 on: true,
+    //             }
+    //         }));
+    //     })
+    //     .catch((err)=>{
+    //         console.log(err);
+    //     })
+    //     // setDevices(devices2.map((device)=>{ 
+    //     //     return{
+    //     //         ...device,
+    //     //         consumption: device.sensors.map((sensor)=>{
+    //     //             return{
+    //     //                 x: sensor.value,
+    //     //                 y: sensor.modified.getHours(),
 
-        //             }
-        //         }),
-        //         isSelect: false,
-        //         location: {
-        //             lat: 0,
-        //             lng: 0
-        //         },
-        //         on: true,
-        //     }
-        // }));
-    },[]);
+    //     //             }
+    //     //         }),
+    //     //         isSelect: false,
+    //     //         location: {
+    //     //             lat: 0,
+    //     //             lng: 0
+    //     //         },
+    //     //         on: true,
+    //     //     }
+    //     // }));
+    // },[]);
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {
             setSelectedTank(devices[0])

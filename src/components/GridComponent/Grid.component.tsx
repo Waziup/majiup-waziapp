@@ -30,29 +30,7 @@ function GridComponent() {
     const [tankDevice, setTankDevice]  = useState([]);
     //
     
-    useEffect(()=>{
-        // fetch('http://localhost/devices', {
-        //     headers: {            
-        //         'Accept': 'application/json',
-        //     }
-        // })
-        // .then(response => {
-        //     if (!response.ok) {
-        //     // throw new Error('Network response was not ok');
-        //         console.error("ERROR IN CONNECTION");
-        //     }
-        //     return response.json();
-        // })
-        // .then(data => {
-        //     data.splice(0,1);
-        //     console.log("Loaded Tanks =>",data)
-        //     setTankDevice(data);
-        // })
-        // .catch(error => {
-        //     // Handle any errors that occurred during the request
-        //     console.error('Error Occured  =>  ', error);
-        // });
-    }, [])
+    
     
     const handleSelectedTank = (tank: Device) => {
         const newTanks = tankDevice.map((item: Device) => {
