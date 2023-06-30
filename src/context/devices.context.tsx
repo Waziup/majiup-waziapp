@@ -238,10 +238,9 @@ export const  DevicesProvider = ({children}: Props)=>{
                     },
                     on: true,
                 }
-            }).then((devices)=>{
-                console.log(devices);
-            })
-        }).catch((err)=>{
+            }));
+        })
+        .catch((err)=>{
             console.log(err);
         })
         // setDevices(devices2.map((device)=>{ 

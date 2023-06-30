@@ -2,7 +2,7 @@ import { Box, Grid } from "@mui/material";
 import SideNavigation from "../SideNavigation";
 import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
-import { useContext, useState } from "react";
+import { useContext, useState,useEffect } from "react";
 import TankDetailComponent from "../TankDetail/TankDetail.component";
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
@@ -25,7 +25,7 @@ function GridComponent() {
     const navigate = useNavigate();
 
     //
-    const [tankDevice, setTankDevice]  = useState([]);
+    // const [tankDevice, setTankDevice]  = useState([]);
     //
     
     useEffect(()=>{
@@ -77,9 +77,9 @@ function GridComponent() {
     const matches = useMediaQuery(theme.breakpoints.up('md'));
      
     function mqttSubscription(devices: Device []){                  
-        var reconnectTimeout = 2000;        
-        var mqtt = new window['Paho'].MQTT.Client("api.waziup.io", Number(443), "/websocket", "clientjs");
-        var options = {
+        const reconnectTimeout = 2000;        
+        const mqtt = new window['Paho'].MQTT.Client("api.waziup.io", Number(443), "/websocket", "clientjs");
+        const options = {
             useSSL: true,
             timeout: 5,
             onSuccess: onConnect,
@@ -105,14 +105,14 @@ function GridComponent() {
             setTimeout(window['MQTTconnect'], reconnectTimeout);
         }
 
-        function onMessageArrived(msg) {
+        function onMessageArrived(msg: {payloadString: string}) {
             console.log("----------->")
-            // const val = (JSON.parse(msg.payloadString))  
-            // console.log("Received -> ",val)                                
+            const val = (JSON.parse(msg.payloadString))  
+            console.log("Received -> ",val)                                
         }
     }
      
-    mqttSubscription(devices);
+    useEffect(()=> mqttSubscription(devices));
 
     return (        
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
