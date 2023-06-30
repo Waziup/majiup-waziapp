@@ -33,7 +33,7 @@ function WatertankComponent({percentage,waterQuality}: Props) {
             <h1>{percentage}%</h1>
             <div style={{}} className="wave">
                 {
-                    waterQuality==='Turbidity' &&(
+                    waterQuality==='Poor' &&(
                         <>
                             <img src={BacteriaSVG} alt="bacteria" className="bacteria"/>
                             <img src={DirtSVG} alt="dirt" className="dirt"/>
