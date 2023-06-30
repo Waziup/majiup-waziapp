@@ -5,6 +5,7 @@ import SettingsPage from "./pages/SettingsPage";
 import {  Routes, Route } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import { DevicesProvider } from "./context/devices.context";
+// import { DeviceProvider } from "./context/DeviceContext";
 import LayoutComponent from "./components/Layout/Layout.component";
 
 import SignUpPage from "./pages/SignupPage";

@@ -2,11 +2,14 @@ import { Box, Grid } from "@mui/material";
 import SideNavigation from "../SideNavigation";
 import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
-import { useContext, useState } from "react";import TankDetailComponent from "../TankDetail/TankDetail.component";
+import { useContext, useState } from "react";
+import TankDetailComponent from "../TankDetail/TankDetail.component";
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
 import { X as Device } from "../../context/devices.context";
-import {useEffect} from 'react';
+
+import './Grid.styles.css'
+import { DevicesContext } from "../../context/devices.context";
 
 const BoxStyle={ 
     bgcolor: "#fff", 
@@ -14,11 +17,6 @@ const BoxStyle={
     margin: "10px 0",
 }
 
-import './Grid.styles.css'
-import { DevicesContext } from "../../context/devices.context";
-function getLitres(capacity: number, height: number,level: number): number{
-    return (level/height)*capacity;
-}
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
@@ -30,10 +28,32 @@ function GridComponent() {
     const [tankDevice, setTankDevice]  = useState([]);
     //
     
-    
+    useEffect(()=>{
+        // fetch('http://localhost/devices', {
+        //     headers: {            
+        //         'Accept': 'application/json',
+        //     }
+        // })
+        // .then(response => {
+        //     if (!response.ok) {
+        //     // throw new Error('Network response was not ok');
+        //         console.error("ERROR IN CONNECTION");
+        //     }
+        //     return response.json();
+        // })
+        // .then(data => {
+        //     data.splice(0,1);
+        //     console.log("Loaded Tanks =>",data)
+        //     setTankDevice(data);
+        // })
+        // .catch(error => {
+        //     // Handle any errors that occurred during the request
+        //     console.error('Error Occured  =>  ', error);
+        // });
+    }, [])
     
     const handleSelectedTank = (tank: Device) => {
-        const newTanks = tankDevice.map((item: Device) => {
+        const newTanks = devices.map((item: Device) => {
             
             if(item.name === tank.name){
                 item.isSelect = true;
@@ -55,7 +75,45 @@ function GridComponent() {
     }
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
-    // console.log('Devices Loaded: ',devices)
+     
+    function mqttSubscription(devices: Device []){                  
+        var reconnectTimeout = 2000;        
+        var mqtt = new window['Paho'].MQTT.Client("api.waziup.io", Number(443), "/websocket", "clientjs");
+        var options = {
+            useSSL: true,
+            timeout: 5,
+            onSuccess: onConnect,
+            onFailure: onFailure
+        };
+
+        mqtt.connect(options)     
+        mqtt.onMessageArrived = onMessageArrived;               
+
+        function onConnect() {
+            console.log("Connected!")            
+            return devices.map((device)=>{                
+                const deviceId = device.id
+                const deviceUrl = "devices/"+deviceId            
+                mqtt.subscribe(deviceUrl+"/#")
+                // getData('https://api.waziup.io/api/v2/'+sensorUrl,sensor.name)                                    
+    
+            })        
+        }
+
+        function onFailure(message: string) {
+            console.log("Failed: ", message);
+            setTimeout(window['MQTTconnect'], reconnectTimeout);
+        }
+
+        function onMessageArrived(msg) {
+            console.log("----------->")
+            // const val = (JSON.parse(msg.payloadString))  
+            // console.log("Received -> ",val)                                
+        }
+    }
+     
+    mqttSubscription(devices);
+
     return (        
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
@@ -79,17 +137,16 @@ function GridComponent() {
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
                         devices.map((tank,i: number) => (
-                            <Box key={i} onClick={()=>handleSelectedTank(tank)}> 
-                                {/* sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]} */}
+                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}> 
                                 <ItemCardComponent
                                     isOn={tank.on}
-                                    amount={ 1000}
-                                    owner={tank.name}
-                                    litresPercent={78}
+                                    amount={tank.liters}
+                                    name={tank.name}
+                                    litresPercent={tank.liters}
                                     handleClose={handleClose}
                                     handleOpen={handleOpen}
                                     open={open}
-                                    temp={tank.sensors[0].value}
+                                    temp={tank.temp}
                                 />
                             </Box>
                         ))
@@ -99,95 +156,18 @@ function GridComponent() {
                     matches&&(
                         <Grid item xs={3.4}>
                             {
-                                // selectedTank &&(
-                                //     <TankDetailComponent
-                                //         waterLevel={selectedTank.amount??50}
-                                //         owner={selectedTank.name}
-                                //         waterTemp={selectedTank.waterTemp}
-                                //         waterQuality={selectedTank.waterQuality}
-                                //         liters={selectedTank.liters}
-                                //         on={selectedTank.on??false}
-                                //     />
-                                // )
                                 selectedDevice &&(
                                     <TankDetailComponent
                                         // waterLevel={selectedDevice.amount??50}
                                         owner={selectedDevice.name}
-                                        waterTemp={selectedDevice.sensors[0].value}
+                                        waterTemp={selectedDevice.temp}
                                         waterQuality={'Turbidity'}
-                                        liters={getLitres(selectedDevice.capacity,selectedDevice.height,selectedDevice.sensors[1].value)}
+                                        liters={selectedDevice.liters}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
                                     />
                                 )
-                            }
-                            {/* <Stack sx={BoxStyle} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
-                                <h3 style={{display: 'inline-block'}}>NGO Tank</h3>
-                                <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '1px 2px 1px rgba(0, 0, 0, 0.15)',}}>
-                                    <p style={{display: 'inline-block'}}>Water Pump Control</p>
-                                    <Android12Switch />
-                                </Box>
-                                <Box alt="water Tank." sx={{width: '200px'}} component="img" src={WaterTank}/>
-                                <Stack spacing={2} alignItems={'center'} flexWrap={'wrap'} direction="row">
-                                    <Box sx={{padding: '6px 10px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                                        <p style={{fontSize: '12px',}}>
-                                            <WaterDrop style={{fontSize: 25, display: 'inline-block', color: '#4592F6'}}/>
-                                            Water Amount
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>341 Ltr</p>
-                                    </Box>
-                                    <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                                        <p style={{fontSize: '12px',}}>
-                                            <DeviceThermostatSharp style={{fontSize: 18, display: 'inline-block', color: '#1C1B1F'}}/>
-                                            Temperature
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>32&#8451;</p>
-                                    </Box>
-                                    <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                                        <p style={{fontSize: '12px',}}>
-                                            <AutoAwesome style={{fontSize: 25, display: 'inline-block', }}/>
-                                            Water Quality
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>341 Ltr</p>
-                                    </Box>
-                                    <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                                        <p style={{fontSize: '12px',}}>
-                                            <WaterDrop style={{fontSize: 25, display: 'inline-block', color: '#2C2D38'}}/>
-                                            Water Leakage
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>No</p>
-                                    </Box>
-                                </Stack>
-                                <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '1px 2px 1px rgba(0, 0, 0, 0.15)',}}>
-                                    <p style={{display: 'inline-block'}}>Notification</p>
-                                    <Android12Switch/>
-                                </Box>
-                                <Box sx={{ display: 'flex',flexDirection: 'column', alignItems:'flex-start', cursor: 'pointer', transition: '.5s',  }}>
-                                    <p style={{fontSize: '16px',fontWeight: 'bold', textAlign: 'center'}}>WATER CONSUMPTION</p>
-                                    <LineChart
-                                        width={400}
-                                        height={300}
-                                        data={data}
-                                        margin={{
-                                            top: 5,
-                                            right: 30,
-                                            bottom: 5
-                                        }}
-                                        >
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="name" />
-                                        <YAxis  />
-                                        <Legend />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="time"
-                                            stroke="#1A73E8"
-                                            activeDot={{ r: 1 }}
-                                        />
-                                        
-                                    </LineChart>
-                                </Box>
-                            </Stack> */}
+                            }                            
                         </Grid>
                     )
                 }
