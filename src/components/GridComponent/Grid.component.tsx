@@ -25,7 +25,6 @@ function GridComponent() {
     const navigate = useNavigate();        
     
     const handleSelectedTank = (tank: Device) => {
-        console.log(tank);
         const newTanks = devices.map((item: Device) => {
             
             if(item.name === tank.name){
@@ -52,7 +51,6 @@ function GridComponent() {
     function mqttSubscription(devices: Device []){                  
         var reconnectTimeout = 2000;        
         var mqtt = new window['Paho'].MQTT.Client("api.waziup.io", Number(443), "/websocket", "clientjs");
-        console.log(mqtt)
         var options = {
             useSSL: true,
             timeout: 5,

@@ -62,7 +62,6 @@ const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadiu
 
 
 function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption}:Props) {
-    console.log(waterTemp, liters,waterQuality)
 	const [isChecked, setIsChecked] = useState(false);
 	const [toggleHot, setToggleHot] = useState(false);
 	// const CanvasJS = CanvasJSReact.CanvasJS;

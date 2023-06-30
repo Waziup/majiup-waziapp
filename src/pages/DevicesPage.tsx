@@ -9,11 +9,8 @@ function DevicesPage() {
     const data = useLocation();
     const navigate = useNavigate();
     const resp= data.state.tds.filter(td=>td)[0]
-    let foundQuality = '';
-    console.log(resp);
-        
+    let foundQuality = '';        
         if (resp<300) {
-            console.log('satisfied');
             foundQuality='Excellent'
         }else if(td>300 &&td<900){
             foundQuality='Good'
