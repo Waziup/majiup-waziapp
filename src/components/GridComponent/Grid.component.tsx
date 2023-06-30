@@ -10,47 +10,29 @@ import { X as Device } from "../../context/devices.context";
 
 import './Grid.styles.css'
 import { DevicesContext } from "../../context/devices.context";
-
+import FrameSVG from '../../assets/frame.svg';
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
     margin: "10px 0",
 }
-
+function getWaterQuality(tds: number){
+    if (tds<300) {
+        return 'Excellent'
+    }else if(tds>300 &&tds<900){
+        return'Good'
+    }else if(tds>900){
+        return 'Poor'
+    }else{
+        return('not satisfied');
+    }
+}
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
-
-    //
-    // const [tankDevice, setTankDevice]  = useState([]);
-    //
-    
-    useEffect(()=>{
-        // fetch('http://localhost/devices', {
-        //     headers: {            
-        //         'Accept': 'application/json',
-        //     }
-        // })
-        // .then(response => {
-        //     if (!response.ok) {
-        //     // throw new Error('Network response was not ok');
-        //         console.error("ERROR IN CONNECTION");
-        //     }
-        //     return response.json();
-        // })
-        // .then(data => {
-        //     data.splice(0,1);
-        //     console.log("Loaded Tanks =>",data)
-        //     setTankDevice(data);
-        // })
-        // .catch(error => {
-        //     // Handle any errors that occurred during the request
-        //     console.error('Error Occured  =>  ', error);
-        // });
-    }, [])
     
     const handleSelectedTank = (tank: Device) => {
         const newTanks = devices.map((item: Device) => {
@@ -111,7 +93,6 @@ function GridComponent() {
             console.log("Received -> ",val)                                
         }
     }
-     
     useEffect(()=> mqttSubscription(devices));
 
     return (        
@@ -136,7 +117,26 @@ function GridComponent() {
                 
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
-                        devices.map((tank,i: number) => (
+                        devices.length<=0 ?(
+                            <Box sx={{position: 'relative', width: '100%'}}>
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50, -50%)',
+                                    marginTop: '10px'
+                                }}>
+                                    <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
+                                        Hi there, No devices found.Create one!
+                                    </h3>
+                                    <Box component='img' src={FrameSVG}/>
+                                    
+                                    <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No devices found, create one.</p>
+                                </Box>
+                            </Box>
+                        ):
+                        
+                        (devices.map((tank,i: number) => (
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}> 
                                 <ItemCardComponent
                                     isOn={tank.on}
@@ -149,7 +149,8 @@ function GridComponent() {
                                     temp={tank.temp}
                                 />
                             </Box>
-                        ))
+                        )))
+                        
                     }
                 </Grid>
                 {
@@ -161,13 +162,13 @@ function GridComponent() {
                                         // waterLevel={selectedDevice.amount??50}
                                         owner={selectedDevice.name}
                                         waterTemp={selectedDevice.temp}
-                                        waterQuality={'Turbidity'}
+                                        waterQuality={getWaterQuality(selectedDevice.tds)}
                                         liters={selectedDevice.liters}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
                                     />
                                 )
-                            }                            
+                            }
                         </Grid>
                     )
                 }
