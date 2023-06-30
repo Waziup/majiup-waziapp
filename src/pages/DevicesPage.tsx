@@ -6,19 +6,32 @@ import {NavigateBefore} from '@mui/icons-material';
 import { Box } from "@mui/material";
 function DevicesPage() {
     const params = useParams();
-    console.log(params)
     const data = useLocation();
     const navigate = useNavigate();
-
+    const resp= data.state.tds.filter(td=>td)[0]
+    let foundQuality = '';
+    console.log(resp);
+        
+        if (resp<300) {
+            console.log('satisfied');
+            foundQuality='Excellent'
+        }else if(td>300 &&td<900){
+            foundQuality='Good'
+        }else if(td>900){
+            foundQuality='Poor'
+        }else{
+            foundQuality=('not satisfied');
+        }
+    
     return (
         <Box pl={2} pr={2}>
            <NavigateBefore sx={{cursor:'pointer', border: '1px solid #000',borderRadius:'50%'}} onClick={()=>navigate(-1)} /> 
             <TankDetailComponent
-                liters={data.state.liters}
+                liters={data.state.liters.filter(ltrs=>ltrs)[0]}
                 on={data.state.on}
                 owner={data.state.name}
-                waterQuality={data.state.waterQuality}
-                waterTemp={data.state.waterTemp}
+                waterQuality={foundQuality}
+                waterTemp={data.state.temp.filter(temp=>temp)[0]}
             />
         </Box>
     );

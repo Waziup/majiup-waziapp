@@ -12,7 +12,6 @@ type Props={
     owner: string,
     liters: number,
     waterTemp: number,
-    // waterLevel: number,
     waterQuality: string,
     on: boolean,
 	consumption: any[],
@@ -63,11 +62,11 @@ const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadiu
 
 
 function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption}:Props) {
+    console.log(waterTemp, liters,waterQuality)
 	const [isChecked, setIsChecked] = useState(false);
 	const [toggleHot, setToggleHot] = useState(false);
 	// const CanvasJS = CanvasJSReact.CanvasJS;
 	const CanvasJSChart = CanvasJSReact.CanvasJSChart;
-	console.log(consumption)
 	const options = {
 		// animationEnabled: true,
 		// exportEnabled: true,
@@ -126,7 +125,22 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption}:P
                         <AutoAwesome style={{fontSize: 12, display: 'inline-block', }}/>
                         Water Quality
                     </p>
-                    <p style={{fontSize: '24px',}}>{waterQuality}</p>
+                    {
+                        waterQuality.includes('Excellent') &&(
+                            <p style={{fontSize: '24px',color:'#85ea2d' }}>{waterQuality}</p>
+                        )
+                    }
+                    {
+                        waterQuality.includes('Poor') &&(
+                            <p style={{fontSize: '24px',color:'#c5221f' }}>{waterQuality}</p>
+                        )
+                    }
+                    {
+                        waterQuality.includes('Good') &&(
+                            <p style={{fontSize: '24px',color:'#f35e19' }}>{waterQuality}</p>
+                        )
+                    }
+
                 </Box>
                 <Box sx={TankDetails}>
                     <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
