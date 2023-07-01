@@ -22,7 +22,7 @@ type Sensor={
     unit: string,
     value: number,
 }
-type Actuator={
+export type Actuator={
     created: Date,
     id: string,
     meta: unknown,
@@ -108,23 +108,30 @@ export const  DevicesProvider = ({children}: Props)=>{
             setDevices(res.data.map((device: X)=>{
                 return{
                     ...device,
-                    consumption: device.sensors.map((sensor: Sensor)=>{
-                        if (sensor.name.includes('Water Level Sensor'.toLowerCase())) {
-                            return{
-                                x: sensor.value ?? 10,
-                                y: sensor.modified.getHours(),
-                            }
+                    consumption: device.sensors.filter((sensor: Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))
+                    .map((sensor: Sensor)=>{
+                        return{
+                            x: sensor.value ?? 10,
+                            y: new Date(sensor.modified).getHours(),
                         }
                     }),
-                    liters: device.sensors.find((sensor:Sensor)=>sensor.name.includes('Water Level'.toLowerCase()))?.value ?? 0,
+                    // consumption: device.sensors.map((sensor: Sensor)=>{
+                    //     if (sensor.name.includes('Water Level Sensor'.toLowerCase())) {
+                    //         return{
+                    //             x: sensor.value ?? 10,
+                    //             y: sensor.modified.getHours(),
+                    //         }
+                    //     }
+                    // }),
+                    liters: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))?.value ?? 0,
                     tds: device.sensors.find((sensor:Sensor)=>sensor.name.includes('TDS'.toLowerCase()))?.value ?? 0,
+                    temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Temperature Sensor'.toLowerCase()))?.value ?? 0,
                     isSelect: false,
                     location: {
                         lat: 0,
                         lng: 0
                     },
                     on: true,
-                    temp: device.sensors.find((sensor:Sensor)=>sensor.name.includes('Temperature'.toLowerCase()))?.value ?? 0,
                 }
             }));
         })
