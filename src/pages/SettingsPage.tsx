@@ -130,11 +130,12 @@ function SettingsPage() {
                                         <p style={{fontSize: '20px',}}>Height</p>
                                     </Box>
                                     <Box>
-                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{getLitres(device.capacity,device.height,device.sensors[0]?.value)}
+                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>
+                                            {device.liters}
                                             <span>litres</span>
                                         </h3>
                                         <p style={{fontSize: '20px',}}>
-                                            2
+                                            {device.height}
                                             <span>meters</span>
                                         </p>
                                     </Box>

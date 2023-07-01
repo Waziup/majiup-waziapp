@@ -7,7 +7,6 @@ import TankDetailComponent from "../TankDetail/TankDetail.component";
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
 import { X as Device } from "../../context/devices.context";
-
 import './Grid.styles.css'
 import { DevicesContext } from "../../context/devices.context";
 import FrameSVG from '../../assets/frame.svg';
@@ -33,6 +32,7 @@ function GridComponent() {
     const handleClose = () => setOpen(false);
     const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
+    
     
     const handleSelectedTank = (tank: Device) => {
         const newTanks = devices.map((item: Device) => {
@@ -94,7 +94,7 @@ function GridComponent() {
         }
     }
     useEffect(()=> mqttSubscription(devices));
-
+    console.log(devices);
     return (        
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
@@ -127,12 +127,14 @@ function GridComponent() {
                                     marginTop: '10px'
                                 }}>
                                     <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
-                                        Hi there, No devices found.Create one!
+                                        Hi there, No devices found!
                                     </h3>
                                     <Box component='img' src={FrameSVG}/>
                                     
                                     <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No devices found, create one.</p>
+                                    
                                 </Box>
+                                
                             </Box>
                         ):
                         
@@ -166,6 +168,7 @@ function GridComponent() {
                                         liters={selectedDevice.liters}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
+                                        actuator={selectedDevice.actuators}
                                     />
                                 )
                             }
