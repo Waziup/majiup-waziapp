@@ -54,7 +54,7 @@ function ModalComponent({open, handleClose,ref, children}: ModalComponentProps) 
 		}
 	}
 	const {devices} = useContext(DevicesContext);
-	const notifications = devices.reduce((acc,dev)=>(acc+dev.notifications.length),0);
+	const notifications = devices.reduce((acc,dev)=>(acc+0),0);
 	const totalLiters = devices.reduce((acc,dev)=>(acc+dev.liters),0);
 	// console.log('Ref handler: ',refHandler)
     return (

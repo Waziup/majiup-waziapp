@@ -142,9 +142,9 @@ function GridComponent() {
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}> 
                                 <ItemCardComponent
                                     isOn={tank.on}
-                                    amount={tank.liters}
+                                    amount={Math.round((tank.liters/tank.height)*tank.capacity)}
                                     name={tank.name}
-                                    litresPercent={tank.liters}
+                                    litresPercent={(tank.liters/tank.height)*100}
                                     handleClose={handleClose}
                                     handleOpen={handleOpen}
                                     open={open}
@@ -164,7 +164,7 @@ function GridComponent() {
                                         owner={selectedDevice.name}
                                         waterTemp={selectedDevice.temp}
                                         waterQuality={getWaterQuality(selectedDevice.tds)}
-                                        liters={selectedDevice.liters}
+                                        liters={Math.round((selectedDevice.liters/selectedDevice.height)*selectedDevice.capacity)}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
                                         actuator={selectedDevice.actuators}
