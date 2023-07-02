@@ -72,8 +72,8 @@ function GridComponent() {
         mqtt.onMessageArrived = onMessageArrived;               
 
         function onConnect() {
-            console.log("Connected!")            
-            return devices.map((device)=>{                
+            console.log("Connected!")
+            return devices.map((device)=>{
                 const deviceId = device.id
                 const deviceUrl = "devices/"+deviceId            
                 mqtt.subscribe(deviceUrl+"/#")

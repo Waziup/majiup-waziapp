@@ -8,7 +8,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
 import CanvasJSReact from '@canvasjs/react-charts';
-import FrameSVG from '../../assets/frame.svg';
+import FrameSVG from '../../assets/404-error.png';
 import { Actuator } from '../../context/devices.context';
 type Props={
     owner: string,
@@ -56,7 +56,7 @@ export const Android12Switch = styled(Switch)(({ theme }) => ({
     },
 }));
 const BoxStyle={ 
-    bgcolor: "#fff", 
+     
     borderRadius: "10px",
     margin: "10px 0",
 	position: 'relative'
@@ -98,7 +98,7 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption, a
 	}
     console.log('Water quality ', waterQuality,consumption,actuator)
     return (
-        <Stack sx={BoxStyle} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
+        <Stack sx={BoxStyle,(consumption.length || waterQuality && waterTemp)?{bgcolor: "#fff"}:{bgcolor:'inherit'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             {
                 (consumption.length || waterQuality && waterTemp) ?(
                     <>
@@ -186,9 +186,9 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption, a
                             <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
                                 {owner}
                             </h3>
-                            <Box component='img' src={FrameSVG}/>
-                            
-                            <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No readings detected for this device.</p>
+                            {/* <Box sx={{width: '100%'}} component='img' src={FrameSVG}/> */}
+                            <p>--------</p>
+                            <p style={{color: 'red',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No readings detected for this device!</p>
                         </Box>
                     </Box>
                 )

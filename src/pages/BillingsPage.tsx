@@ -41,14 +41,14 @@ function getLitres(capacity: number, height: number,level: number): number{
     return (level/height)*capacity;
 }
 function getWaterQuality(tds: number){
-    if (tds<300) {
+    if (tds>0 && tds<300) {
         return 'Excellent'
     }else if(tds>300 &&tds<900){
         return'Good'
     }else if(tds>900){
         return 'Poor'
     }else{
-        return('not satisfied');
+        return('Not satisfied');
     }
 }
 function getPercentageOfWater (height: number,level: number): number{

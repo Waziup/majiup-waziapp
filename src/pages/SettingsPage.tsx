@@ -126,13 +126,13 @@ function SettingsPage() {
                                 </h3>
                                 <Box p={1} sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                                     <Box>
-                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>Capacity</h3>
+                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>Capacity </h3>
                                         <p style={{fontSize: '20px',}}>Height</p>
                                     </Box>
                                     <Box>
                                         <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>
                                             {device.liters}
-                                            <span>litres</span>
+                                            <span> litres</span>
                                         </h3>
                                         <p style={{fontSize: '20px',}}>
                                             {device.height}
