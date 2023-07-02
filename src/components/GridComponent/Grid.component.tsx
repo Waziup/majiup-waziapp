@@ -2,27 +2,37 @@ import { Box, Grid } from "@mui/material";
 import SideNavigation from "../SideNavigation";
 import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
-import { useContext, useState } from "react";
+import { useContext, useState,useEffect } from "react";
 import TankDetailComponent from "../TankDetail/TankDetail.component";
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
 import { X as Device } from "../../context/devices.context";
-
 import './Grid.styles.css'
 import { DevicesContext } from "../../context/devices.context";
-
+import FrameSVG from '../../assets/frame.svg';
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
     margin: "10px 0",
 }
-
+function getWaterQuality(tds: number){
+    if (tds<300) {
+        return 'Excellent'
+    }else if(tds>300 &&tds<900){
+        return'Good'
+    }else if(tds>900){
+        return 'Poor'
+    }else{
+        return('not satisfied');
+    }
+}
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
-    const navigate = useNavigate();        
+    const navigate = useNavigate();
+    
     
     const handleSelectedTank = (tank: Device) => {
         const newTanks = devices.map((item: Device) => {
@@ -49,9 +59,9 @@ function GridComponent() {
     const matches = useMediaQuery(theme.breakpoints.up('md'));
      
     function mqttSubscription(devices: Device []){                  
-        var reconnectTimeout = 2000;        
-        var mqtt = new window['Paho'].MQTT.Client("api.waziup.io", Number(443), "/websocket", "clientjs");
-        var options = {
+        const reconnectTimeout = 2000;        
+        const mqtt = new window['Paho'].MQTT.Client("api.waziup.io", Number(443), "/websocket", "clientjs");
+        const options = {
             useSSL: true,
             timeout: 5,
             onSuccess: onConnect,
@@ -62,8 +72,8 @@ function GridComponent() {
         mqtt.onMessageArrived = onMessageArrived;               
 
         function onConnect() {
-            console.log("Connected!")            
-            return devices.map((device)=>{                
+            console.log("Connected!")
+            return devices.map((device)=>{
                 const deviceId = device.id
                 const deviceUrl = "devices/"+deviceId            
                 mqtt.subscribe(deviceUrl+"/#")
@@ -77,15 +87,14 @@ function GridComponent() {
             setTimeout(window['MQTTconnect'], reconnectTimeout);
         }
 
-        function onMessageArrived(msg) {
+        function onMessageArrived(msg: {payloadString: string}) {
             console.log("----------->")
-            // const val = (JSON.parse(msg.payloadString))  
-            // console.log("Received -> ",val)                                
+            const val = (JSON.parse(msg.payloadString))  
+            console.log("Received -> ",val)                                
         }
     }
-     
-    mqttSubscription(devices);
-
+    useEffect(()=> mqttSubscription(devices));
+    console.log(devices);
     return (        
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
@@ -108,7 +117,28 @@ function GridComponent() {
                 
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
-                        devices.map((tank,i: number) => (
+                        devices.length<=0 ?(
+                            <Box sx={{position: 'relative', width: '100%'}}>
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50, -50%)',
+                                    marginTop: '10px'
+                                }}>
+                                    <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
+                                        Hi there, No devices found!
+                                    </h3>
+                                    <Box component='img' src={FrameSVG}/>
+                                    
+                                    <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No devices found, create one.</p>
+                                    
+                                </Box>
+                                
+                            </Box>
+                        ):
+                        
+                        (devices.map((tank,i: number) => (
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}> 
                                 <ItemCardComponent
                                     isOn={tank.on}
@@ -121,7 +151,8 @@ function GridComponent() {
                                     temp={tank.temp}
                                 />
                             </Box>
-                        ))
+                        )))
+                        
                     }
                 </Grid>
                 {
@@ -133,13 +164,14 @@ function GridComponent() {
                                         // waterLevel={selectedDevice.amount??50}
                                         owner={selectedDevice.name}
                                         waterTemp={selectedDevice.temp}
-                                        waterQuality={'Turbidity'}
+                                        waterQuality={getWaterQuality(selectedDevice.tds)}
                                         liters={selectedDevice.liters}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
+                                        actuator={selectedDevice.actuators}
                                     />
                                 )
-                            }                            
+                            }
                         </Grid>
                     )
                 }

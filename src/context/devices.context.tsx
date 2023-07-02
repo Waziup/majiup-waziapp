@@ -22,7 +22,7 @@ type Sensor={
     unit: string,
     value: number,
 }
-type Actuator={
+export type Actuator={
     created: Date,
     id: string,
     meta: unknown,
@@ -47,7 +47,7 @@ interface Device{
     meta: unknown,
     modified: Date,
     name: string,
-    notification: Notification[],
+    notifications: Notification[],
     radius: number,
     sensors: Sensor[],
     width: number,
@@ -91,14 +91,12 @@ export const DevicesContext = createContext<ContextValues>({
 //add the rest of the rows as consumption data
 
 export const  DevicesProvider = ({children}: Props)=>{
-    
     const [devices,setDevices] = useState<X[]>([]);
     const [selectedTank, setSelectedTank] = useState<X>()
     const [user,setLoggedUser]=useState<{name: string,token:string}>({name:'',token:''});
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     const setTanks = (devices: X[])=> setDevices(devices);
-    
     useEffect(()=>{
         axios.get('http://localhost/devices',{
             headers:{
@@ -106,39 +104,28 @@ export const  DevicesProvider = ({children}: Props)=>{
             }
         })
         .then((res)=>{
-            let data = res.data;
-            data.splice(0,1);
+            console.log(res.data);
             setDevices(res.data.map((device: X)=>{
                 return{
                     ...device,
-                    consumption: device.sensors.map((sensor: Sensor)=>{
-                        if (sensor.name.includes('Water Level Sensor')) {
-                            return{
-                                x: 0,
-                                y: 0,
-                            }
-                        }                                                
-                    }),
-                    liters: device.sensors.map((sensor: Sensor)=>{
-                        if (sensor.name.includes('Water Level Sensor')) {
-                            const liters= (sensor.value / device.height) *device.capacity
-                            return Math.round(liters);
-                        }
-                    }),                            
-
-                    temp: device.sensors.map((sensor: Sensor)=>{
-                        if (sensor.name.includes('Temperature Sensor')) {
-                            return sensor.value;
-                        }else{
-                            return
+                    consumption: device.sensors.filter((sensor: Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))
+                    .map((sensor: Sensor)=>{
+                        return{
+                            x: sensor.value ?? 10,
+                            y: new Date(sensor.modified).getHours(),
                         }
                     }),
-                   
-                    tds: device.sensors.map((sensor: Sensor)=>{
-                        if (sensor.name.includes('TDS')) {
-                            return sensor.value;
-                        }
-                    }),
+                    // consumption: device.sensors.map((sensor: Sensor)=>{
+                    //     if (sensor.name.includes('Water Level Sensor'.toLowerCase())) {
+                    //         return{
+                    //             x: sensor.value ?? 10,
+                    //             y: sensor.modified.getHours(),
+                    //         }
+                    //     }
+                    // }),
+                    liters: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))?.value ?? 0,
+                    tds: device.sensors.find((sensor:Sensor)=>sensor.name.includes('TDS'.toLowerCase()))?.value ?? 0,
+                    temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Temperature Sensor'.toLowerCase()))?.value ?? 0,
                     isSelect: false,
                     location: {
                         lat: 0,
@@ -150,9 +137,9 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .catch((err)=>{
             console.log(err);
-        })       
+        })
+        
     },[]);
-
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {
             setSelectedTank(devices[0])

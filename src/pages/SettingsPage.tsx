@@ -44,7 +44,7 @@ function SettingsPage() {
     const { devices } = useContext(DevicesContext);
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
     const [matches] = useOutletContext<[matches: boolean]>();
-    console.log(matches)
+    console.log(devices)
     return (
         <Box pl={2} pr={2}>
             <Box onClick={()=>setIsOpenModal(true)} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -126,15 +126,16 @@ function SettingsPage() {
                                 </h3>
                                 <Box p={1} sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                                     <Box>
-                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>Capacity</h3>
+                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>Capacity </h3>
                                         <p style={{fontSize: '20px',}}>Height</p>
                                     </Box>
                                     <Box>
-                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>{getLitres(device.capacity,device.height,device.sensors[0].value)}
-                                            <span>litres</span>
+                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>
+                                            {device.liters}
+                                            <span> litres</span>
                                         </h3>
                                         <p style={{fontSize: '20px',}}>
-                                            2
+                                            {device.height}
                                             <span>meters</span>
                                         </p>
                                     </Box>

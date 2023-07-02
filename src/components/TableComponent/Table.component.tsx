@@ -18,17 +18,17 @@ interface Column {
 
 const columns: readonly Column[] = [
     { id: 'time', label: 'Time', minWidth: 170 },
-    { id: 'water_content', label: 'Water Content', minWidth: 100 },
+    { id: 'water_content', label: 'Water Content(Ltr)', minWidth: 100 },
     {
         id: 'level',
-        label: 'Level',
+        label: 'Level(%)',
         minWidth: 170,
         align: 'right',
         format: (value: number) => value.toLocaleString('en-US'),
     },
     {
         id: 'temperature',
-        label: 'Temperature',
+        label: 'Temperature (°C)',
         minWidth: 170,
         align: 'right',
         format: (value: number) => value.toLocaleString('en-US'),
@@ -58,7 +58,7 @@ function createData(
     quality: string,
 ): Data {
 //   const density = water_content / level;
-  return { time, water_content, level,temperature, quality };
+  return { time , water_content, level,temperature, quality };
 }
 
 // const rows = [
@@ -81,7 +81,9 @@ type Row={
 type Props = {
     rows1: Row[]
 }
+
 export default function StickyHeadTable({rows1}: Props) {
+    console.log(rows1)
     const rows = rows1.map((row)=>{
         return createData(row.time,row.litres,row.level,row.temp,row.quality)
     })

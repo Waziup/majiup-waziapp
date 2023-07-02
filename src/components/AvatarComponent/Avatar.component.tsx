@@ -9,8 +9,7 @@ function AvatarComponent({name,src}: Props) {
             alt={name}
             src={src}
             sx={{ width:32, height: 32, }}
-            // title={user.name ||''}
-            component={()=>(<h1>Oliver</h1>)}
+            title={name ||''}
         />
     );
 }
