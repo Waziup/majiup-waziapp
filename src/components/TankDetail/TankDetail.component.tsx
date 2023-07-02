@@ -8,7 +8,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
 import CanvasJSReact from '@canvasjs/react-charts';
-import FrameSVG from '../../assets/404-error.png';
+// import FrameSVG from '../../assets/404-error.png';
 import { Actuator } from '../../context/devices.context';
 type Props={
     owner: string,
@@ -132,7 +132,7 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption, a
                                 Water Quality
                             </p>
                             {
-                                waterQuality.includes('Excellent') &&(
+                                waterQuality.toLowerCase().includes('Excellent'.toLowerCase()) &&(
                                     <p style={{fontSize: '24px',color:'#85ea2d' }}>{waterQuality}</p>
                                 )
                             }

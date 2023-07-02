@@ -161,7 +161,6 @@ function GridComponent() {
                             {
                                 selectedDevice &&(
                                     <TankDetailComponent
-                                        // waterLevel={selectedDevice.amount??50}
                                         owner={selectedDevice.name}
                                         waterTemp={selectedDevice.temp}
                                         waterQuality={getWaterQuality(selectedDevice.tds)}
