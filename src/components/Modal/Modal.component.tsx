@@ -2,7 +2,8 @@ import './Modals.styles.css';
 // import {WaterDrop, NotificationsOutlined, FireHydrantAltOutlined} from '@mui/icons-material';
 import {Modal, } from '@mui/material';
 import './Modals.styles.css';
-// import {Document,Page, View, Text, StyleSheet,Image, } from '@react-pdf/renderer'
+import { useContext } from 'react';
+import { DevicesContext } from '../../context/devices.context';
 type ModalComponentProps = {
     open: boolean;
     handleClose: () => void;
@@ -52,6 +53,9 @@ function ModalComponent({open, handleClose,ref, children}: ModalComponentProps) 
 			display:'flex'
 		}
 	}
+	const {devices} = useContext(DevicesContext);
+	const notifications = devices.reduce((acc,dev)=>(acc+dev.notifications.length),0);
+	const totalLiters = devices.reduce((acc,dev)=>(acc+dev.liters),0);
 	// console.log('Ref handler: ',refHandler)
     return (
 		<Modal
@@ -110,7 +114,7 @@ function ModalComponent({open, handleClose,ref, children}: ModalComponentProps) 
 									<div >
 										<p>Total Tanks</p>
 										<h1 style={styles.titleBold} >
-											5
+											{devices.length}
 										</h1>
 										<p style={{fontSize: '16px', color:'#14AE5D'}}>good condition.</p>
 									</div>
@@ -120,7 +124,7 @@ function ModalComponent({open, handleClose,ref, children}: ModalComponentProps) 
 									<div>
 										<p>Notifications Received</p>
 										<p style={styles.titleBold} >
-											27
+											{notifications}
 										</p>
 									</div>
 								</div>
@@ -130,7 +134,7 @@ function ModalComponent({open, handleClose,ref, children}: ModalComponentProps) 
 									<div>
 										<p>Total Consumption</p>
 										<h1 style={styles.titleBold} >
-											1350 Ltrs
+											{totalLiters} Ltrs
 										</h1>
 									</div>
 								</div>

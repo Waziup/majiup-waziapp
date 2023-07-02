@@ -9,4 +9,4 @@ RUN ls -la
 COPY . .
 RUN npm run build
 EXPOSE 4173
-CMD ["npm", "run", "preview","--","--host"]
+CMD ["npm", "run", "dev"]

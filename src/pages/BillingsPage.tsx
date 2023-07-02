@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import React, { useState, useRef, createRef, useContext,useLayoutEffect, useEffect } from 'react';
 import { Box} from '@mui/material';
 import { Visibility} from '@mui/icons-material';
@@ -13,7 +12,7 @@ import ModalComponent from '../components/Modal/Modal.component';
 import jsPDF from 'jspdf';
 import { DevicesContext } from '../context/devices.context';
 import CanvasJSReact from '@canvasjs/react-charts';
-import ReportcardComponent from '../components/ReportCard/Reportcard.component';
+// import ReportcardComponent from '../components/ReportCard/Reportcard.component';
 const ReportsActiveText={
     cursor: 'pointer', 
     color: '#2C2D38',
@@ -40,6 +39,20 @@ type Consumption = {
 }
 function getLitres(capacity: number, height: number,level: number): number{
     return (level/height)*capacity;
+}
+function getWaterQuality(tds: number){
+    if (tds>0 && tds<300) {
+        return 'Excellent'
+    }else if(tds>300 &&tds<900){
+        return'Good'
+    }else if(tds>900){
+        return 'Poor'
+    }else{
+        return('Not satisfied');
+    }
+}
+function getPercentageOfWater (height: number,level: number): number{
+    return (level/height)*100;
 }
 function BillingsPage() {
     const { devices,} = useContext(DevicesContext)
@@ -92,70 +105,87 @@ function BillingsPage() {
         console.log('Selected table tank', selectedTableTank1)
         if (selectedTableTank1) {
             setSelectedTableTank({
-                consumption: selectedTableTank.consumption.push({
-                    time: `${selectedTableTank1.modified.getHours()}:00`,
-                    litres: getLitres(selectedTableTank1.capacity, selectedTableTank1.height, selectedTableTank1.sensors[1].value),
-                    level: selectedTableTank1.sensors[1].value,
-                    quality: 'Fresh',
-                    temp: selectedTableTank1.sensors[0].value
-                })
+                // consumption: selectedTableTank.consumption.push({
+                //     time: `${selectedTableTank1.modified?  new Date(selectedTableTank1?.modified).getHours(): ''}:${selectedTableTank1.modified?new Date(selectedTableTank1?.modified).getMinutes():''}`,
+                //     // litres: getLitres(selectedTableTank1.capacity, selectedTableTank1.height, selectedTableTank1.sensors[1].value),
+                //     // level: selectedTableTank1.liters,
+                //     litres:  selectedTableTank1.liters,
+                //     level: isNaN(getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.height))? 0: getPercentageOfWater(selectedTableTank1.liters,100),
+                //     quality: getWaterQuality(selectedTableTank1.tds),
+                //     temp: selectedTableTank1.temp,
+                // })
+                consumption: [
+                    ...selectedTableTank.consumption,
+                    {
+                        time: `${selectedTableTank1.modified?  new Date(selectedTableTank1?.modified).getHours(): ''}:${selectedTableTank1.modified?new Date(selectedTableTank1?.modified).getMinutes():''}`,
+                        litres:  selectedTableTank1.liters,
+                        level: isNaN(getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.height))? 0: getPercentageOfWater(selectedTableTank1.liters,100),
+                        quality: getWaterQuality(selectedTableTank1.tds),
+                        temp: selectedTableTank1.temp,
+                    }
+                ]
             })
         }
         console.log('Selected table tank', selectedTableTank);
-        // setSelectedTableTank(selectedTableTank);
+        //setSelectedTableTank(selectedTableTank);
     }
     useLayoutEffect(()=>{
         console.log('Component mounted');
         setSelectedTank({
             ...selectedTank,
-            id: 'All',
+            id: "All",
         });
     },[])
     useEffect(()=>{
         if (devices.length>=1) {
             setSelectedTableTank({
                 consumption: [{
-                    time: `${devices[0].modified.getHours()}:00`,
-                    litres: getLitres(devices[0].capacity, devices[0].height, devices[0].sensors[1].value),
-                    level: devices[0].sensors[1].value,
-                    quality: 'Fresh',
-                    temp: devices[0].sensors[0].value
+                    time: `${new Date(devices[0].modified).getHours()}:00`,
+                    litres:  devices[0].liters,
+                    level: isNaN(getPercentageOfWater(devices[0].liters,devices[0].height))? 0: getPercentageOfWater(devices[0].liters,devices[0].height),
+                    quality: getWaterQuality(devices[0].tds),
+                    temp: devices[0].temp,
                 }]
             })
-            console.log('Devices to be loaded re', selectedTank)
+            console.log('Devices to be loaded are:', selectedTank)
             if(selectedTank.id==='All'){
-                console.log('All tanks',selectedTank);
+                console.log('All tanks',devices.reduce((acc, curr)=>acc+curr.liters,0));
                 setSelectedTank({
                     ...selectedTank,
-                    consumption: devices[0].consumption,
+                    consumption: devices[0].consumption??[],
                     // consumption:[],
-                    litres: devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.sensors[1].value), 0)
+                    litres: devices.reduce((acc, curr)=>acc+curr.liters,0)
                 });
-                setOptionsToRender({...options, data: devices.map((d)=>({
-                    type: "spline",
-                    dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
-                }))})
+                setOptionsToRender({
+                    ...options, 
+                    data: devices.map((d)=>({
+                        type: "spline",
+                        dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
+                    }))
+                })
                 return;
-                // setSelectedTank({...selectedTank, litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)})
+                //setSelectedTank({...selectedTank, litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)})
             }
             console.log('Devicces', devices.length)
             setSelectedTank({
                 ...selectedTank,
-                consumption: devices[0].consumption,    
-                litres: devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.sensors[1].value), 0)
-                // litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)
+                consumption: devices[0].consumption ??[],
+                litres: devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.liters), 0)
             });
-            setOptionsToRender({...options, data: devices.map((d)=>({
-                type: "spline",
-                dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
-            }))})
+            // setOptionsToRender({
+            //     ...options, 
+            //     data: devices.map((d)=>({
+            //         type: "spline",
+            //         dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
+            //     }))
+            // })
             setSelectedTank({name: devices[0].name, litres:devices[0].liters, id: devices[0].id, consumption: devices[0].consumption})
             setOptionsToRender({
                 ...options,
                 data: [{
                     // Change type to "doughnut", "line", "splineArea", etc.
-                    type: "column",
-                    dataPoints: devices[0]?.consumption.filter((_,i)=>i%2),
+                    type: "column", 
+                    dataPoints: devices[0]?.consumption??[],
                 }]
             })
             console.log('Table tank consumption',selectedTableTank.consumption)
@@ -163,36 +193,42 @@ function BillingsPage() {
     },[devices.length])
     useEffect(()=>{
         if(selectedTank.id==='All'){
-            console.log('All tanks');
+            console.log('All tanks',devices);
             setSelectedTank({
                 ...selectedTank,
                 consumption: devices[0]?.consumption,
-                // consumption:[],
-                litres: devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.sensors[1].value), 0)
-                // litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)
+                litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)
             });
-            setOptionsToRender({...options, data: devices.map((d)=>({
-                type: "spline",
-                dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
-            }))})
+            setOptionsToRender({
+                ...options, 
+                data: devices.map((d)=>({
+                    type: "spline",
+                    dataPoints: d.consumption? d?.consumption:[]
+                }))
+            })
             return;
-            // setSelectedTank({...selectedTank, litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)})
         }
         console.log('Tank ID has changed', selectedTank.id)
         const device = devices.filter((d)=>d.id===selectedTank.id);
-        if (device) {
-            setSelectedTank({...selectedTank, consumption: device[0]?.consumption, name: device[0]?.name, litres: device[0]?.liters})
+        if (device.length >=1) {
+            console.log('This is a single device',device)
+            setSelectedTank({
+                ...selectedTank, 
+                consumption: device[0]?.consumption, 
+                name: device[0]?.name, 
+                litres: device[0]?.liters
+            })
             setOptionsToRender({
                 ...options, 
                 data: [{
                     // Change type to "doughnut", "line", "splineArea", etc.
                     type: "column",
-                    dataPoints: selectedTank?.consumption.filter((_,i)=>i%2),
+                    dataPoints: device[0].consumption? device[0].consumption:[],
                 }]
             })
             return;
         }
-        setSelectedTank({...selectedTank, name: devices[0].name, litres:devices[0].liters, id: devices[0].id})
+        // setSelectedTank({...selectedTank, name: devices[0].name, litres:devices[0].liters, id: devices[0].id})
         return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectedTank.id])
@@ -207,8 +243,6 @@ function BillingsPage() {
                 </p>
             </Box>
              <div ref={reportTemplateRef}>
-                {/* <h1>File.....</h1> */}
-                {/* </div> */}
                 <ModalComponent ref={reportTemplateRef1} handleClose={()=>{console.log(reportTemplateRef1.current); setIsOpenModal(!isOpenModal)}} open={isOpenModal} >
                     <CanvasJSChart options = {optionsToRender}/>
                     {
@@ -255,22 +289,18 @@ function BillingsPage() {
                         <p style={ReportsText}>Monthly</p>
                     </Box>
                 </Box>
-                <h2 style={{ fontSize: 'calc(10px + 1.8vw)'}} >{selectedTank.litres} {selectedTank.id==='All'?'total litres consumed':'Litres'} </h2>
+                <h2 style={{ fontSize: 'calc(10px + 1.8vw)'}} >{isNaN(selectedTank.litres)?0:selectedTank.litres} {selectedTank.id==='All'?'total litres consumed':'Litres'} </h2>
                 {/* <Box alt="water Tank." sx={{width: '100%'}} component="img" src={ChatFlow}/> */}
                 <CanvasJSChart options = {optionsToRender}/>
             </Box>
-            {/* <div ref={reportTemplateRef1}>
-                <ReportcardComponent  ref={reportTemplateRef1} />
-            </div> */}
+            
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>
                     <Box sx={{border: '1px solid #ccc',marginRight:'5px', padding:'5px', width: '75%', borderRadius: '20px'}}>
-                        {/* <label style={{background: '#E8E8E8',padding: 'inherit',borderRadius:'40px 30px', height: '100%'}} htmlFor="devs">Plots:</label> */}
                         <select onChange={(e)=>handleSelectedTableTank(e)} style={{border: 'none', width: '100%',outline: 'none', background: 'none'}} name="devs" id="devs">
-                            
                             {
-                                devices.map((device)=>(
-                                    <option value={device.id}>{device.name}</option>
+                                devices.map((device,idx)=>(
+                                    <option key={idx} value={device.id}>{device.name}</option>
                                 ))
                             }
                         </select>

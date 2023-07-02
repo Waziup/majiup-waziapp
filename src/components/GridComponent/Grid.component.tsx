@@ -2,20 +2,29 @@ import { Box, Grid } from "@mui/material";
 import SideNavigation from "../SideNavigation";
 import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
-import { useContext, useState } from "react";import TankDetailComponent from "../TankDetail/TankDetail.component";
+import { useContext, useState,useEffect } from "react";
+import TankDetailComponent from "../TankDetail/TankDetail.component";
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
 import { X as Device } from "../../context/devices.context";
+import './Grid.styles.css'
+import { DevicesContext } from "../../context/devices.context";
+import FrameSVG from '../../assets/frame.svg';
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
     margin: "10px 0",
 }
-
-import './Grid.styles.css'
-import { DevicesContext } from "../../context/devices.context";
-function getLitres(capacity: number, height: number,level: number): number{
-    return (level/height)*capacity;
+function getWaterQuality(tds: number){
+    if (tds<300) {
+        return 'Excellent'
+    }else if(tds>300 &&tds<900){
+        return'Good'
+    }else if(tds>900){
+        return 'Poor'
+    }else{
+        return('not satisfied');
+    }
 }
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
@@ -23,6 +32,7 @@ function GridComponent() {
     const handleClose = () => setOpen(false);
     const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
+    
     
     const handleSelectedTank = (tank: Device) => {
         const newTanks = devices.map((item: Device) => {
@@ -37,8 +47,7 @@ function GridComponent() {
         if(!matches){
             setTanks(newTanks);
             navigate(`/devices/${tank.id}`,{
-                state: tank,
-                
+                state: tank,                
             });
             return;
         }
@@ -48,9 +57,45 @@ function GridComponent() {
     }
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
-    console.log('Devices Loaded: ',devices)
-    return (
-        
+     
+    function mqttSubscription(devices: Device []){                  
+        const reconnectTimeout = 2000;        
+        const mqtt = new window['Paho'].MQTT.Client("api.waziup.io", Number(443), "/websocket", "clientjs");
+        const options = {
+            useSSL: true,
+            timeout: 5,
+            onSuccess: onConnect,
+            onFailure: onFailure
+        };
+
+        mqtt.connect(options)     
+        mqtt.onMessageArrived = onMessageArrived;               
+
+        function onConnect() {
+            console.log("Connected!")
+            return devices.map((device)=>{
+                const deviceId = device.id
+                const deviceUrl = "devices/"+deviceId            
+                mqtt.subscribe(deviceUrl+"/#")
+                // getData('https://api.waziup.io/api/v2/'+sensorUrl,sensor.name)                                    
+    
+            })        
+        }
+
+        function onFailure(message: string) {
+            console.log("Failed: ", message);
+            setTimeout(window['MQTTconnect'], reconnectTimeout);
+        }
+
+        function onMessageArrived(msg: {payloadString: string}) {
+            console.log("----------->")
+            const val = (JSON.parse(msg.payloadString))  
+            console.log("Received -> ",val)                                
+        }
+    }
+    useEffect(()=> mqttSubscription(devices));
+    console.log(devices);
+    return (        
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
                 <NavigationIndex matches={matches} />
@@ -72,121 +117,67 @@ function GridComponent() {
                 
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
-                        devices.map((tank,i: number) => (
-                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}>
+                        devices.length<=0 ?(
+                            <Box sx={{position: 'relative', width: '100%'}}>
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50, -50%)',
+                                    marginTop: '10px'
+                                }}>
+                                    <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
+                                        Hi there, No devices found!
+                                    </h3>
+                                    <Box component='img' src={FrameSVG}/>
+                                    
+                                    <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No devices found, create one.</p>
+                                    
+                                </Box>
+                                
+                            </Box>
+                        ):
+                        
+                        (devices.map((tank,i: number) => (
+                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}> 
                                 <ItemCardComponent
-                                    isOn={tank.on??false}
-                                    amount={getLitres(tank.capacity,tank.height,tank.sensors[1].value)}
-                                    owner={tank.name}
-                                    litresPercent={getLitres(tank.capacity,tank.height,tank.sensors[1].value)}
+                                    isOn={tank.on}
+                                    amount={tank.liters}
+                                    name={tank.name}
+                                    litresPercent={tank.liters}
                                     handleClose={handleClose}
                                     handleOpen={handleOpen}
                                     open={open}
-                                    temp={tank.sensors[0].value}
+                                    temp={tank.temp}
                                 />
                             </Box>
-                        ))
+                        )))
+                        
                     }
                 </Grid>
                 {
                     matches&&(
                         <Grid item xs={3.4}>
                             {
-                                // selectedTank &&(
-                                //     <TankDetailComponent
-                                //         waterLevel={selectedTank.amount??50}
-                                //         owner={selectedTank.name}
-                                //         waterTemp={selectedTank.waterTemp}
-                                //         waterQuality={selectedTank.waterQuality}
-                                //         liters={selectedTank.liters}
-                                //         on={selectedTank.on??false}
-                                //     />
-                                // )
                                 selectedDevice &&(
                                     <TankDetailComponent
                                         // waterLevel={selectedDevice.amount??50}
                                         owner={selectedDevice.name}
-                                        waterTemp={selectedDevice.sensors[0].value}
-                                        waterQuality={'Turbidity'}
-                                        liters={getLitres(selectedDevice.capacity,selectedDevice.height,selectedDevice.sensors[1].value)}
+                                        waterTemp={selectedDevice.temp}
+                                        waterQuality={getWaterQuality(selectedDevice.tds)}
+                                        liters={selectedDevice.liters}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
+                                        actuator={selectedDevice.actuators}
                                     />
                                 )
                             }
-                            {/* <Stack sx={BoxStyle} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
-                                <h3 style={{display: 'inline-block'}}>NGO Tank</h3>
-                                <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '1px 2px 1px rgba(0, 0, 0, 0.15)',}}>
-                                    <p style={{display: 'inline-block'}}>Water Pump Control</p>
-                                    <Android12Switch />
-                                </Box>
-                                <Box alt="water Tank." sx={{width: '200px'}} component="img" src={WaterTank}/>
-                                <Stack spacing={2} alignItems={'center'} flexWrap={'wrap'} direction="row">
-                                    <Box sx={{padding: '6px 10px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                                        <p style={{fontSize: '12px',}}>
-                                            <WaterDrop style={{fontSize: 25, display: 'inline-block', color: '#4592F6'}}/>
-                                            Water Amount
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>341 Ltr</p>
-                                    </Box>
-                                    <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                                        <p style={{fontSize: '12px',}}>
-                                            <DeviceThermostatSharp style={{fontSize: 18, display: 'inline-block', color: '#1C1B1F'}}/>
-                                            Temperature
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>32&#8451;</p>
-                                    </Box>
-                                    <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                                        <p style={{fontSize: '12px',}}>
-                                            <AutoAwesome style={{fontSize: 25, display: 'inline-block', }}/>
-                                            Water Quality
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>341 Ltr</p>
-                                    </Box>
-                                    <Box sx={{padding: '6px 20px',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}}>
-                                        <p style={{fontSize: '12px',}}>
-                                            <WaterDrop style={{fontSize: 25, display: 'inline-block', color: '#2C2D38'}}/>
-                                            Water Leakage
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>No</p>
-                                    </Box>
-                                </Stack>
-                                <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '1px 2px 1px rgba(0, 0, 0, 0.15)',}}>
-                                    <p style={{display: 'inline-block'}}>Notification</p>
-                                    <Android12Switch/>
-                                </Box>
-                                <Box sx={{ display: 'flex',flexDirection: 'column', alignItems:'flex-start', cursor: 'pointer', transition: '.5s',  }}>
-                                    <p style={{fontSize: '16px',fontWeight: 'bold', textAlign: 'center'}}>WATER CONSUMPTION</p>
-                                    <LineChart
-                                        width={400}
-                                        height={300}
-                                        data={data}
-                                        margin={{
-                                            top: 5,
-                                            right: 30,
-                                            bottom: 5
-                                        }}
-                                        >
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="name" />
-                                        <YAxis  />
-                                        <Legend />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="time"
-                                            stroke="#1A73E8"
-                                            activeDot={{ r: 1 }}
-                                        />
-                                        
-                                    </LineChart>
-                                </Box>
-                            </Stack> */}
                         </Grid>
                     )
                 }
             </Grid>
-        </Grid>
-        
+        </Grid>        
     );
 }
+
 export default GridComponent;

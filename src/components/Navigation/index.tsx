@@ -28,7 +28,7 @@ function NavigationIndex({matches}:Props) {
             return;
         }
     }, [user]);
-    console.log('Matches is: ',matches)
+    // console.log('Matches is: ',matches)
     return (
         <Box  sx={{padding: '10px 0', bgcolor: '#fff', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center'}}>
             <Box sx={{display: 'flex', alignItems: 'center'}}>
@@ -50,11 +50,11 @@ function NavigationIndex({matches}:Props) {
                         <Box onClick={isOpen?handleClose:handleClick} sx={{display: 'flex',width:'20%',height:'100%', cursor:'pointer', ":hover":{bgcolor:'#f5f5f5'}, alignItems: 'center', justifyContent: 'space-around', }}>
                             <Box sx={{position:'relative'}} >
                                 <NotificationsNone sx={{fontWeight:'light',color:'#000'}} />
-                                <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>{devices.reduce((acc,device)=>acc+device.notification.length,0)}</h3>
+                                <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>{devices.reduce((acc,device)=>acc+device.notifications.length,0)??0}</h3>
                             </Box>
                             <Box mr={2} sx={{display: 'flex',width:'100%', cursor:'pointer',  alignItems: 'center', justifyContent: 'space-evenly', height:'100%'}}>
                                 <AvatarComponent name={user.name} src='"https://mui.com/static/images/avatar/1.jpg"' />
-                                <h3 style={{fontSize: 'calc(12px + .2vw)', fontWeight:'normal'}}>{user.name}</h3>
+                                <p style={{fontSize: '15px', fontWeight:'normal'}}>{user.name}</p>
                                 <Box component='img' src={ArrowDropDownSVG} />
                             </Box>
                         </Box>
