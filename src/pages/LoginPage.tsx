@@ -2,7 +2,7 @@ import { Box, Button, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Visibility,  } from '@mui/icons-material';
 import { useState } from 'react';
-// import MajiUpIcon from '../assets/majiupicon.png';
+import MajiUpIcon from '../assets/majiupicon.png';
 import {useContext} from 'react'
 import { DevicesContext } from '../context/devices.context';
 import {useNavigate} from 'react-router-dom'
@@ -76,8 +76,8 @@ function LoginPage() {
     }
     return (
         <Box>
-            <Box sx={{bgcolor: '#F6F6F6',height: '100vh',}}>
-                {/* <Box src={MajiUpIcon} component='img' sx={{height: 80,width: 80, }} /> */}
+            <Box sx={{bgcolor: '#fff',height: '100vh',}}>
+                <Box src={MajiUpIcon} component='img' sx={{height: 80,width: 80, }} />
                 <Box sx={{height: '80%', textAlign: 'center', position: 'relative' }}>
                     <Box sx={{}}>
                         <Box sx={{bgcolor: '#fff',height: '100vh', textAlign: 'center', position: 'relative' }}>
