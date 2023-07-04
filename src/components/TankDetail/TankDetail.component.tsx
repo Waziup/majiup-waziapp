@@ -17,7 +17,8 @@ type Props={
     waterQuality: string,
     on: boolean,
 	consumption: any[],
-    actuator?: Actuator[]
+    actuator?: Actuator[],
+    height: number,
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
@@ -64,7 +65,7 @@ const BoxStyle={
 const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
 
 
-function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption, actuator}:Props) {
+function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption,height, actuator}:Props) {
 	const [isChecked, setIsChecked] = useState<boolean>(false);
 	const [toggleHot, setToggleHot] = useState(false);
 	// const CanvasJS = CanvasJSReact.CanvasJS;
@@ -110,7 +111,7 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption, a
                         </p>
                         <Android12Switch onClick={()=>setIsChecked(!isChecked)} checked={isChecked} sx={{color:'#FF5C00'}}  />
                     </Box>
-                    <WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/500)*100)} />
+                    <WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/height)*100)} />
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '80%',}}>
                         <Box sx={TankDetails}>
                             <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>

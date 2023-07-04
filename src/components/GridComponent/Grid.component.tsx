@@ -168,6 +168,7 @@ function GridComponent() {
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
                                         actuator={selectedDevice.actuators}
+                                        height={selectedDevice.height}
                                     />
                                 )
                             }

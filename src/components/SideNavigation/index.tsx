@@ -111,7 +111,7 @@ export default function SideNavigation({matches}: Props) {
                                     <Box ml={2} onClick={isOpen?handleClose:handleClick} sx={{display: 'flex',alignItems:'center', cursor:'pointer', ":hover":{bgcolor:'#f5f5f5'}, }}>
                                         <Box sx={{position:'relative'}} >
                                             <NotificationsNone sx={{fontWeight:'light',color:'#000'}} />
-                                            <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>{devices.reduce((acc,device)=>acc+device.notifications.length,0)??0}</h3>
+                                            <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>{devices.reduce((acc,device)=>device.notifications.length>0? acc+device.notifications.length:0,0)??0}</h3>
                                         </Box>
                                         <Box mr={2} sx={{display: 'flex',width:'100%', cursor:'pointer',  alignItems: 'center', justifyContent: 'space-evenly', height:'100%'}}>
                                             <AvatarComponent name={user.name} src='"https://mui.com/static/images/avatar/1.jpg"' />
