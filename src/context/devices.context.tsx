@@ -105,6 +105,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .then((res)=>{
             console.log(res.data);
+            // res.data.s   plice(0,q)
             setDevices(res.data.map((device: X)=>{
                 return{
                     ...device,

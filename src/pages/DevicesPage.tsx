@@ -33,6 +33,7 @@ function DevicesPage() {
                     waterTemp={data.state.temp}
                     actuator={data.state.actuators}
                     consumption={data.state.consumption}
+                    height={data.state.height}
                 />
         </Box>
     );
