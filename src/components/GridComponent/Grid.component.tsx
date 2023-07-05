@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Stack } from "@mui/material";
 import SideNavigation from "../SideNavigation";
 import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
@@ -10,11 +10,19 @@ import { X as Device } from "../../context/devices.context";
 import './Grid.styles.css'
 import { DevicesContext } from "../../context/devices.context";
 import FrameSVG from '../../assets/frame.svg';
+import { DeviceThermostatSharp, MoreVert, WaterDrop } from "@mui/icons-material";
+import WatertankComponent from "../WaterTank/Watertank.component";
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
     margin: "10px 0",
+    display: 'flex',
+    flexDirection:'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
 }
+const TankDetails={padding: '10px 20px',margin: '7px 0px', width: '50%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
 function getWaterQuality(tds: number){
     if (tds<300) {
         return 'Excellent'
@@ -32,8 +40,7 @@ function GridComponent() {
     const handleClose = () => setOpen(false);
     const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
-    
-    
+
     const handleSelectedTank = (tank: Device) => {
         const newTanks = devices.map((item: Device) => {
             
@@ -60,9 +67,9 @@ function GridComponent() {
      
     function mqttSubscription(devices: Device []){                  
         const reconnectTimeout = 2000;        
-        const mqtt = new window['Paho'].MQTT.Client("api.waziup.io", Number(443), "/websocket", "clientjs");
+        const mqtt = new window['Paho'].MQTT.Client("localhost", Number(80), "/websocket", "clientjs");
         const options = {
-            useSSL: true,
+            useSSL: false,
             timeout: 5,
             onSuccess: onConnect,
             onFailure: onFailure
@@ -95,6 +102,17 @@ function GridComponent() {
     }
     useEffect(()=> mqttSubscription(devices));
     console.log(devices);
+    function toogleActuatorHandler(id:string) {
+        const newTanks = devices.map((item: Device) => {
+            if(item.id === id){
+                item.actuators[0].value = !item.actuators[0].value;
+            }else{
+                item.isSelect = false;
+            }
+            return item;
+        })
+        setTanks(newTanks);
+    }
     return (        
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
@@ -138,7 +156,7 @@ function GridComponent() {
                             </Box>
                         ):
                         
-                        (devices.map((tank,i: number) => (
+                        (devices.map((tank,i: number) => matches? (
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}> 
                                 <ItemCardComponent
                                     isOn={tank.on}
@@ -151,8 +169,34 @@ function GridComponent() {
                                     temp={tank.temp}
                                 />
                             </Box>
-                        )))
-                        
+                        ):(
+                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}>
+                                <Box sx={{display: 'flex',padding:'5px 10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', width:'90%', transition: '.5s'}}>
+                                    <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
+                                        {tank.name.slice(0,10)}
+                                    </p>
+                                    <MoreVert  sx={{fontSize: 25, color: '#4592F6'}}/>
+                                </Box>
+                                <WatertankComponent percentage={Math.round((tank.liters/tank.height)*100)} waterQuality={getWaterQuality(tank.tds)} />
+                                <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '90%',}}>
+                                    <Box sx={TankDetails}>
+                                        <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
+                                            <WaterDrop style={{fontSize: 12,  color: '#4592F6'}}/>
+                                            Water Amount
+                                        </p>
+                                        <p style={{fontSize: '24px',}}>{tank.liters} Ltr</p>
+                                    </Box>
+                                    <Box sx={TankDetails}>
+                                        <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
+                                            <DeviceThermostatSharp style={{fontSize: 12, display: 'inline-block', color: '#1C1B1F'}}/>
+                                            Temperature
+                                        </p>
+                                        <p style={{fontSize: '24px',}}>{tank.temp}&#8451;</p>
+                                    </Box>
+                                </Stack>
+                            </Box>
+                            )
+                        ))
                     }
                 </Grid>
                 {
@@ -161,6 +205,7 @@ function GridComponent() {
                             {
                                 selectedDevice &&(
                                     <TankDetailComponent
+                                        id={selectedDevice.id}
                                         owner={selectedDevice.name}
                                         waterTemp={selectedDevice.temp}
                                         waterQuality={getWaterQuality(selectedDevice.tds)}
@@ -169,6 +214,8 @@ function GridComponent() {
                                         consumption={selectedDevice.consumption}
                                         actuator={selectedDevice.actuators}
                                         height={selectedDevice.height}
+                                        capacity={selectedDevice.capacity}
+                                        toggleActuator={toogleActuatorHandler}
                                     />
                                 )
                             }
