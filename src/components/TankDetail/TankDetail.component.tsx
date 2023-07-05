@@ -8,7 +8,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
 import CanvasJSReact from '@canvasjs/react-charts';
-// import FrameSVG from '../../assets/404-error.png';
+import FrameSVG from '../../assets/not-found.svg';
 import { Actuator } from '../../context/devices.context';
 type Props={
     owner: string,
@@ -19,6 +19,9 @@ type Props={
 	consumption: any[],
     actuator?: Actuator[],
     height: number,
+    capacity: number,
+    toggleActuator?: (id: string, value: boolean) => void,
+    id: string,
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
@@ -57,16 +60,12 @@ export const Android12Switch = styled(Switch)(({ theme }) => ({
     },
 }));
 const BoxStyle={ 
-     
     borderRadius: "10px",
     margin: "10px 0",
 	position: 'relative'
 }
 const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
-
-
-function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption,height, actuator}:Props) {
-	const [isChecked, setIsChecked] = useState<boolean>(false);
+function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
 	const [toggleHot, setToggleHot] = useState(false);
 	// const CanvasJS = CanvasJSReact.CanvasJS;
 	const CanvasJSChart = CanvasJSReact.CanvasJSChart
@@ -97,21 +96,31 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption,he
 			dataPoints: consumption
 		}]
 	}
-    console.log('Water quality ', waterQuality,consumption,actuator)
+    function switchActuator(){
+        console.log(actuator[0].value)
+        toggleActuator(id)
+    }
+    console.log('Water quality ', waterQuality,consumption,actuator,liters,waterTemp)
     return (
         <Stack sx={BoxStyle,(consumption.length || waterQuality && waterTemp)?{bgcolor: "#fff"}:{bgcolor:'inherit'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             {
                 (consumption.length || waterQuality && waterTemp) ?(
                     <>
                     <h3 style={{display: 'inline-block'}}>{owner}</h3>
+                    <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
+                        <p style={{display: 'inline-flex',paddingLeft: '5px', color:'#B69E09', alignItems: 'center'}}>
+                            Tank overflow detected.
+                        </p>
+                        <p style={{color:'#B69E09'}} >&#10006;</p>
+                    </Box>
                     <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
                         <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
                             <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>
                             {actuator[0].name??'Water Pump Control'}
                         </p>
-                        <Android12Switch onClick={()=>setIsChecked(!isChecked)} checked={isChecked} sx={{color:'#FF5C00'}}  />
+                        <Android12Switch onClick={switchActuator} checked={actuator[0].value?true:false} sx={{color:'#FF5C00'}}  />
                     </Box>
-                    <WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/height)*100)} />
+                    <WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/capacity)*100)} />
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '80%',}}>
                         <Box sx={TankDetails}>
                             <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
@@ -187,8 +196,8 @@ function TankDetailComponent({owner,waterTemp,waterQuality,liters,consumption,he
                             <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
                                 {owner}
                             </h3>
-                            {/* <Box sx={{width: '100%'}} component='img' src={FrameSVG}/> */}
-                            <p>--------</p>
+                            <Box sx={{width: '100%'}} component='img' src={FrameSVG}/>
+                            
                             <p style={{color: 'red',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No readings detected for this device!</p>
                         </Box>
                     </Box>
