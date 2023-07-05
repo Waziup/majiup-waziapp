@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
 import SearchComponent from './Search.component';
-import {WaterDrop, NotificationsNone} from '@mui/icons-material';
+import {WaterDrop, NotificationsNone, Search} from '@mui/icons-material';
 import ArrowDropDownSVG from '../../assets/arrow_drop_down.svg';
 import {useContext} from 'react';
 import { DevicesContext } from '../../context/devices.context';
@@ -12,7 +12,7 @@ type Props={
     matches: boolean
 }
 function NavigationIndex({matches}:Props) {
-    const {user, toggleModal,devices} = useContext(DevicesContext);
+    const {user, toggleModal} = useContext(DevicesContext);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const isOpen = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -36,12 +36,19 @@ function NavigationIndex({matches}:Props) {
                 <WaterDrop style={{fontSize: 'calc(20px + 1vw)', color: '#4592F6'}}/>
                 <h1 style={{fontSize: 'calc(20px + 1vw)', fontWeight:'normal'}}>MajiUp</h1>
             </Box>
-                <Box sx={matches?{width: '60%'}:{width:'60%'}}>
-                    <SearchComponent/>
-                </Box>
+            {
+                matches &&(
+                    <Box sx={matches?{width: '60%'}:{width:'60%'}}>
+                        <SearchComponent/>
+                    </Box>
+                )
+            }
                 {
                     !matches &&(
-                        <h3 onClick={toggleModal} style={{marginRight:10, cursor: 'pointer'}}>&#x2630;</h3>
+                        <Box sx={{flexDirection:'row', display:'flex'}}>
+                            <Search  style={{color: 'black',cursor:'pointer',marginRight:'10px' }}/>
+                            <h3 onClick={toggleModal} style={{marginRight:10, cursor: 'pointer'}}>&#x2630;</h3>
+                        </Box>
                     )
                 }
             {
