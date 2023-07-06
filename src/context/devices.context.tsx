@@ -115,14 +115,6 @@ export const  DevicesProvider = ({children}: Props)=>{
                             y: new Date(sensor.modified).getHours(),
                         }
                     }),
-                    // consumption: device.sensors.map((sensor: Sensor)=>{
-                    //     if (sensor.name.includes('Water Level Sensor'.toLowerCase())) {
-                    //         return{
-                    //             x: sensor.value ?? 10,
-                    //             y: sensor.modified.getHours(),
-                    //         }
-                    //     }
-                    // }),
                     liters: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))?.value ?? 0,
                     tds: device.sensors.find((sensor:Sensor)=>sensor.name.includes('TDS'.toLowerCase()))?.value ?? 0,
                     temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Temperature Sensor'.toLowerCase()))?.value ?? 0,
@@ -138,7 +130,6 @@ export const  DevicesProvider = ({children}: Props)=>{
         .catch((err)=>{
             console.log(err);
         })
-        
     },[]);
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {

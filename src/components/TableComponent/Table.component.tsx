@@ -60,17 +60,6 @@ function createData(
 //   const density = water_content / level;
   return { time , water_content, level,temperature, quality };
 }
-
-// const rows = [
-//     //time,litre, level, temp, quality
-//     createData('04:00AM', 341, 85, 30, 'Fresh'),
-//     createData('05:00AM', 340, 75, 10, 'Fresh'),
-//     createData('06:00AM', 329, 85, 20, 'Fresh'),
-//     createData('07:00AM', 325, 82, 10, 'Fresh'),
-//     createData('08:00AM', 323, 85, 40, 'Fresh'),
-//     createData('09:00AM', 320, 35, 70, 'Fresh'),
-//     createData('10:00AM', 310, 25, 30, 'Fresh'),
-// ];
 type Row={
     time: string
     litres: number,
