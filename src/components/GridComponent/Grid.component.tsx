@@ -12,6 +12,7 @@ import { DevicesContext } from "../../context/devices.context";
 import FrameSVG from '../../assets/frame.svg';
 import { DeviceThermostatSharp, MoreVert, WaterDrop } from "@mui/icons-material";
 import WatertankComponent from "../WaterTank/Watertank.component";
+
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
@@ -34,6 +35,7 @@ function getWaterQuality(tds: number){
         return('not satisfied');
     }
 }
+
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
@@ -65,8 +67,8 @@ function GridComponent() {
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
      
-    function mqttSubscription(devices: Device []){                  
-        const reconnectTimeout = 2000;        
+    function mqttSubscription(devices: Device []){
+        const reconnectTimeout = 2000;
         const mqtt = new window['Paho'].MQTT.Client("localhost", Number(80), "/websocket", "clientjs");
         const options = {
             useSSL: false,
@@ -75,18 +77,20 @@ function GridComponent() {
             onFailure: onFailure
         };
 
-        mqtt.connect(options)     
-        mqtt.onMessageArrived = onMessageArrived;               
+        mqtt.connect(options)
+        // client.connect(options);
+        mqtt.onMessageArrived = onMessageArrived;
 
         function onConnect() {
             console.log("Connected!")
             return devices.map((device)=>{
                 const deviceId = device.id
-                const deviceUrl = "devices/"+deviceId            
-                mqtt.subscribe(deviceUrl+"/#")
-                // getData('https://api.waziup.io/api/v2/'+sensorUrl,sensor.name)                                    
-    
-            })        
+                const deviceUrl = "/devices/"+deviceId
+                mqtt.subscribe(deviceUrl+"/")
+                // getData('https://api.waziup.io/api/v2/'+sensorUrl,sensor.name)
+                console.log("Subscribed to: ", deviceUrl) 
+            })
+            
         }
 
         function onFailure(message: string) {
@@ -96,11 +100,11 @@ function GridComponent() {
 
         function onMessageArrived(msg: {payloadString: string}) {
             console.log("----------->")
-            const val = (JSON.parse(msg.payloadString))  
-            console.log("Received -> ",val)                                
+            const val = (JSON.parse(msg.payloadString))
+            console.log("Received -> ",val)
         }
     }
-    useEffect(()=> mqttSubscription(devices));
+    useEffect(()=> mqttSubscription(devices),[devices]);
     console.log(devices);
     function toogleActuatorHandler(id:string) {
         const newTanks = devices.map((item: Device) => {
@@ -175,7 +179,7 @@ function GridComponent() {
                                     <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
                                         {tank.name.slice(0,10)}
                                     </p>
-                                    <MoreVert  sx={{fontSize: 25, color: '#4592F6'}}/>
+                                    <MoreVert sx={{fontSize: 25, color: '#4592F6'}}/>
                                 </Box>
                                 <WatertankComponent percentage={Math.round((tank.liters/tank.height)*100)} waterQuality={getWaterQuality(tank.tds)} />
                                 <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '90%',}}>
