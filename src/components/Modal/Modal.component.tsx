@@ -2,7 +2,7 @@ import './Modals.styles.css';
 import {WaterDrop, } from '@mui/icons-material';
 import {Box, Modal, } from '@mui/material';
 import './Modals.styles.css';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { DevicesContext } from '../../context/devices.context';
 type ModalComponentProps = {
     open: boolean
@@ -28,6 +28,7 @@ import RoundTankSVG from '../../assets/round_tank.svg';
 import NotificationSVG from '../../assets/notifications.svg';
 import FireHydrantSVG from '../../assets/fire_hydrant.svg';
 import FireHydrantSVG1 from '../../assets/fire_hydrant1.svg';
+const ImageStyle={height:40, width:40};
 function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 	const styles={
 		modalContainer:{
@@ -53,10 +54,16 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 			display:'flex'
 		}
 	}
-	const {devices,user,reportRef}= useContext(DevicesContext);
+	const {devices,user,reportRef,setReportRef}= useContext(DevicesContext);
 	const notifications = devices.reduce((acc,dev)=> dev.notifications.length>0?(acc+dev.notifications.length):0,0);
 	const totalLiters = devices.reduce((acc,dev)=>(acc+dev.liters),0);
 	console.log('Ref handler: ',reportRef)
+	useEffect(()=>{
+		const divEl = document.getElementById('divEl');
+		if(divEl){
+			setReportRef(divEl as HTMLDivElement);
+		}
+	},[])
     return (
 		<>
 		{/* <h2 >plsgfggfd</h2> */}
@@ -67,7 +74,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 			aria-labelledby="modal-modal-title"
 			aria-describedby="modal-modal-description"
 			>
-				<div style={{
+				<div id='divEl' style={{
 						backgroundColor: '#fff',
 						padding: '20px',
 						position: 'absolute',
@@ -112,7 +119,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 							<p>General Overview</p>
 							<div style={{display: 'flex',  flexWrap:'wrap' }} >
 								<div style={styles.infoContainer}>
-									<img src={TankSVG} style={{height:40, width:40}} />
+									<Box component={'img'} src={TankSVG} style={ImageStyle} />
 									<div >
 										<p>Total Tanks</p>
 										<h1 style={styles.titleBold} >
@@ -123,7 +130,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 								</div>
 								<div style={styles.infoContainer}>
 									{/* <NotificationsOutlined style={{fontSize:'20px'}} /> */}
-									<img src={NotificationSVG} style={{height:40, width:40}} />
+									<Box component={'img'} src={NotificationSVG} style={ImageStyle} />
 									<div>
 										<p>Notifications Received</p>
 										<p style={styles.titleBold} >
@@ -132,7 +139,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 									</div>
 								</div>
 								<div  style={styles.infoContainer}>
-									<img src={RoundTankSVG} style={{height:40, width:40}} />
+									<Box component={'img'} src={RoundTankSVG} style={ImageStyle} />
 									<div>
 										<p>Total Consumption</p>
 										<h1 style={styles.titleBold} >
@@ -142,8 +149,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 								</div>
 								<div style={styles.infoContainer}>
 									{/* <FireHydrantAltOutlined style={{fontSize:'20px'}} /> */}
-									<img src={FireHydrantSVG} style={{height:40, width:40}} />
-								
+									<Box component={'img'} src={FireHydrantSVG} style={ImageStyle} />
 									<div>
 										<p>Total Pump Runtime.</p>
 										<h1 style={styles.titleBold} >
@@ -153,7 +159,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 								</div>
 								<div style={styles.infoContainer}>
 									{/* <FireHydrantAltOutlined style={{fontSize:'20px'}} /> */}
-									<img src={FireHydrantSVG1} style={{height:40, width:40}} />
+									<Box component={'img'} src={FireHydrantSVG1} style={ImageStyle} />
 									<div>
 										<p>Total activation of Pump.</p>
 										<h1 style={styles.titleBold} >
