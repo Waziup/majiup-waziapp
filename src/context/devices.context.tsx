@@ -1,5 +1,5 @@
 import axios from "axios";
-import React,{ReactNode, createContext, useRef, useEffect, useState, createRef} from "react";
+import {ReactNode, createContext, useEffect, useState,} from "react";
 
 type Props={
     children: ReactNode
@@ -74,7 +74,8 @@ type ContextValues={
     setTanks: (devices: X[])=>void,
     selectedDevice: X | undefined,
     setSelectedDevice: (device: X)=>void,
-    reportRef: React.RefObject<HTMLDivElement> | null,
+    reportRef: HTMLDivElement | undefined,
+    setReportRef: (ref: HTMLDivElement)=>void,
 }
 export const DevicesContext = createContext<ContextValues>({
     devices: [],
@@ -85,12 +86,27 @@ export const DevicesContext = createContext<ContextValues>({
     setTanks: (devices)=>{console.log(devices);},
     selectedDevice: undefined,
     setSelectedDevice(device) {console.log(device)},
-    reportRef: null,
+    reportRef: undefined,
+    setReportRef: (ref) =>{console.log(ref);},
 });
 
 //return an array of device data including level, temperature, quality, etc.
 //extract the first row and add it as current waterTemp, waterQuality, liters, etc.
 //add the rest of the rows as consumption data
+
+async function fetchConsumption(deviceID: string): Promise<Consumption[]>{
+    const response = await axios.get(`http://localhost:8080/tanks/${deviceID}/tank-sensors/waterlevel/values`,{
+        headers:{
+            'Accept': 'application/json',
+        }
+    });
+    return response.data.map((sensor: {value: number,time: string})=>{
+        return{
+            x: sensor.value,
+            y: new Date(sensor.time).getHours(),
+        }
+    });
+}
 
 export const  DevicesProvider = ({children}: Props)=>{
     const [devices,setDevices] = useState<X[]>([]);
@@ -99,26 +115,28 @@ export const  DevicesProvider = ({children}: Props)=>{
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     const setTanks = (devices: X[])=> setDevices(devices);
-    const reportRef = createRef<HTMLDivElement>();
-    const [devicesID, setDevicesID] = useState<{deviceID:string,sensorID:string}[]>([]);
+    const [reportRef,setReportRefFunch] = useState<HTMLDivElement>();
+    // const [devicesID, setDevicesID] = useState<{deviceID:string,sensorID:string}[]>([]);
+    const setReportRef = (ref: HTMLDivElement)=>{setReportRefFunch(ref)};
     useEffect(()=>{
-        axios.get('http://localhost/devices',{
+        axios.get('http://localhost:8080/tanks',{
             headers:{
                 'Accept': 'application/json',
             }
         })
         .then((res)=>{
-            setDevices(res.data.map((device: X)=>{
+            setDevices(res.data.map(async (device: X)=>{
                 return{
                     ...device,
-                    consumption: device.sensors.filter((sensor: Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))
-                    .map((sensor: Sensor)=>{
-                        setDevicesID((prevDevices)=>[...prevDevices, {deviceID: device.id, sensorID: sensor.id}]);
-                        return{
-                            x: sensor.value ?? 10,
-                            y: new Date(sensor.modified).getHours(),
-                        }
-                    }),
+                    // consumption: device.sensors.filter((sensor: Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))
+                    // .map((sensor: Sensor)=>{
+                    //     setDevicesID((prevDevices)=>[...prevDevices, {deviceID: device.id, sensorID: sensor.id}]);
+                    //     return{
+                    //         x: sensor.value ?? 10,
+                    //         y: new Date(sensor.modified).getHours(),
+                    //     }
+                    // }),
+                    consumption: await fetchConsumption(device.id),
                     liters: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))?.value ?? 0,
                     tds: device.sensors.find((sensor:Sensor)=>sensor.name.includes('TDS'.toLowerCase()))?.value ?? 0,
                     temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Temperature Sensor'.toLowerCase()))?.value ?? 0,
@@ -140,10 +158,10 @@ export const  DevicesProvider = ({children}: Props)=>{
             setSelectedTank(devices[0])
         }
     },[devices, selectedTank]);
-    function fetchDataAtInterval(){
-        console.log('fetching data', devicesID);
-    }
-    fetchDataAtInterval()
+    // function fetchDataAtInterval(){
+    //     console.log('fetching data', devicesID);
+    // }
+    // fetchDataAtInterval()
     // setInterval(fetchDataAtInterval, 10000);
     const setSelectedDevice = (device: X)=> setSelectedTank(device);
     const setUser = (userName: string,token:string)=>setLoggedUser({name:userName,token})
@@ -157,6 +175,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         selectedDevice: selectedTank,
         setSelectedDevice,
         reportRef,
+        setReportRef,
     }
     return(
         <DevicesContext.Provider value={value}>
