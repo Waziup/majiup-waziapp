@@ -13,6 +13,9 @@ import { DevicesContext } from '../context/devices.context';
 import CanvasJSReact from '@canvasjs/react-charts';
 // import ReportcardComponent from '../components/ReportCard/Reportcard.component';
 import DocumentComponent from '../components/Document/Document.component';
+import { X as Device } from '../context/devices.context';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import html2canvas from 'html2canvas';
 const ReportsActiveText={
     cursor: 'pointer', 
     color: '#2C2D38',
@@ -28,8 +31,6 @@ type SelectedTankInfo = {
         y: number
     }[]
 }
-import { X as Device } from '../context/devices.context';
-import { PDFDownloadLink } from '@react-pdf/renderer';
 const ReportsText={cursor: 'pointer',color: '#9291A5',padding: '0 .4vw',fontSize: '13px' }
 type Consumption = {
     time: string,
@@ -63,39 +64,48 @@ function BillingsPage() {
             tickLength: 0,
             interval: 2,
         },
-
         axisY:{
             interval: 2,
             gridLegend: 'none',
         },
         data: [
-        {
-            type: "column",
-            dataPoints: selectedTank.consumption? selectedTank?.consumption.filter((_,i)=>i%2):[]
-            
-        }
+            {
+                type: "column",
+                dataPoints: selectedTank.consumption? selectedTank?.consumption.filter((_,i)=>i%2):[]
+            }
         ]
     }
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 	const reportTemplateRef = useRef<HTMLDivElement>(null);
-	
-    
     const handleGeneratePdf = () => {
-        console.log('reportTemplateRef',reportRef.current)
+        console.log('reportTemplateRef',reportRef)
         console.log('REf current state is: ',reportTemplateRef.current)
-		const doc = new jsPDF({
-			format: 'a4',
-			unit: 'px',
-		});
+        html2canvas(reportRef)
+        .then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            console.log('====================================');
+            console.log(imgData);
+            setImage(imgData)
+            console.log('====================================');
+            const pdf = new jsPDF();
+            pdf.addImage(imgData, 'JPEG', 0, 0);
 
-		// Adding the fonts.
-		// doc.setFont('Inter-Regular', 'normal');
-        // doc.setFillColor({ch1: 'black'})
-		doc.html(reportRef.current?.innerHTML as HTMLDivElement, {
-			callback(doc) {
-				doc.save('report_document');
-			},
-		});
+            pdf.save("download.pdf");
+        })
+        .catch((err) => console.log(err));
+		// const doc = new jsPDF({
+		// 	format: 'a4',
+		// 	unit: 'px',
+		// });
+
+		// // Adding the fonts.
+		// // doc.setFont('Inter-Regular', 'normal');
+        // // doc.setFillColor({ch1: 'black'})
+		// doc.html(reportRef.current?.innerHTML as HTMLDivElement, {
+		// 	callback(doc) {
+		// 		doc.save('report_document');
+		// 	},
+		// });
 	};
     function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
         console.log(event.target.value)
@@ -282,7 +292,7 @@ function BillingsPage() {
                 <CanvasJSChart options = {optionsToRender}/>
             </Box>
             <PDFDownloadLink document={<DocumentComponent/>} fileName="somename.pdf">
-                {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download now!')}
+                {({_,_, loading,}) => (loading ? 'Loading document...' : 'Download now!')}
             </PDFDownloadLink>
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>
