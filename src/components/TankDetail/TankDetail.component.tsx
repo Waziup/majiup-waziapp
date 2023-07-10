@@ -5,11 +5,12 @@ import {Stack,Box, styled, Switch} from '@mui/material';
 import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome, DeviceThermostat, Opacity } from "@mui/icons-material";
 import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
 import CanvasJSReact from '@canvasjs/react-charts';
 import FrameSVG from '../../assets/not-found.svg';
 import { Actuator } from '../../context/devices.context';
+import axios from 'axios';
 type Props={
     owner: string,
     liters: number,
@@ -68,7 +69,8 @@ const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadiu
 function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
 	const [toggleHot, setToggleHot] = useState(false);
 	// const CanvasJS = CanvasJSReact.CanvasJS;
-	const CanvasJSChart = CanvasJSReact.CanvasJSChart
+	const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+    const [temperatureConsumption, setTemperatureConsumption] = useState<any[]>([]);
 	const options = {
 		// animationEnabled: true,
 		// exportEnabled: true,
@@ -82,7 +84,7 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
 		axisY: {
 			// title: "Bounce Rate",
 			// suffix: "%"
-			interval: 2
+			interval: 2,
 		},
 		axisX: {
 			// title: "Week of Year",
@@ -93,12 +95,30 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
 			type: "line",
 			yValueFormatString: "#,##0.0#\"%\"",
 			// toolTipContent: "Week {x}: {y}%",
-			dataPoints: consumption
+			dataPoints: temperatureConsumption
 		}]
 	}
     function switchActuator(){
         console.log(actuator[0].value)
-        toggleActuator(id)
+        toggleActuator(id);
+    }
+    useEffect(()=>{
+        setTemperatureConsumption(consumption)
+    },[consumption]);
+    async function runFetch(){
+        const tempCons = await axios.get(`localhost:8080/tanks/${id}/tank-sensors/water-temperature/values`);
+        setTemperatureConsumption(tempCons.data);
+    }
+    useEffect(()=>{
+        console.log('Togglehot is true: ', toggleHot);
+        runFetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[toggleHot])
+    function handleToggleTeemp(){
+        setToggleHot(!toggleHot);
+        if (!toggleHot) {
+            setTemperatureConsumption(consumption);
+        }
     }
     console.log('Water quality ', waterQuality,consumption,actuator,liters,waterTemp)
     return (
@@ -118,7 +138,7 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
                             <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>
                             {actuator[0].name??'Water Pump Control'}
                         </p>
-                        <Android12Switch onClick={switchActuator} checked={actuator[0].value?true:false} sx={{color:'#FF5C00'}}  />
+                        <Android12Switch onClick={switchActuator} checked={actuator[0].value} sx={{color:'#FF5C00'}}  />
                     </Box>
                     <WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/capacity)*100)} />
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '80%',}}>
@@ -178,7 +198,7 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
                     <Box sx={{ display: 'flex',flexDirection: 'column', alignItems:'center',  transition: '.5s',  }}>
                         <Box sx={{ display: 'flex',flexDirection: 'row', alignItems:'center', justifyContent:'space-between',  transition: '.5s',width:'75%'  }}>
                             <p style={{fontSize: 16,fontWeight: '600', textAlign: 'center'}}>WATER {toggleHot?'TEMPERATURE':'CONSUMPTION'}</p>
-                            <Box onClick={()=>setToggleHot(!toggleHot)} pt={.3} bgcolor={'#E8E8E8'} sx={{borderRadius:'20px', width: '20%', textAlign:'center'}} >
+                            <Box onClick={handleToggleTeemp} pt={.3} bgcolor={'#E8E8E8'} sx={{borderRadius:'20px', width: '20%', textAlign:'center'}} >
                                 <Opacity style={!toggleHot? { cursor: 'pointer', color:'#fff',borderRadius:'50%', backgroundColor:'#4592F6' }:{ cursor: 'pointer', color:'#888992',borderRadius:'50%', }}/>
                                 <DeviceThermostat style={toggleHot?{ color:'#fff',cursor: 'pointer', borderRadius:'50%',backgroundColor:'#FF5C00'}:{ color:'#888992',cursor: 'pointer', }}/>
                             </Box>
