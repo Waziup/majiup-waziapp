@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useRef, createRef, useContext,useLayoutEffect, useEffect } from 'react';
+import React, { useState, useRef, useContext,useLayoutEffect, useEffect } from 'react';
 import { Box} from '@mui/material';
 import { Visibility} from '@mui/icons-material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-// import ChatFlow from '../assets/chart _flow.png';
 import StickyHeadTable from '../components/TableComponent/Table.component';
 import DownloadSVG from '../assets/download.svg';
 import ModalComponent from '../components/Modal/Modal.component';
@@ -13,6 +12,7 @@ import jsPDF from 'jspdf';
 import { DevicesContext } from '../context/devices.context';
 import CanvasJSReact from '@canvasjs/react-charts';
 // import ReportcardComponent from '../components/ReportCard/Reportcard.component';
+import DocumentComponent from '../components/Document/Document.component';
 const ReportsActiveText={
     cursor: 'pointer', 
     color: '#2C2D38',
@@ -29,6 +29,7 @@ type SelectedTankInfo = {
     }[]
 }
 import { X as Device } from '../context/devices.context';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 const ReportsText={cursor: 'pointer',color: '#9291A5',padding: '0 .4vw',fontSize: '13px' }
 type Consumption = {
     time: string,
@@ -51,11 +52,8 @@ function getWaterQuality(tds: number){
         return('Not satisfied');
     }
 }
-function getPercentageOfWater (height: number,level: number): number{
-    return (level/height)*100;
-}
 function BillingsPage() {
-    const { devices,} = useContext(DevicesContext)
+    const { devices, reportRef} = useContext(DevicesContext)
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[]}>([]);
     const [optionsToRender, setOptionsToRender] = useState({})
@@ -79,21 +77,21 @@ function BillingsPage() {
         ]
     }
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-	const reportTemplateRef = createRef<HTMLDivElement>(null);
-	const reportTemplateRef1 = useRef<HTMLDivElement | null | string>(null);
+	const reportTemplateRef = useRef<HTMLDivElement>(null);
+	
     
     const handleGeneratePdf = () => {
-        console.log('reportTemplateRef')
+        console.log('reportTemplateRef',reportRef.current)
         console.log('REf current state is: ',reportTemplateRef.current)
 		const doc = new jsPDF({
-			format: 'a5',
+			format: 'a4',
 			unit: 'px',
 		});
 
 		// Adding the fonts.
 		// doc.setFont('Inter-Regular', 'normal');
         // doc.setFillColor({ch1: 'black'})
-		doc.html(reportTemplateRef.current?.innerHTML as HTMLDivElement, {
+		doc.html(reportRef.current?.innerHTML as HTMLDivElement, {
 			callback(doc) {
 				doc.save('report_document');
 			},
@@ -105,21 +103,13 @@ function BillingsPage() {
         console.log('Selected table tank', selectedTableTank1)
         if (selectedTableTank1) {
             setSelectedTableTank({
-                // consumption: selectedTableTank.consumption.push({
-                //     time: `${selectedTableTank1.modified?  new Date(selectedTableTank1?.modified).getHours(): ''}:${selectedTableTank1.modified?new Date(selectedTableTank1?.modified).getMinutes():''}`,
-                //     // litres: getLitres(selectedTableTank1.capacity, selectedTableTank1.height, selectedTableTank1.sensors[1].value),
-                //     // level: selectedTableTank1.liters,
-                //     litres:  selectedTableTank1.liters,
-                //     level: isNaN(getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.height))? 0: getPercentageOfWater(selectedTableTank1.liters,100),
-                //     quality: getWaterQuality(selectedTableTank1.tds),
-                //     temp: selectedTableTank1.temp,
-                // })
                 consumption: [
-                    ...selectedTableTank.consumption,
+                    // ...selectedTableTank.consumption,
                     {
                         time: `${selectedTableTank1.modified?  new Date(selectedTableTank1?.modified).getHours(): ''}:${selectedTableTank1.modified?new Date(selectedTableTank1?.modified).getMinutes():''}`,
                         litres:  selectedTableTank1.liters,
-                        level: isNaN(getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.height))? 0: getPercentageOfWater(selectedTableTank1.liters,100),
+                        level: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
+                        // level: isNaN(getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.capacity))? 0: getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.capacity),
                         quality: getWaterQuality(selectedTableTank1.tds),
                         temp: selectedTableTank1.temp,
                     }
@@ -142,7 +132,7 @@ function BillingsPage() {
                 consumption: [{
                     time: `${new Date(devices[0].modified).getHours()}:00`,
                     litres:  devices[0].liters,
-                    level: isNaN(getPercentageOfWater(devices[0].liters,devices[0].height))? 0: getPercentageOfWater(devices[0].liters,devices[0].height),
+                    level: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
                     quality: getWaterQuality(devices[0].tds),
                     temp: devices[0].temp,
                 }]
@@ -172,13 +162,6 @@ function BillingsPage() {
                 consumption: devices[0].consumption ??[],
                 litres: devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.liters), 0)
             });
-            // setOptionsToRender({
-            //     ...options, 
-            //     data: devices.map((d)=>({
-            //         type: "spline",
-            //         dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
-            //     }))
-            // })
             setSelectedTank({name: devices[0].name, litres:devices[0].liters, id: devices[0].id, consumption: devices[0].consumption})
             setOptionsToRender({
                 ...options,
@@ -242,23 +225,28 @@ function BillingsPage() {
                     View Analytics
                 </p>
             </Box>
-             <div ref={reportTemplateRef}>
-                <ModalComponent ref={reportTemplateRef1} handleClose={()=>{console.log(reportTemplateRef1.current); setIsOpenModal(!isOpenModal)}} open={isOpenModal} >
-                    <CanvasJSChart options = {optionsToRender}/>
-                    {
-                        selectedTableTank.consumption?(
-                            <>
-                                <h4>Tabular Overview</h4>
-                                <StickyHeadTable 
-                                    rows1={selectedTableTank.consumption}
-                                />
-                            </>
-                        ):''
-                    }
-                </ModalComponent>
-            </div>  
-            
-            <Box sx={{display: 'flex',margin: '10px 0', flexWrap: 'wrap', alignItems: 'center'}}>
+            <ModalComponent handleClose={()=>{console.log(reportTemplateRef.current); setIsOpenModal(!isOpenModal)}} open={isOpenModal}>
+                <div>
+                    <h3 style={{fontSize: '16px', margin:'10px 0'}}>Consumption Chart</h3>
+                    <div style={{border: '1px solid black', padding:'8px 10px', borderRadius:'4px'}}>
+                        <p style={{color: '#9291A5', fontSize: '15px', margin:'10px 0'}}>Water Consumption, {new Date().toDateString()}</p>
+                        {/* <h3 style={{fontSize: '24px'}}>Usage Volume</h3> */}
+                        <h4 style={{margin:'10px 0'}}>{isNaN(selectedTank.litres)?0:selectedTank.litres} {selectedTank.id==='All'?'total litres consumed':'Litres'} </h4>
+                        <CanvasJSChart options = {optionsToRender}/>
+                    </div>
+                </div>
+                {
+                    selectedTableTank.consumption?(
+                        <>
+                            <h4 style={{margin:'10px'}}>Tabular Overview</h4>
+                            <StickyHeadTable 
+                                rows1={selectedTableTank.consumption}
+                            />
+                        </>
+                    ):''
+                }
+            </ModalComponent>
+            <Box  ref={reportTemplateRef} sx={{display: 'flex',margin: '10px 0', flexWrap: 'wrap', alignItems: 'center'}}>
                 <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0', minWidth: '200px', width: '20%', borderRadius: '20px'}}>
                     <label style={{background: '#E8E8E8',fontSize: '18',fontWeight: '500', color: '#2C2D38', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Device:</label>
                     <select onChange={(event)=>{setSelectedTank({...selectedTank, id: event.target.value})}} style={{border: 'none',outline: 'none',width: '65%', background: 'none'}} name="tanks" id="tanks">
@@ -270,7 +258,7 @@ function BillingsPage() {
                         }
                     </select>
                 </Box>
-                <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0',minWidth: '200px', width: '20%', borderRadius: '20px'}}>
+                <Box  sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0',minWidth: '200px', width: '20%', borderRadius: '20px'}}>
                     <label style={{background: '#E8E8E8',fontWeight: '500', color: '#2C2D38', fontSize: '18', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Plots:</label>
                     <select style={{border: 'none',outline: 'none',width: '70%', background: 'none'}} name="devs" id="devs">
                         <option value="all">Custom</option>
@@ -293,7 +281,9 @@ function BillingsPage() {
                 {/* <Box alt="water Tank." sx={{width: '100%'}} component="img" src={ChatFlow}/> */}
                 <CanvasJSChart options = {optionsToRender}/>
             </Box>
-            
+            <PDFDownloadLink document={<DocumentComponent/>} fileName="somename.pdf">
+                {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download now!')}
+            </PDFDownloadLink>
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>
                     <Box sx={{border: '1px solid #ccc',marginRight:'5px', padding:'5px', width: '75%', borderRadius: '20px'}}>
@@ -309,7 +299,7 @@ function BillingsPage() {
                         <AssessmentIcon sx={{ color: '#666666',cursor: 'pointer', margin: '0 10px'}}/>
                         <Box onClick={handleGeneratePdf} sx={{bgcolor: '#F5F5F5', cursor: 'pointer', width: '100px',borderRadius:'4px', padding: '4px', display: 'inline-flex',alignItems:'center', fontSize: '13px'}}>
                             <Box alt="download" sx={{width: '20px', color: '#666666'}} component="img" src={DownloadSVG}/>
-                            <p style={{ fontWeight: 'bold'}}>Generate </p>
+                            <p style={{ fontWeight: 'bold'}}>Generate</p>
                         </Box>
                     </Box>
                 </Box>

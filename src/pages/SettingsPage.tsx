@@ -1,10 +1,11 @@
-import { Add, MoreVert } from '@mui/icons-material';
+import { Add, MoreVert, } from '@mui/icons-material';
 import { Box, Button, Modal, Stack } from '@mui/material';
 import FrameSVG from '../assets/frame.svg';
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { DevicesContext } from '../context/devices.context';
 import { Android12Switch } from '../components/TankDetail/TankDetail.component';
 import { useOutletContext } from 'react-router-dom';
+import { X as Device } from '../context/devices.context';
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
@@ -33,18 +34,22 @@ const InputLabel={
 }
 const SensorContainer = {
     display: 'flex', 
-    justifyContent: 'space-between', 
+    justifyContent: 'space-evenly', 
     alignItems: 'center', 
     flexWrap:'wrap'
 }
-function getLitres(capacity: number, height: number,level: number): number{
-    return (level/height)*capacity;
-}
+
 function SettingsPage() {
     const { devices } = useContext(DevicesContext);
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+    const [selectedDevice, setSelectedDevice] = useState<Device>();
     const [matches] = useOutletContext<[matches: boolean]>();
-    console.log(devices)
+    // console.log(devices)
+    const handleSelectedTank = (e:React.MouseEvent<SVGSVGElement, MouseEvent>,device: Device) => {
+        setSelectedDevice(device);
+        setIsOpenModal(true);
+        console.log(e.target,selectedDevice);
+    }
     return (
         <Box pl={2} pr={2}>
             <Box onClick={()=>setIsOpenModal(true)} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -69,8 +74,12 @@ function SettingsPage() {
                                 <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0',width:'50%',bgcolor:'#F6F6F6', borderRadius: '20px'}}>
                                     {/* <label style={{background: '#E8E8E8',fontSize: '18',fontWeight: '500', color: '#2C2D38', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Device:</label> */}
                                     <select required style={{border: 'none',outline: 'none',width: '100%', background:'none' }} name="devs" id="devs">
-                                        <option value="all">Gateway 5454gf34</option>
-                                        
+                                        {/* <option value="all">Gateway 5454gf34</option> */}
+                                        {
+                                            devices.map((device,idx)=>(
+                                                <option key={idx} value={device.id}>{device.name}</option>
+                                            ))
+                                        }
                                     </select>
                                 </Box>
                             </Box>
@@ -110,56 +119,74 @@ function SettingsPage() {
                 {
                     devices.map((device,id)=>(
                         <Stack key={id} p={1} sx={BoxStyle} alignItems={'center'} flexWrap='wrap'  direction='column' alignContent={'center'} spacing={2}>
-                            <Stack  width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
+                            <Stack  width={'100%'} direction='row' justifyContent={'space-between'}>
                                 <h3 style={{fontSize: '20px',fontWeight: '500', }}>
-                                    {device.name}
+                                    {device.name.slice(0,10)}
                                     <p style={{color: '#888992',fontWeight: 'lighter',textAlign: 'center', fontSize: 12}}>{device.id}</p>
                                 </h3>
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>
                                     <Android12Switch checked/>
-                                    <MoreVert/>
+                                    <MoreVert sx={{cursor:'pointer'}} onClick={(e)=>handleSelectedTank(e,device)}/>
                                 </Box>
                             </Stack>
-                            <Box p={1} sx={{border: '1px solid #888992', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '20px',fontWeight: '500', }}>
+                            <Box p={1} sx={{border: '1px solid #ccc', borderRadius: 1, width: '100%'}}>
+                                <h3 style={{fontSize: '18px',fontWeight: '700', }}>
                                     Tank Information
                                 </h3>
                                 <Box p={1} sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                                     <Box>
-                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>Capacity </h3>
-                                        <p style={{fontSize: '20px',}}>Height</p>
+                                        <h3 style={{fontSize: '16px',fontWeight: 'normal', }}>Capacity </h3>
+                                        <p style={{fontSize: '16px',}}>Height</p>
                                     </Box>
                                     <Box>
-                                        <h3 style={{fontSize: '20px',fontWeight: 'normal', }}>
+                                        <h3 style={{fontSize: '16px',fontWeight: 'normal', }}>
                                             {device.liters}
                                             <span> litres</span>
                                         </h3>
-                                        <p style={{fontSize: '20px',}}>
+                                        <p style={{fontSize: '16px',}}>
                                             {device.height}
                                             <span>meters</span>
                                         </p>
                                     </Box>
                                 </Box>
                             </Box>
-                            <Box p={1} sx={{border: '1px solid #888992', borderRadius: 1, width: '100%'}}>
-                                <Stack  width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
-                                    <h3 style={{fontSize: '20px',fontWeight: '600', }}>
-                                        Robodo SEN18
-                                    </h3>
-                                    <p style={{color: '#888992',fontWeight: 'lighter',textAlign: 'center', fontSize: 14}}>Water level sensor</p>
-                                </Stack>
-                                <Box sx={{justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
-                                    <h3 style={{fontSize: '18px',fontWeight: '600', }}>
-                                        State
-                                    </h3>
-                                    <Android12Switch checked/>
-                                </Box>
-                                <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
-                                    <h3 style={{fontSize: '18px',fontWeight: '600', }}>
-                                        Notification
-                                    </h3>
-                                    <Android12Switch checked/>
-                                </Box>
+                            <Box  p={1} sx={{border: '1px solid #CCC', borderRadius: 1, width: '100%'}}>
+                                <h3 style={{fontSize: '18px',fontWeight: '700',margin:'10px 0'}}>
+                                    SENSORS
+                                </h3>
+                                {
+                                    device.sensors.map((sensor,idx)=>(
+                                        <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
+                                            <h3 style={{fontSize: '13px',fontWeight: '600',margin:'5px 0' }}>
+                                                {sensor.name}
+                                            </h3>
+                                            <Box>
+                                                {/* <p>Edit</p> */}
+                                                {/* <Edit sx={{cursor:'pointer', color:'#14AE5D', fontSize:'18px'}} /> */}
+                                                {/* <Delete sx={{cursor:'pointer', color:'#F00', fontSize:'18px'}}/> */}
+                                                {/* <p>Delete</p> */}
+                                            </Box>
+                                            {/* <p style={{fontWeight: 'lighter',textAlign: 'center', fontSize: '10px'}}>Water level sensor</p> */}
+                                        </Stack>
+                                    ))
+                                } 
+                                
+                            </Box>
+                            <Box  p={1} sx={{border: '1px solid #CCC', borderRadius: 1, width: '100%'}}>
+                                <h3 style={{fontSize: '18px',fontWeight: '700',margin:'10px 0'}}>
+                                    ACTUATORS
+                                </h3>
+                                {
+                                    device.actuators.map((actuator,idx)=>(
+                                            <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
+                                                <h3 style={{fontSize: '13px',fontWeight: '600',margin:'5px 0' }}>
+                                                    {actuator.name}
+                                                </h3>
+                                                
+                                            </Stack>
+                                    ))
+                                } 
+                                
                             </Box>
                         </Stack>
                     ))
