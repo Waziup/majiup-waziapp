@@ -72,7 +72,6 @@ type Props = {
 }
 
 export default function StickyHeadTable({rows1}: Props) {
-    console.log(rows1)
     const rows = rows1.map((row)=>{
         return createData(row.time,row.litres,row.level,row.temp,row.quality)
     })
