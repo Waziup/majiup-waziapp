@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import React,{ReactNode, createContext, useRef, useEffect, useState, createRef} from "react";
 
 type Props={
     children: ReactNode
@@ -73,7 +73,8 @@ type ContextValues={
     isOpenNav?: boolean,
     setTanks: (devices: X[])=>void,
     selectedDevice: X | undefined,
-    setSelectedDevice: (device: X)=>void
+    setSelectedDevice: (device: X)=>void,
+    reportRef: React.RefObject<HTMLDivElement> | null,
 }
 export const DevicesContext = createContext<ContextValues>({
     devices: [],
@@ -84,6 +85,7 @@ export const DevicesContext = createContext<ContextValues>({
     setTanks: (devices)=>{console.log(devices);},
     selectedDevice: undefined,
     setSelectedDevice(device) {console.log(device)},
+    reportRef: null,
 });
 
 //return an array of device data including level, temperature, quality, etc.
@@ -97,6 +99,8 @@ export const  DevicesProvider = ({children}: Props)=>{
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     const setTanks = (devices: X[])=> setDevices(devices);
+    const reportRef = createRef<HTMLDivElement>();
+    const [devicesID, setDevicesID] = useState<{deviceID:string,sensorID:string}[]>([]);
     useEffect(()=>{
         axios.get('http://localhost/devices',{
             headers:{
@@ -104,12 +108,12 @@ export const  DevicesProvider = ({children}: Props)=>{
             }
         })
         .then((res)=>{
-            
             setDevices(res.data.map((device: X)=>{
                 return{
                     ...device,
                     consumption: device.sensors.filter((sensor: Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))
                     .map((sensor: Sensor)=>{
+                        setDevicesID((prevDevices)=>[...prevDevices, {deviceID: device.id, sensorID: sensor.id}]);
                         return{
                             x: sensor.value ?? 10,
                             y: new Date(sensor.modified).getHours(),
@@ -136,20 +140,24 @@ export const  DevicesProvider = ({children}: Props)=>{
             setSelectedTank(devices[0])
         }
     },[devices, selectedTank]);
-
+    function fetchDataAtInterval(){
+        console.log('fetching data', devicesID);
+    }
+    fetchDataAtInterval()
+    // setInterval(fetchDataAtInterval, 10000);
     const setSelectedDevice = (device: X)=> setSelectedTank(device);
     const setUser = (userName: string,token:string)=>setLoggedUser({name:userName,token})
     const value={
-        devices, 
+        devices,
         user, 
         setUser,
         isOpenNav,
         toggleModal,
         setTanks,
         selectedDevice: selectedTank,
-        setSelectedDevice
+        setSelectedDevice,
+        reportRef,
     }
-
     return(
         <DevicesContext.Provider value={value}>
             {children}
