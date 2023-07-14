@@ -63,9 +63,9 @@ function createData(
 type Row={
     time: string
     litres: number,
-    level: number,
-    temp: number,
-    quality: string
+    waterLevel: number,
+    waterTemperature: number,
+    waterQuality: string
 }
 type Props = {
     rows1: Row[]
@@ -73,7 +73,7 @@ type Props = {
 
 export default function StickyHeadTable({rows1}: Props) {
     const rows = rows1.map((row)=>{
-        return createData(row.time,row.litres,row.level,row.temp,row.quality)
+        return createData(row.time,row.litres,row.waterLevel,row.waterTemperature,row.waterQuality)
     })
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
