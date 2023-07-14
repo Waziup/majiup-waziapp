@@ -16,6 +16,8 @@ import DocumentComponent from '../components/Document/Document.component';
 import { X as Device } from '../context/devices.context';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
+import axios from 'axios';
+import { getConsumption } from '../utils/consumptionHelper';
 const ReportsActiveText={
     cursor: 'pointer', 
     color: '#2C2D38',
@@ -32,32 +34,47 @@ type SelectedTankInfo = {
     }[]
 }
 const ReportsText={cursor: 'pointer',color: '#9291A5',padding: '0 .4vw',fontSize: '13px' }
-type Consumption = {
+export type Consumption = {
     time: string,
     litres: number
-    level: number
-    quality: string
-    temp: number
+    waterLevel: number
+    waterQuality: string
+    waterTemperature: number
 }
 function getLitres(capacity: number, height: number,level: number): number{
     return (level/height)*capacity;
 }
-function getWaterQuality(tds: number){
-    if (tds>0 && tds<300) {
-        return 'Excellent'
-    }else if(tds>300 &&tds<900){
-        return'Good'
-    }else if(tds>900){
-        return 'Poor'
-    }else{
-        return('Not satisfied');
-    }
-}
+
 function BillingsPage() {
     const { devices, reportRef} = useContext(DevicesContext)
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[]}>([]);
     const [optionsToRender, setOptionsToRender] = useState({})
+    function handleFetchTableComponents(deviceId: string){
+        const getLevel = axios.get(`http://localhost:8080/tanks/${deviceId}/waterlevel/value`)
+        const getWaterQuality = axios.get(`http://localhost:8080/tanks/${deviceId}/water-quality/value`)
+        const getTemp = axios.get(`http://localhost:8080/tanks/${deviceId}/water-temperature/value`)
+    
+        axios.all([getLevel,getWaterQuality,getTemp])
+        .then(axios.spread(function (respLevel,respQuality,respTemp){
+            const lastArr = selectedTableTank.consumption[selectedTableTank.consumption.length];
+            if (lastArr.level !==respLevel.data || lastArr.quality !== respQuality.data || lastArr.temp !== respTemp.data ){
+                const date = new Date();
+                setSelectedTableTank({
+                    consumption: [
+                        // ...selectedTableTank.consumption,
+                        {
+                            time: `${date.getHours()}:${date.getMinutes()}`,
+                            litres:  selectedTableTank1.liters,
+                            level: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
+                            quality: selectedTableTank1.tds,
+                            waterTemperature: selectedTableTank1.temp,
+                        }
+                    ]
+                })
+            }
+        }))
+    }
     const options = {
         axisX:{
             gridThickness: 0,
@@ -107,24 +124,29 @@ function BillingsPage() {
 		// 	},
 		// });
 	};
-    function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
+    async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
         console.log(event.target.value)
         const selectedTableTank1 = devices.filter((device: Device) => device.id === event.target.value)[0];
         console.log('Selected table tank', selectedTableTank1)
         if (selectedTableTank1) {
+            const responseData =await getConsumption(selectedTableTank1.id);
+            console.log('Response data', responseData)
             setSelectedTableTank({
-                consumption: [
-                    // ...selectedTableTank.consumption,
-                    {
-                        time: `${selectedTableTank1.modified?  new Date(selectedTableTank1?.modified).getHours(): ''}:${selectedTableTank1.modified?new Date(selectedTableTank1?.modified).getMinutes():''}`,
-                        litres:  selectedTableTank1.liters,
-                        level: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
-                        // level: isNaN(getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.capacity))? 0: getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.capacity),
-                        quality: getWaterQuality(selectedTableTank1.tds),
-                        temp: selectedTableTank1.temp,
-                    }
-                ]
+                consumption: responseData
             })
+            // setSelectedTableTank({
+            //     consumption: [
+            //         // ...selectedTableTank.consumption,
+            //         {
+            //             time: `${selectedTableTank1.modified?  new Date(selectedTableTank1?.modified).getHours(): ''}:${selectedTableTank1.modified?new Date(selectedTableTank1?.modified).getMinutes():''}`,
+            //             litres:  selectedTableTank1.liters,
+            //             waterLevel: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
+            //             // level: isNaN(getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.capacity))? 0: getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.capacity),
+            //             waterQuality: selectedTableTank1.tds,
+            //             waterTemperature: selectedTableTank1.temp,
+            //         }
+            //     ]
+            // })
         }
         console.log('Selected table tank', selectedTableTank);
         //setSelectedTableTank(selectedTableTank);
@@ -138,15 +160,20 @@ function BillingsPage() {
     },[])
     useEffect(()=>{
         if (devices.length>=1) {
+            const responseData =getConsumption(devices[0].id);
+            console.log('Response data', responseData)
             setSelectedTableTank({
-                consumption: [{
-                    time: `${new Date(devices[0].modified).getHours()}:00`,
-                    litres:  devices[0].liters,
-                    level: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
-                    quality: getWaterQuality(devices[0].tds),
-                    temp: devices[0].temp,
-                }]
+                consumption: responseData
             })
+            // setSelectedTableTank({
+            //     consumption: [{
+            //         time: `${new Date(devices[0].modified).getHours()}:00`,
+            //         litres:  devices[0].liters,
+            //         waterLevel: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
+            //         waterQuality: devices[0].tds,
+            //         waterTemperature: devices[0].temp,
+            //     }]
+            // })
             console.log('Devices to be loaded are:', selectedTank)
             if(selectedTank.id==='All'){
                 console.log('All tanks',devices.reduce((acc, curr)=>acc+curr.liters,0));
@@ -226,6 +253,11 @@ function BillingsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectedTank.id])
     const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+    if(!devices && !selectedTableTank.consumption){
+        return(
+            <h1>Loading</h1>
+        )
+    }
     return (
         <Box pl={2} pr={2}>
             <Box onClick={()=>setIsOpenModal(!isOpenModal)} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -292,7 +324,7 @@ function BillingsPage() {
                 <CanvasJSChart options = {optionsToRender}/>
             </Box>
             <PDFDownloadLink document={<DocumentComponent/>} fileName="somename.pdf">
-                {({_,_, loading,}) => (loading ? 'Loading document...' : 'Download now!')}
+                {({blob,_, loading,}) => (loading ? 'Loading document...' : 'Download now!')}
             </PDFDownloadLink>
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>
