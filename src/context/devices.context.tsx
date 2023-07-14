@@ -18,7 +18,7 @@ type Sensor={
     modified: Date,
     name: string,
     quantity: number,
-    time: Date | null,
+    time: string ,
     unit: string,
     value: number,
 }
@@ -37,6 +37,27 @@ type Notification={
     meta: unknown,
     date: Date,
 }
+type MetaInformation={
+    receivenotifications: false,
+    notifications: {
+        id: string,
+        message: string,
+        read_status: boolean
+    },
+    location: {
+        longitude: number,
+        latitude: 0
+    },
+    settings: {
+        length: number,
+        width: number,
+        height: number,
+        radius: number,
+        capacity: number,
+        maxalert: number,
+        minalert: number,
+    }
+}
 interface Device{
     actuators: Actuator[],
     capacity: number,
@@ -44,7 +65,7 @@ interface Device{
     height: number,
     id: string,
     length: number,
-    meta: unknown,
+    meta: MetaInformation,
     modified: Date,
     name: string,
     notifications: Notification[],
@@ -58,10 +79,6 @@ export interface X extends Device {
     liters: number
     temp: number,
     tds: number,
-    location?: {
-        lat: number,
-        lng: number
-    },
     on: boolean,
 }
 
@@ -76,6 +93,8 @@ type ContextValues={
     setSelectedDevice: (device: X)=>void,
     reportRef: HTMLDivElement | undefined,
     setReportRef: (ref: HTMLDivElement)=>void,
+    loading: boolean,
+    setLoadingFunc: (loading: boolean)=>void,
 }
 export const DevicesContext = createContext<ContextValues>({
     devices: [],
@@ -88,28 +107,17 @@ export const DevicesContext = createContext<ContextValues>({
     setSelectedDevice(device) {console.log(device)},
     reportRef: undefined,
     setReportRef: (ref) =>{console.log(ref);},
+    loading: false,
+    setLoadingFunc: (loading)=>{console.log(loading);},
 });
 
 //return an array of device data including level, temperature, quality, etc.
 //extract the first row and add it as current waterTemp, waterQuality, liters, etc.
 //add the rest of the rows as consumption data
 
-async function fetchConsumption(deviceID: string): Promise<Consumption[]>{
-    const response = await axios.get(`http://localhost:8080/tanks/${deviceID}/tank-sensors/waterlevel/values`,{
-        headers:{
-            'Accept': 'application/json',
-        }
-    });
-    return response.data.map((sensor: {value: number,time: string})=>{
-        return{
-            x: sensor.value,
-            y: new Date(sensor.time).getHours(),
-        }
-    });
-}
-
 export const  DevicesProvider = ({children}: Props)=>{
     const [devices,setDevices] = useState<X[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
     const [selectedTank, setSelectedTank] = useState<X>()
     const [user,setLoggedUser]=useState<{name: string,token:string}>({name:'',token:''});
     const [isOpenNav, setIsOpenNav] = useState<boolean>(false);
@@ -118,51 +126,67 @@ export const  DevicesProvider = ({children}: Props)=>{
     const [reportRef,setReportRefFunch] = useState<HTMLDivElement>();
     // const [devicesID, setDevicesID] = useState<{deviceID:string,sensorID:string}[]>([]);
     const setReportRef = (ref: HTMLDivElement)=>{setReportRefFunch(ref)};
+    const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     useEffect(()=>{
+        setLoading(true)
         axios.get('http://localhost:8080/tanks',{
             headers:{
                 'Accept': 'application/json',
+                'Content-Type':'application/json'
             }
         })
-        .then((res)=>{
-            setDevices(res.data.map(async (device: X)=>{
+        .then(async (response)=>{
+            const devicePromises = response.data.map(async (device:Device) => {
+                const sensorResponse = await axios.get(`http://localhost:8080/tanks/${device.id}/tank-sensors/waterlevel/values`, {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+          
+                return sensorResponse.data.map((sensor:Sensor) => {
+                    const date = new Date(sensor.time);
+                    return {
+                        y: sensor.value,
+                        x: date.getHours(),
+                    };
+                });
+            });
+            const consumption = await Promise.all(devicePromises);
+
+            return {
+                consumption: consumption[0] as Consumption[],
+                res: response.data,
+            };
+        })
+        .then(({res,consumption})=>{
+            console.log('Devices: ', res,consumption);
+            setDevices(res.map(function(device: X){
                 return{
                     ...device,
-                    // consumption: device.sensors.filter((sensor: Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))
-                    // .map((sensor: Sensor)=>{
-                    //     setDevicesID((prevDevices)=>[...prevDevices, {deviceID: device.id, sensorID: sensor.id}]);
-                    //     return{
-                    //         x: sensor.value ?? 10,
-                    //         y: new Date(sensor.modified).getHours(),
-                    //     }
-                    // }),
-                    consumption: await fetchConsumption(device.id),
-                    liters: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Water Level Sensor'.toLowerCase()))?.value ?? 0,
-                    tds: device.sensors.find((sensor:Sensor)=>sensor.name.includes('TDS'.toLowerCase()))?.value ?? 0,
-                    temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('Temperature Sensor'.toLowerCase()))?.value ?? 0,
+                    consumption: consumption,
+                    liters: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,
+                    tds: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0,
+                    temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
                     isSelect: false,
-                    location: {
-                        lat: 0,
-                        lng: 0
-                    },
+                    
                     on: true,
                 }
             }));
+            console.log('Devices: ',devices);
+            setLoading(false);
         })
         .catch((err)=>{
             console.log(err);
         })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {
+            console.log('First device',Promise.resolve(devices).then((res)=>console.log(res)));
             setSelectedTank(devices[0])
+            setLoading(false);
         }
     },[devices, selectedTank]);
-    // function fetchDataAtInterval(){
-    //     console.log('fetching data', devicesID);
-    // }
-    // fetchDataAtInterval()
-    // setInterval(fetchDataAtInterval, 10000);
     const setSelectedDevice = (device: X)=> setSelectedTank(device);
     const setUser = (userName: string,token:string)=>setLoggedUser({name:userName,token})
     const value={
@@ -176,6 +200,8 @@ export const  DevicesProvider = ({children}: Props)=>{
         setSelectedDevice,
         reportRef,
         setReportRef,
+        loading,
+        setLoadingFunc,
     }
     return(
         <DevicesContext.Provider value={value}>
