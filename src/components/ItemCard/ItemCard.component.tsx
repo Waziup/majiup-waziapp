@@ -46,9 +46,9 @@ function ItemCardComponent({name,amount,temp,isOn,}: Props) {
                 </Stack>
                 <Box>
                     <h3 style={
-                        isOn?{fontSize: '16px', color: '#1a73e8'}:{fontSize: '16px', color: '#888992'}
+                        isOn?{fontSize: '16px', color: '#85ea2d'}:{fontSize: '16px', color: '#888992'}
                     }>{
-                        isOn?'On':'Off'
+                        isOn?'Active':'Inactive'
                     }</h3>
                     {
                         isOn?(
