@@ -24,23 +24,23 @@ const BoxStyle={
     width: '100%',
 }
 const TankDetails={padding: '10px 20px',margin: '7px 0px', width: '50%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
-function getWaterQuality(tds: number){
-    if (tds<300) {
+
+function getWaterQuality(tds: number):string{
+    if (tds>0 && tds<300) {
         return 'Excellent'
     }else if(tds>300 &&tds<900){
         return'Good'
     }else if(tds>900){
         return 'Poor'
     }else{
-        return('not satisfied');
+        return('Not satisfied');
     }
 }
-
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const { isOpenNav, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
+    const { isOpenNav,loading, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
 
     const handleSelectedTank = (tank: Device) => {
@@ -117,6 +117,30 @@ function GridComponent() {
         })
         setTanks(newTanks);
     }
+    if(loading){
+        return(
+            <Grid container style={{background: '#F6F6F6'}} spacing={2}>
+                <Grid item xs={12}>
+                    <NavigationIndex matches={matches} />
+                </Grid>
+                <Grid container spacing={2}>
+                    {isOpenNav && !matches &&(
+                        <Box sx={{position:'absolute', height:'100vh', width:'110vw',bgcolor:'rgba(0,0,0,.25)'}}></Box>
+                    )}
+                    {
+                        (matches || isOpenNav)&&(
+                            <Grid sx={!matches?{zIndex:6,position:'absolute', bgcolor:'#fff',transition:.5, width:'500px', height: '95vh', mt:2}:{}} item xs={matches?2.5:9}>
+                                <SideNavigation matches={matches} />
+                            </Grid>
+                        )
+                    }   
+                    <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
+                        <h1>Loading...</h1>
+                    </Grid>
+                </Grid>
+            </Grid>
+        )
+    }
     return (        
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
@@ -142,11 +166,10 @@ function GridComponent() {
                         devices.length<=0 ?(
                             <Box sx={{position: 'relative', width: '100%'}}>
                                 <Box sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50, -50%)',
-                                    marginTop: '10px'
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
                                 }}>
                                     <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
                                         Hi there, No devices found!
@@ -159,7 +182,6 @@ function GridComponent() {
                                 
                             </Box>
                         ):
-                        
                         (devices.map((tank,i: number) => matches? (
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}> 
                                 <ItemCardComponent
