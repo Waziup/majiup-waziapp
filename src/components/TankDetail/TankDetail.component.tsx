@@ -65,6 +65,7 @@ const BoxStyle={
     margin: "10px 0",
 	position: 'relative'
 }
+
 const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
 function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
 	const [toggleHot, setToggleHot] = useState(false);
@@ -103,11 +104,32 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
         toggleActuator(id);
     }
     useEffect(()=>{
+        console.log(consumption,'IS consumption')
         setTemperatureConsumption(consumption)
     },[consumption]);
     async function runFetch(){
-        const tempCons = await axios.get(`localhost:8080/tanks/${id}/tank-sensors/water-temperature/values`);
-        setTemperatureConsumption(tempCons.data);
+        const temperatureConsumptionVal =await axios.get(`http://localhost:8080/tanks/${deviceID}/tank-sensors/water-temperature/values`,{
+            headers:{
+                'Accept': 'application/json',
+            }
+        })
+        .then((response)=>{
+            console.log(response.data);
+            return response.data.map((sensor: {value: number,time: string})=>{
+                const date = new Date(sensor.time)
+                return{
+                    x: sensor.value,
+                    y: `${date.getHours()}:${date.getMinutes()}`,
+                }
+            });
+        })
+        .catch((err)=>{
+            alert(err);
+        })
+        console.log('====================================');
+        console.log(temperatureConsumptionVal);
+        console.log('====================================');
+        setTemperatureConsumption(temperatureConsumptionVal);
     }
     useEffect(()=>{
         console.log('Togglehot is true: ', toggleHot);
@@ -122,9 +144,9 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
     }
     console.log('Water quality ', waterQuality,consumption,actuator,liters,waterTemp)
     return (
-        <Stack sx={BoxStyle,(consumption.length || waterQuality && waterTemp)?{bgcolor: "#fff"}:{bgcolor:'inherit'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
+        <Stack sx={BoxStyle,(consumption?.length || waterQuality && waterTemp)?{bgcolor: "#fff"}:{bgcolor:'inherit'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             {
-                (consumption.length || waterQuality && waterTemp) ?(
+                (consumption?.length || waterQuality && waterTemp) ?(
                     <>
                     <h3 style={{display: 'inline-block'}}>{owner}</h3>
                     <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
@@ -162,17 +184,17 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
                                 Water Quality
                             </p>
                             {
-                                waterQuality.toLowerCase().includes('Excellent'.toLowerCase()) &&(
+                                waterQuality.toLowerCase().includes('excellent') &&(
                                     <p style={{fontSize: '24px',color:'#85ea2d' }}>{waterQuality}</p>
                                 )
                             }
                             {
-                                waterQuality.includes('Poor') &&(
+                                waterQuality.includes('poor') &&(
                                     <p style={{fontSize: '24px',color:'#c5221f' }}>{waterQuality}</p>
                                 )
                             }
                             {
-                                waterQuality.includes('Good') &&(
+                                waterQuality.includes('poor') &&(
                                     <p style={{fontSize: '24px',color:'#f35e19' }}>{waterQuality}</p>
                                 )
                             }
