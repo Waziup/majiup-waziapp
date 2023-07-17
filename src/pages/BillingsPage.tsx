@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -16,7 +17,10 @@ import DocumentComponent from '../components/Document/Document.component';
 import { X as Device } from '../context/devices.context';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
-import axios from 'axios';
+const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const date = new Date();
+const todaysDate = `${months[date.getMonth()]}, ${date.getDate()}, ${date.getFullYear()}`;
 import { getConsumption } from '../utils/consumptionHelper';
 const ReportsActiveText={
     cursor: 'pointer', 
@@ -42,6 +46,7 @@ export type Consumption = {
     waterTemperature: number
 }
 function getLitres(capacity: number, height: number,level: number): number{
+    console.log(capacity,' ',height,' ',level)
     return (level/height)*capacity;
 }
 
@@ -50,31 +55,7 @@ function BillingsPage() {
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[]}>([]);
     const [optionsToRender, setOptionsToRender] = useState({})
-    function handleFetchTableComponents(deviceId: string){
-        const getLevel = axios.get(`http://localhost:8080/tanks/${deviceId}/waterlevel/value`)
-        const getWaterQuality = axios.get(`http://localhost:8080/tanks/${deviceId}/water-quality/value`)
-        const getTemp = axios.get(`http://localhost:8080/tanks/${deviceId}/water-temperature/value`)
     
-        axios.all([getLevel,getWaterQuality,getTemp])
-        .then(axios.spread(function (respLevel,respQuality,respTemp){
-            const lastArr = selectedTableTank.consumption[selectedTableTank.consumption.length];
-            if (lastArr.level !==respLevel.data || lastArr.quality !== respQuality.data || lastArr.temp !== respTemp.data ){
-                const date = new Date();
-                setSelectedTableTank({
-                    consumption: [
-                        // ...selectedTableTank.consumption,
-                        {
-                            time: `${date.getHours()}:${date.getMinutes()}`,
-                            litres:  selectedTableTank1.liters,
-                            level: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
-                            quality: selectedTableTank1.tds,
-                            waterTemperature: selectedTableTank1.temp,
-                        }
-                    ]
-                })
-            }
-        }))
-    }
     const options = {
         axisX:{
             gridThickness: 0,
@@ -160,11 +141,14 @@ function BillingsPage() {
     },[])
     useEffect(()=>{
         if (devices.length>=1) {
-            const responseData =getConsumption(devices[0].id);
-            console.log('Response data', responseData)
-            setSelectedTableTank({
-                consumption: responseData
-            })
+            const getData= async()=>{
+                const responseData =await getConsumption(devices[0].id,devices[0].height,devices[0].capacity);
+                console.log('Response data', responseData)
+                setSelectedTableTank({
+                    consumption: responseData
+                })
+            }
+            getData();
             // setSelectedTableTank({
             //     consumption: [{
             //         time: `${new Date(devices[0].modified).getHours()}:00`,
@@ -217,7 +201,7 @@ function BillingsPage() {
             setSelectedTank({
                 ...selectedTank,
                 consumption: devices[0]?.consumption,
-                litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)
+                litres: devices.reduce((acc, curr)=>acc+(curr.liters), 0)
             });
             setOptionsToRender({
                 ...options, 
@@ -292,7 +276,7 @@ function BillingsPage() {
                 <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0', minWidth: '200px', width: '20%', borderRadius: '20px'}}>
                     <label style={{background: '#E8E8E8',fontSize: '18',fontWeight: '500', color: '#2C2D38', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Device:</label>
                     <select onChange={(event)=>{setSelectedTank({...selectedTank, id: event.target.value})}} style={{border: 'none',outline: 'none',width: '65%', background: 'none'}} name="tanks" id="tanks">
-                    <option value='All'>All</option>
+                        <option value='All'>All</option>
                         {
                             devices.map((device,idx)=>(
                                 <option key={idx} value={device.id}>{device.name}</option>
@@ -304,15 +288,17 @@ function BillingsPage() {
                     <label style={{background: '#E8E8E8',fontWeight: '500', color: '#2C2D38', fontSize: '18', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Plots:</label>
                     <select style={{border: 'none',outline: 'none',width: '70%', background: 'none'}} name="devs" id="devs">
                         <option value="all">Custom</option>
-                        <option value="tank1">Tank 1</option>
-                        <option value="tank2">Tank 2</option>
-                        <option value="tank3">Tank 3</option>
+                        {
+                            devices.map((device,idx)=>(
+                                <option key={idx} value={device.id}>{device.name}</option>
+                            ))
+                        }
                     </select>
                 </Box>
             </Box>
             <Box p={2} sx={{width: '100%',bgcolor: "#fff",borderRadius: "8px",}}>
                 <Box sx={{display: 'flex',alignItems: 'center',justifyContent: 'space-between', width:'100%',bgcolor: "#fff",borderRadius: "5px",marginTop: "10px",}} >
-                    <p style={{color: '#9291A5', fontSize: '12px'}}>Water Consumption, May 23, 2022</p>
+                    <p style={{color: '#9291A5', fontSize: '12px'}}>Water Consumption, {todaysDate}</p>
                     <Box p={1} sx={{  display: 'flex',bgcolor: '#F3F8FF', borderRadius: "5px",justifyContent: 'space-between', alignItems: 'center'}}>
                         <p style={ReportsActiveText}>Daily</p>
                         <p style={ReportsText}>Weekly</p>
@@ -324,7 +310,7 @@ function BillingsPage() {
                 <CanvasJSChart options = {optionsToRender}/>
             </Box>
             <PDFDownloadLink document={<DocumentComponent/>} fileName="somename.pdf">
-                {({blob,_, loading,}) => (loading ? 'Loading document...' : 'Download now!')}
+                {({blob,data, loading,}) => (loading ? 'Loading document...' : 'Download now!')}
             </PDFDownloadLink>
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>
