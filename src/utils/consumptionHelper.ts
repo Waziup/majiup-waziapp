@@ -49,3 +49,6 @@ export async function getConsumption(deviceId: string) {
     //set the overall length of the other elements to the longest length
     //add the data to the table
 }
+export const getLiters = (waterLevel: number, tankHeight: number, tankCapacity: number) => {
+    return (waterLevel / tankHeight) * tankCapacity;
+}
