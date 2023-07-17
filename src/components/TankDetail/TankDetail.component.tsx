@@ -10,6 +10,7 @@ import MapComponent from '../MapComponent/Map.component';
 import CanvasJSReact from '@canvasjs/react-charts';
 import FrameSVG from '../../assets/not-found.svg';
 import { Actuator } from '../../context/devices.context';
+import { getLiters } from '../../utils/consumptionHelper';
 import axios from 'axios';
 type Props={
     owner: string,
@@ -67,7 +68,7 @@ const BoxStyle={
 }
 
 const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
-function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
+function TankDetailComponent({id,capacity,height, owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
 	const [toggleHot, setToggleHot] = useState(false);
 	// const CanvasJS = CanvasJSReact.CanvasJS;
 	const CanvasJSChart = CanvasJSReact.CanvasJSChart;
@@ -86,6 +87,7 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
 			// title: "Bounce Rate",
 			// suffix: "%"
 			interval: 2,
+            color : toggleHot? "#FF5C00": "#3F51B5",
 		},
 		axisX: {
 			// title: "Week of Year",
@@ -108,7 +110,7 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
         setTemperatureConsumption(consumption)
     },[consumption]);
     async function runFetch(){
-        const temperatureConsumptionVal =await axios.get(`http://localhost:8080/tanks/${deviceID}/tank-sensors/water-temperature/values`,{
+        const temperatureConsumptionVal =await axios.get(`http://localhost:8080/tanks/${id}/tank-sensors/water-temperature/values`,{
             headers:{
                 'Accept': 'application/json',
             }
@@ -118,8 +120,9 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
             return response.data.map((sensor: {value: number,time: string})=>{
                 const date = new Date(sensor.time)
                 return{
-                    x: sensor.value,
-                    y: `${date.getHours()}:${date.getMinutes()}`,
+                    // y: sensor.value,
+                    y: getLiters(sensor.value,height,capacity),
+                    x: date.getHours(),
                 }
             });
         })
@@ -132,15 +135,17 @@ function TankDetailComponent({id,capacity, owner,waterTemp,waterQuality,liters,c
         setTemperatureConsumption(temperatureConsumptionVal);
     }
     useEffect(()=>{
-        console.log('Togglehot is true: ', toggleHot);
-        runFetch();
+        console.log('Togglehot is ', toggleHot);
+        if(toggleHot){
+            runFetch();
+        }else{
+            setTemperatureConsumption(consumption);
+        }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[toggleHot])
     function handleToggleTeemp(){
         setToggleHot(!toggleHot);
-        if (!toggleHot) {
-            setTemperatureConsumption(consumption);
-        }
+        // setTemperatureConsumption(consumption);
     }
     console.log('Water quality ', waterQuality,consumption,actuator,liters,waterTemp)
     return (
