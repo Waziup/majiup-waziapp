@@ -1,5 +1,6 @@
 import axios from "axios";
 import {ReactNode, createContext, useEffect, useState,} from "react";
+import { getLiters } from "../utils/consumptionHelper";
 
 type Props={
     children: ReactNode
@@ -146,7 +147,7 @@ export const  DevicesProvider = ({children}: Props)=>{
                 return sensorResponse.data.map((sensor:Sensor) => {
                     const date = new Date(sensor.time);
                     return {
-                        y: sensor.value,
+                        y: getLiters(sensor.value,device.meta.settings.height, device.meta.settings.capacity),
                         x: date.getHours(),
                     };
                 });
@@ -163,8 +164,12 @@ export const  DevicesProvider = ({children}: Props)=>{
             setDevices(res.map(function(device: X){
                 return{
                     ...device,
+                    capacity: device.meta.settings.capacity,
+                    length: device.meta.settings.length,
+                    width: device.meta.settings.width,
+                    height: device.meta.settings.height,
                     consumption: consumption,
-                    liters: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,
+                    liters:  getLiters(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,device.meta.settings.height, device.meta.settings.capacity),
                     tds: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0,
                     temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
                     isSelect: false,
@@ -182,7 +187,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     },[]);
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {
-            console.log('First device',Promise.resolve(devices).then((res)=>console.log(res)));
+            console.log('First device',Promise.all(devices).then((res)=>console.log(res)));
             setSelectedTank(devices[0])
             setLoading(false);
         }
