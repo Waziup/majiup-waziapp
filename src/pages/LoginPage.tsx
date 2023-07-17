@@ -3,10 +3,7 @@ import { Link } from 'react-router-dom';
 import { Visibility,  } from '@mui/icons-material';
 import { useState } from 'react';
 import MajiUpIcon from '../assets/majiupicon.png';
-import {useContext} from 'react'
-import { DevicesContext } from '../context/devices.context';
 import {useNavigate} from 'react-router-dom'
-import axios from 'axios';
 const FormInput={
     border:'1px solid #ccc',
     outline: 'none',
@@ -44,7 +41,6 @@ const InputLabel={
     padding: '10px 0'
 }
 function LoginPage() {
-    const {setUser} = useContext(DevicesContext);
     const [isText, setIsText] = useState(false);
     const navigate = useNavigate();
     const [userData,setUserData] = useState({
@@ -53,22 +49,6 @@ function LoginPage() {
     })
     function submitLoginHandler(e: React.SyntheticEvent){
         e.preventDefault();
-        axios.post('http//wazigate.local/auth/token',{
-            username:userData.name,
-            password:userData.password,
-        },{
-            headers:{
-                'Content-Type':'text/plain'
-            }
-        }).then((res)=>{
-            console.log(res);
-            setUser(userData.name,res.data);
-        }).catch((err)=>{
-            console.log('====================================');
-            console.log(err);
-            setUser(userData.name,'gffgg');
-            console.log('====================================');
-        })
         navigate('/dashboard')
     }
     function handleInputChange(e: React.FormEvent<HTMLInputElement>){
