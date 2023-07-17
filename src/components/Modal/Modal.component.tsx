@@ -55,7 +55,8 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 		}
 	}
 	const {devices,user,reportRef,setReportRef}= useContext(DevicesContext);
-	const notifications = devices.reduce((acc,dev)=> dev.notifications.length>0?(acc+dev.notifications.length):0,0);
+	const notifications=0;
+	// const notifications = devices.reduce((acc,dev)=> dev.notifications.length>0?(acc+dev.notifications.length):0,0);
 	const totalLiters = devices.reduce((acc,dev)=>(acc+dev.liters),0);
 	console.log('Ref handler: ',reportRef)
 	useEffect(()=>{
@@ -63,7 +64,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 		if(divEl){
 			setReportRef(divEl as HTMLDivElement);
 		}
-	},[])
+	},[setReportRef])
     return (
 		<>
 		{/* <h2 >plsgfggfd</h2> */}
