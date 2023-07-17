@@ -6,6 +6,11 @@ export type Consumption = {
     waterQuality: string
     waterTemperature: number
 }
+type ObjProps={
+    time: string, 
+    liters: number, 
+    [key: string]: number | string
+}
 export async function getConsumption(deviceId: string) {
     const response = await axios.get(`http://localhost:8080/tanks/${deviceId}/tank-info`, {
         headers:{
@@ -25,7 +30,10 @@ export async function getConsumption(deviceId: string) {
     }
     // Create a new array with objects containing elements
     const newArray = Array.from({ length: maxLength }, (_, index) => {
-        const newObj: any = {};
+        const newObj: ObjProps = {
+            time: '',
+            liters: 0
+        };
         for (const property in obj) {
             // eslint-disable-next-line no-prototype-builtins
             if (obj.hasOwnProperty(property) && Array.isArray(obj[property])) {
