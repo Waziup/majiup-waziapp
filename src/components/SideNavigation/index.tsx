@@ -34,7 +34,7 @@ export default function SideNavigation({matches}: Props) {
             color: isActive? 'white':'#1C1B1F'
         }
     }
-    const {toggleModal, user,devices} = useContext(DevicesContext)
+    const {toggleModal, user} = useContext(DevicesContext)
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const isOpen = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -69,7 +69,7 @@ export default function SideNavigation({matches}: Props) {
                                     <Dashboard sx={{color: 'inherit'}}/>
                                 </ListItemIcon>
                                 <ListItemText primary="Dashboards" />
-                                <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', padding:'0 2%', background: '#fff', color: '#E46B26'}}>3</h4>
+                                <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', padding:'0 2%', background: '#fff', color: '#E46B26'}}>0</h4>
                             </ListItemButton>
                         </NavLink>
                     </ListItem>
@@ -111,7 +111,7 @@ export default function SideNavigation({matches}: Props) {
                                     <Box ml={2} onClick={isOpen?handleClose:handleClick} sx={{display: 'flex',alignItems:'center', cursor:'pointer', ":hover":{bgcolor:'#f5f5f5'}, }}>
                                         <Box sx={{position:'relative'}} >
                                             <NotificationsNone sx={{fontWeight:'light',color:'#000'}} />
-                                            <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>{devices.reduce((acc,device)=>device.notifications.length>0? acc+device.notifications.length:0,0)??0}</h3>
+                                            <h3 style={{fontSize: '15px', fontWeight:'bold', position:'absolute', top:-6,right:3 ,backgroundColor:'#fff'}}>0</h3>
                                         </Box>
                                         <Box mr={2} sx={{display: 'flex',width:'100%', cursor:'pointer',  alignItems: 'center', justifyContent: 'space-evenly', height:'100%'}}>
                                             <AvatarComponent name={user.name} src='"https://mui.com/static/images/avatar/1.jpg"' />
