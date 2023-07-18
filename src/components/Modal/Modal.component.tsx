@@ -2,7 +2,7 @@ import './Modals.styles.css';
 import {WaterDrop, } from '@mui/icons-material';
 import {Box, Modal, } from '@mui/material';
 import './Modals.styles.css';
-import { useContext, useEffect } from 'react';
+import { useContext, } from 'react';
 import { DevicesContext } from '../../context/devices.context';
 type ModalComponentProps = {
     open: boolean
@@ -10,19 +10,7 @@ type ModalComponentProps = {
 	ref?: React.RefObject<HTMLDivElement>;
 	children: React.ReactNode;
 }
-// const ModalContainer={
-// 	backgroundColor: '#fff',
-// 	padding: 2,
-// 	position: 'absolute',
-// 	top: '50%',
-// 	left: '50%',
-// 	transform: 'translate(-50%, -50%)',
-// 	width: '50%',
-// 	minWidth: '85vw',
-// 	alignContent:'center',
-// 	height: '80vh',
-// 	overflowY: 'auto',
-// }
+
 import TankSVG from '../../assets/tank_sett.svg';
 import RoundTankSVG from '../../assets/round_tank.svg';
 import NotificationSVG from '../../assets/notifications.svg';
@@ -54,17 +42,11 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 			display:'flex'
 		}
 	}
-	const {devices,user,reportRef,setReportRef}= useContext(DevicesContext);
+	const {devices,user }= useContext(DevicesContext);
 	const notifications=0;
 	// const notifications = devices.reduce((acc,dev)=> dev.notifications.length>0?(acc+dev.notifications.length):0,0);
 	const totalLiters = devices.reduce((acc,dev)=>(acc+dev.liters),0);
-	console.log('Ref handler: ',reportRef)
-	useEffect(()=>{
-		const divEl = document.getElementById('divEl');
-		if(divEl){
-			setReportRef(divEl as HTMLDivElement);
-		}
-	},[setReportRef])
+	
     return (
 		<>
 		{/* <h2 >plsgfggfd</h2> */}
@@ -75,7 +57,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 			aria-labelledby="modal-modal-title"
 			aria-describedby="modal-modal-description"
 			>
-				<div id='divEl' style={{
+				<div style={{
 						backgroundColor: '#fff',
 						padding: '20px',
 						position: 'absolute',
@@ -90,7 +72,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 					}}>
 					<div >
 						<Box sx={{display: 'flex', alignItems: 'center'}}>
-							<WaterDrop style={{fontSize: '20px', color: '#4592F6'}}/>
+							{/* <WaterDrop style={{fontSize: '20px', color: '#4592F6'}}/> */}
 							<h1  style={{...styles.headerText}}>MajiUp</h1>
 						</Box>
 						<div style={{display: 'flex', alignItems: 'center', justifyContent:'space-between',borderBottom:'1px solid #000'}}>
@@ -116,7 +98,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 								<p style={{fontSize: '16px', fontWeight:'normal'}}>  johndoe@gmail.com</p>
 							</div>
 						</div>
-						<div style={{padding:'1vw'}}>
+						<div id='divEl' style={{padding:'1vw'}}>
 							<p>General Overview</p>
 							<div style={{display: 'flex',  flexWrap:'wrap' }} >
 								<div style={styles.infoContainer}>
