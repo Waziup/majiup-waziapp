@@ -126,7 +126,12 @@ export const  DevicesProvider = ({children}: Props)=>{
     const setTanks = (devices: X[])=> setDevices(devices);
     const [reportRef,setReportRefFunch] = useState<HTMLDivElement>();
     // const [devicesID, setDevicesID] = useState<{deviceID:string,sensorID:string}[]>([]);
-    const setReportRef = (ref: HTMLDivElement)=>{setReportRefFunch(ref)};
+    const setReportRef = (ref: HTMLDivElement)=>{
+        console.log('Ref i have received',ref);
+        if (ref !==null && ref !== undefined) {
+            setReportRefFunch(ref)
+        }
+    };
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     useEffect(()=>{
         setLoading(true)
