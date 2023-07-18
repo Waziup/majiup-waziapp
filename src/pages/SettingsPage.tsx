@@ -1,5 +1,5 @@
-import { Add, MoreVert, } from '@mui/icons-material';
-import { Box, Button, Modal, Stack } from '@mui/material';
+import { MoreVert, SaveAlt } from '@mui/icons-material';
+import { Box, Modal, Stack } from '@mui/material';
 import FrameSVG from '../assets/frame.svg';
 import React, { useContext, useState } from 'react';
 import { DevicesContext } from '../context/devices.context';
@@ -20,17 +20,13 @@ const ModalContainer={
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: '50%',
+	width: '40%',
     alignContent:'center',
     // 
 }
-const InputContainer={
-    display:'flex', 
-    alignItems:'center', 
-    justifyContent:'space-around'
-}
 const InputLabel={
-    fontSize:'12px',
+    fontSize: '16px',
+    margin: '10px 0',
 }
 const SensorContainer = {
     display: 'flex', 
@@ -38,7 +34,59 @@ const SensorContainer = {
     alignItems: 'center', 
     flexWrap:'wrap'
 }
+const boldText={
+    fontWeight: 'bold',
+    fontSize: '16px',
+    margin: '10px 0',
+}
+const inputbox={
+    height: '100%',
+    padding:'5px 15px', 
+    outline:'none',
+    border: '1px solid #ccc', 
+    background: '#F6F6F6', 
+    width: '100%', 
+    borderRadius: '20px'
+}
 
+const inputbox1={
+    height: '100%',
+    padding:'5px 5px', 
+    outline:'none',
+    border: '1px solid #888', 
+    // background: '#F6F6F6', 
+    width: '50%',
+    margin: '0 10px', 
+}
+const ButtonStyle={
+    borderRadius: '20px',
+    padding: '8px 0px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    margin: '10px 5px',
+    width: '60%',
+    backgroundColor: '#FF5C00',
+    color: '#fff',
+    border: 'none',
+    outline: 'none',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+}
+const cancelButtonStyle={
+    borderRadius: '20px',
+    padding: '10px 20px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    margin: '10px 5px',
+    width: '60%',
+    backgroundColor: '#Fff',
+    color: '#888992',
+    border: '1px solid #888992',
+    outline: 'none',
+    cursor: 'pointer',
+}
 function SettingsPage() {
     const { devices } = useContext(DevicesContext);
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -52,48 +100,77 @@ function SettingsPage() {
     }
     return (
         <Box pl={2} pr={2}>
-            <Box onClick={()=>setIsOpenModal(true)} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <h3 style={{fontSize: '24px',margin:'10px 0'}}>Setup Device</h3>
-                <p style={{color: '#fff',fontSize: 16,cursor:'pointer', borderRadius: '20px', padding:'10px 12px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <h3 style={{fontSize: '24px',margin:'10px 0'}}>Device Settings</h3>
+                {/* <p style={{color: '#fff',fontSize: 16,cursor:'pointer', borderRadius: '20px', padding:'10px 12px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
                     <Add sx={{fontSize: 16, margin:'0 4px'}}/>
                     New Device
-                </p>
+                </p> */}
             </Box>
             <Modal open={isOpenModal}
                 onClose={()=>setIsOpenModal(!isOpenModal)}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description">
                     <Box sx={matches?{...ModalContainer}:{...ModalContainer,minWidth:'80vw'}}>
-                        <form style={{width:'100%', alignItems:'center'}}>
-                            <Box mb={2} sx={InputContainer}>
-                                <h4 style={InputLabel}>Device Name</h4>
-                                <input required style={{height: '100%',padding:'10px 5px', outline:'none',border: '1px solid #ccc', background: '#F6F6F6', width: '60%', borderRadius: '20px'}} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
-                            </Box>
-                            <Box mb={2} sx={InputContainer}>
-                                <h4 style={InputLabel}>Gateway ID</h4>
-                                <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0',width:'50%',bgcolor:'#F6F6F6', borderRadius: '20px'}}>
-                                    {/* <label style={{background: '#E8E8E8',fontSize: '18',fontWeight: '500', color: '#2C2D38', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Device:</label> */}
-                                    <select required style={{border: 'none',outline: 'none',width: '100%', background:'none' }} name="devs" id="devs">
-                                        {/* <option value="all">Gateway 5454gf34</option> */}
-                                        {
-                                            devices.map((device,idx)=>(
-                                                <option key={idx} value={device.id}>{device.name}</option>
-                                            ))
-                                        }
-                                    </select>
+                        <h1 style={boldText}>Edit Information</h1>
+                        <form style={{width:'90%', alignItems:'center'}}>
+                            <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
+                                <Box mb={2}>
+                                    <h4 style={InputLabel}>Device Name*</h4>
+                                    <input value={selectedDevice?.name} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                </Box>
+                                <Box mb={2} >
+                                    <h4 style={InputLabel}>Gateway ID</h4>
+                                    <input value={selectedDevice?.id} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                    
                                 </Box>
                             </Box>
-                            <Box mb={2} sx={InputContainer}>
-                                <h4 style={InputLabel}> Tank Capacity</h4>
-                                <input required style={{height: '100%',padding:'10px 5px', outline:'none',border: '1px solid #ccc', background: '#F6F6F6', width: '60%', borderRadius: '20px'}} className="input_box" type={'number'} placeholder={'Capacity in litres'} />
+                            <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
+                                <Box mb={2}>
+                                    <h4 style={InputLabel}>Tank Capacity</h4>
+                                    <input value={selectedDevice?.capacity} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                </Box>
+                                <Box mb={2} >
+                                    <h4 style={InputLabel}>Tank Height</h4>
+                                    <input value={selectedDevice?.height} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                </Box>
                             </Box>
-                            <Box mb={2} sx={InputContainer}>
-                                <h4 style={InputLabel}>Tank Height</h4>
-                                <input required style={{height: '100%',padding:'10px 5px', outline:'none',border: '1px solid #ccc', background: '#F6F6F6', width: '60%', borderRadius: '20px'}} className="input_box" type={'number'} placeholder={'Enter Tank Height'} />
+                            <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
+                                <Box mb={2}>
+                                    <h4 style={InputLabel}>Tank Diameter</h4>
+                                    <input value={selectedDevice?.meta.settings.radius? selectedDevice?.meta.settings.radius*2:0 } required style={inputbox} className="input_box" type={'number'} placeholder={'Enter Device Name'} />
+                                </Box>
+                                <Box mb={2} >
+                                    <h4 style={InputLabel}>Tank Location</h4>
+                                    <input value={selectedDevice?.meta.settings.capacity} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                </Box>
                             </Box>
-                            <Button type='submit' sx={{color: 'white',height: 40, bgcolor: '#E46B26', width: '50%', borderRadius: '24px', padding: '4px', alignSelf:'center', marginTop: '20px'}} variant="contained">
-                                Save
-                            </Button>
+                            <h4 style={InputLabel}>Sensors</h4>
+                            <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
+                                {
+                                    selectedDevice?.sensors.map((sensor,id)=>(
+                                            <input key={id} value={sensor.name} required style={inputbox1} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                        // <Box sx={inputbox1} mb={2} key={id}>
+                                        //     {/* <h4 style={InputLabel}>{sensor.name}</h4> */}
+                                        // </Box>
+                                    ))
+                                }
+                            </Box>
+                            <h4 style={InputLabel}>Actuators</h4>
+                            <Box sx={{display:'flex',alignItems: 'center', }}>
+                                {
+                                    selectedDevice?.actuators.map((actuator,id)=>(
+                                        <input key={id} value={actuator.name} required style={inputbox1} className="input_box" type={'text'} placeholder={'Enter Device Name'} />    
+                                    ))
+                                }
+                            </Box>
+                            <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-between'}}>
+                                <button style={ButtonStyle} className="button">
+                                    <SaveAlt sx={{cursor:'pointer'}}/>
+                                    <span>Save</span>
+                                </button>
+                                <button onClick={()=>setIsOpenModal(!isOpenModal)} style={cancelButtonStyle} >Cancel</button>
+                            </Box>
                         </form>
                     </Box>
             </Modal>
@@ -140,7 +217,7 @@ function SettingsPage() {
                                     </Box>
                                     <Box>
                                         <h3 style={{fontSize: '16px',fontWeight: 'normal', }}>
-                                            {device.liters}
+                                            {device.capacity}
                                             <span> litres</span>
                                         </h3>
                                         <p style={{fontSize: '16px',}}>
