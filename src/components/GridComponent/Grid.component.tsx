@@ -152,7 +152,7 @@ function GridComponent() {
                 )}
                 {
                     (matches || isOpenNav)&&(
-                        <Grid sx={!matches?{zIndex:6,position:'absolute', bgcolor:'#fff',transition:.5, width:'500px', height: '95vh', mt:2}:{}} item xs={matches?2.5:9}>
+                        <Grid sx={!matches?{zIndex:100,position:'absolute', bgcolor:'#fff',transition:.5, width:'500px', height: '95vh', mt:2}:{}} item xs={matches?2.5:9}>
                             <SideNavigation matches={matches} />
                         </Grid>
                     )
@@ -186,9 +186,9 @@ function GridComponent() {
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}> 
                                 <ItemCardComponent
                                     isOn={tank.on}
-                                    amount={Math.round((tank.liters/tank.height)*tank.capacity)}
+                                    amount={tank.liters}
                                     name={tank.name}
-                                    litresPercent={(tank.liters/tank.height)*100}
+                                    litresPercent={(tank.liters/tank.capacity)*100}
                                     handleClose={handleClose}
                                     handleOpen={handleOpen}
                                     open={open}
@@ -235,7 +235,7 @@ function GridComponent() {
                                         owner={selectedDevice.name}
                                         waterTemp={selectedDevice.temp}
                                         waterQuality={getWaterQuality(selectedDevice.tds)}
-                                        liters={Math.round((selectedDevice.liters/selectedDevice.height)*selectedDevice.capacity)}
+                                        liters={selectedDevice.liters}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
                                         actuator={selectedDevice.actuators}
