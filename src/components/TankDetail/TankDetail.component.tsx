@@ -189,17 +189,17 @@ function TankDetailComponent({id,capacity,height, owner,waterTemp,waterQuality,l
                                 Water Quality
                             </p>
                             {
-                                waterQuality.toLowerCase().includes('excellent') &&(
+                                waterQuality.toLowerCase().includes('Excellent') &&(
                                     <p style={{fontSize: '24px',color:'#85ea2d' }}>{waterQuality}</p>
                                 )
                             }
                             {
-                                waterQuality.includes('poor') &&(
+                                waterQuality.includes('Poor') &&(
                                     <p style={{fontSize: '24px',color:'#c5221f' }}>{waterQuality}</p>
                                 )
                             }
                             {
-                                waterQuality.includes('poor') &&(
+                                waterQuality.includes('Good') &&(
                                     <p style={{fontSize: '24px',color:'#f35e19' }}>{waterQuality}</p>
                                 )
                             }
