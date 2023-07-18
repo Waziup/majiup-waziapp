@@ -51,7 +51,11 @@ function getLitres(capacity: number, height: number,level: number): number{
 }
 
 function BillingsPage() {
-    const { devices, reportRef} = useContext(DevicesContext)
+    const { devices, reportRef, setReportRef} = useContext(DevicesContext)
+    console.log('Ref handler: ',reportRef)
+	const divEl = document.getElementById('divEl');
+	setReportRef(divEl as HTMLDivElement);
+	console.log('Ref handler: ',divEl);
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[]}>([]);
     const [optionsToRender, setOptionsToRender] = useState({})
@@ -76,14 +80,15 @@ function BillingsPage() {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 	const reportTemplateRef = useRef<HTMLDivElement>(null);
     const handleGeneratePdf = () => {
-        console.log('reportTemplateRef',reportRef)
-        console.log('REf current state is: ',reportTemplateRef.current)
+        console.log('Report TemplateRef template: ',reportRef)
+        document.body.appendChild(reportRef);
+        // console.log('REf current state is: ',reportTemplateRef.current)
         html2canvas(reportRef)
         .then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
             console.log('====================================');
             console.log(imgData);
-            setImage(imgData)
+            // setImage(imgData)
             console.log('====================================');
             const pdf = new jsPDF();
             pdf.addImage(imgData, 'JPEG', 0, 0);
@@ -91,19 +96,19 @@ function BillingsPage() {
             pdf.save("download.pdf");
         })
         .catch((err) => console.log(err));
-		// const doc = new jsPDF({
-		// 	format: 'a4',
-		// 	unit: 'px',
-		// });
+		const doc = new jsPDF({
+			format: 'a4',
+			unit: 'px',
+		});
 
-		// // Adding the fonts.
-		// // doc.setFont('Inter-Regular', 'normal');
-        // // doc.setFillColor({ch1: 'black'})
-		// doc.html(reportRef.current?.innerHTML as HTMLDivElement, {
-		// 	callback(doc) {
-		// 		doc.save('report_document');
-		// 	},
-		// });
+		// Adding the fonts.
+		// doc.setFont('Inter-Regular', 'normal');
+        // doc.setFillColor({ch1: 'black'})
+		doc.html(reportRef as HTMLDivElement, {
+			callback(doc) {
+				doc.save('report_document');
+			},
+		});
 	};
     async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
         console.log(event.target.value)
@@ -139,6 +144,7 @@ function BillingsPage() {
             id: "All",
         });
     },[])
+    console.log(reportRef,'ReportRef')
     useEffect(()=>{
         if (devices.length>=1) {
             const getData= async()=>{
@@ -252,7 +258,7 @@ function BillingsPage() {
                 </p>
             </Box>
             <ModalComponent handleClose={()=>{console.log(reportTemplateRef.current); setIsOpenModal(!isOpenModal)}} open={isOpenModal}>
-                <div>
+                <div >
                     <h3 style={{fontSize: '16px', margin:'10px 0'}}>Consumption Chart</h3>
                     <div style={{border: '1px solid black', padding:'8px 10px', borderRadius:'4px'}}>
                         <p style={{color: '#9291A5', fontSize: '15px', margin:'10px 0'}}>Water Consumption, {new Date().toDateString()}</p>
@@ -272,6 +278,7 @@ function BillingsPage() {
                     ):''
                 }
             </ModalComponent>
+            
             <Box  ref={reportTemplateRef} sx={{display: 'flex',margin: '10px 0', flexWrap: 'wrap', alignItems: 'center'}}>
                 <Box sx={{border: '1px solid #ccc',margin:'15px', padding:'5px 0', minWidth: '200px', width: '20%', borderRadius: '20px'}}>
                     <label style={{background: '#E8E8E8',fontSize: '18',fontWeight: '500', color: '#2C2D38', padding: '5px 5px',borderTopLeftRadius: 'inherit',borderBottomLeftRadius:'inherit', height: '100%'}} htmlFor="devs">Device:</label>
@@ -309,7 +316,7 @@ function BillingsPage() {
                 {/* <Box alt="water Tank." sx={{width: '100%'}} component="img" src={ChatFlow}/> */}
                 <CanvasJSChart options = {optionsToRender}/>
             </Box>
-            <PDFDownloadLink document={<DocumentComponent/>} fileName="somename.pdf">
+            <PDFDownloadLink document={<DocumentComponent reportRef={reportRef} totalDevices={devices.length} user={'Oliver'} totalLiters={devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.liters), 0)} />} fileName="somename.pdf">
                 {({blob,data, loading,}) => (loading ? 'Loading document...' : 'Download now!')}
             </PDFDownloadLink>
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
@@ -331,13 +338,16 @@ function BillingsPage() {
                         </Box>
                     </Box>
                 </Box>
-                {
-                    selectedTableTank.consumption?(
-                        <StickyHeadTable 
-                            rows1={selectedTableTank.consumption}
-                        />
-                    ):''
-                }
+                <div id='divEl'>
+                    <h4 style={{margin:'10px 0'}}>Tabular Overview</h4>
+                    {
+                        selectedTableTank.consumption?(
+                            <StickyHeadTable 
+                                rows1={selectedTableTank.consumption}
+                            />
+                        ):''
+                    }
+                </div>
             </Box>
         </Box>
     );
