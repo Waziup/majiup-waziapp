@@ -2,7 +2,7 @@ import { Box, Grid, Stack } from "@mui/material";
 import SideNavigation from "../SideNavigation";
 import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
-import { useContext, useState,useEffect } from "react";
+import { useContext, useState } from "react";
 import TankDetailComponent from "../TankDetail/TankDetail.component";
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
@@ -66,45 +66,7 @@ function GridComponent() {
     }
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
-     
-    function mqttSubscription(devices: Device []){
-        const reconnectTimeout = 2000;
-        const mqtt = new window['Paho'].MQTT.Client("localhost", Number(80), "/websocket", "clientjs");
-        const options = {
-            useSSL: false,
-            timeout: 5,
-            onSuccess: onConnect,
-            onFailure: onFailure
-        };
-
-        mqtt.connect(options)
-        // client.connect(options);
-        mqtt.onMessageArrived = onMessageArrived;
-
-        function onConnect() {
-            console.log("Connected!")
-            return devices.map((device)=>{
-                const deviceId = device.id
-                const deviceUrl = "/devices/"+deviceId
-                mqtt.subscribe(deviceUrl+"/")
-                // getData('https://api.waziup.io/api/v2/'+sensorUrl,sensor.name)
-                console.log("Subscribed to: ", deviceUrl) 
-            })
-            
-        }
-
-        function onFailure(message: string) {
-            console.log("Failed: ", message);
-            setTimeout(window['MQTTconnect'], reconnectTimeout);
-        }
-
-        function onMessageArrived(msg: {payloadString: string}) {
-            console.log("----------->")
-            const val = (JSON.parse(msg.payloadString))
-            console.log("Received -> ",val)
-        }
-    }
-    useEffect(()=> mqttSubscription(devices),[devices]);
+    
     console.log(devices);
     function toogleActuatorHandler(id:string) {
         const newTanks = devices.map((item: Device) => {
@@ -141,7 +103,7 @@ function GridComponent() {
             </Grid>
         )
     }
-    return (        
+    return (
         <Grid container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
                 <NavigationIndex matches={matches} />
@@ -156,11 +118,7 @@ function GridComponent() {
                             <SideNavigation matches={matches} />
                         </Grid>
                     )
-                }   
-                {/* <Grid item xs={2.5}>
-                    <SideNavigation />
-                </Grid> */}
-                
+                }
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
                         devices.length<=0 ?(
@@ -175,11 +133,8 @@ function GridComponent() {
                                         Hi there, No devices found!
                                     </h3>
                                     <Box component='img' src={FrameSVG}/>
-                                    
                                     <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No devices found, create one.</p>
-                                    
                                 </Box>
-                                
                             </Box>
                         ):
                         (devices.map((tank,i: number) => matches? (
