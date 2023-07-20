@@ -1,22 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-import {Document,Page, View, Text, StyleSheet,Image, } from '@react-pdf/renderer'
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-function DocumentComponent({reportRef, totalDevices, user, totalLiters}:{reportRef: HTMLDivElement, user: string, totalLiters: number, totalDevices: number}) {
-    html2canvas(reportRef)
-        .then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            console.log('====================================');
-            console.log(imgData);
-            // setImage(imgData)
-            console.log('====================================');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'JPEG', 0, 0);
 
-            pdf.save("download.pdf");
-	})
-	.catch((err) => console.log(err));
+import {Document,Page, View, Text, StyleSheet,Image, } from '@react-pdf/renderer'
+function DocumentComponent({ totalDevices, user, totalLiters}:{reportRef: HTMLDivElement, user: string, totalLiters: number, totalDevices: number}) {
 	return (
         <Document >
 			<Page size={'A4'} >
