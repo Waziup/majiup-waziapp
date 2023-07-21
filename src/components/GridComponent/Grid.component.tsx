@@ -13,6 +13,14 @@ import FrameSVG from '../../assets/frame.svg';
 import { DeviceThermostatSharp, MoreVert, WaterDrop } from "@mui/icons-material";
 import WatertankComponent from "../WaterTank/Watertank.component";
 
+/** 
+ * ToDo
+ * Data pulling
+ * 1. array testing on multiple changes and graph
+ * reusable setState function
+ * request for all information after successfull Changing of data information
+ * Document generation
+*/
 const BoxStyle={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
@@ -204,8 +212,7 @@ function GridComponent() {
                     )
                 }
             </Grid>
-        </Grid>        
+        </Grid>
     );
 }
-
 export default GridComponent;

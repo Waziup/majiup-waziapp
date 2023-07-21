@@ -72,7 +72,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 					}}>
 					<div >
 						<Box sx={{display: 'flex', alignItems: 'center'}}>
-							{/* <WaterDrop style={{fontSize: '20px', color: '#4592F6'}}/> */}
+							<WaterDrop style={{fontSize: '20px', color: '#4592F6'}}/>
 							<h1  style={{...styles.headerText}}>MajiUp</h1>
 						</Box>
 						<div style={{display: 'flex', alignItems: 'center', justifyContent:'space-between',borderBottom:'1px solid #000'}}>
@@ -153,7 +153,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 							</div>
 							{children}
 						</div>
-				</div>
+					</div>
 				</div>
 		</Modal>
 		</>

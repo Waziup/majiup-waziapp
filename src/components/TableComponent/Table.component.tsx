@@ -70,10 +70,20 @@ type Row={
 type Props = {
     rows1: Row[]
 }
-
+function getWaterQuality(tds: number):string{
+    if (tds>0 && tds<300) {
+        return 'Excellent'
+    }else if(tds>300 &&tds<900){
+        return'Good'
+    }else if(tds>900){
+        return 'Poor'
+    }else{
+        return('Not satisfied');
+    }
+}
 export default function StickyHeadTable({rows1}: Props) {
     const rows = rows1.map((row)=>{
-        return createData(row.time, row.liters, row.waterLevel, row.waterTemperature, row.waterQuality)
+        return createData(row.time, row.liters, row.waterLevel, row.waterTemperature, getWaterQuality(parseInt(row.waterQuality)))
     })
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -114,7 +124,7 @@ export default function StickyHeadTable({rows1}: Props) {
                             {columns.map((column) => {
                             const value = row[column.id];
                             return (
-                                <TableCell sx={value==="Fresh"?{color: '#F66868',}:{}} key={column.id} align={column.align}>
+                                <TableCell sx={value==="Poor"?{ color: '#F66868',}:value==='Excellent'?{color:'#85ea2d'}:{}} key={column.id} align={column.align}>
                                 {column.format && typeof value === 'number'
                                     ? column.format(value)
                                     : value}

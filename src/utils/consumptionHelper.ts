@@ -38,6 +38,7 @@ export async function getConsumption(deviceId: string, tankHeight: number, tankC
             // eslint-disable-next-line no-prototype-builtins
             if (obj.hasOwnProperty(property) && Array.isArray(obj[property])) {
                 if (index < obj[property].length) {
+                    console.log('Date is :',obj[property][index].timestamp)
                     const date = new Date(obj[property][index].timestamp)
                     newObj.time = `${date.getHours()}hr:${date.getMinutes()}mins:${date.getSeconds()}s`;
                     newObj[property] = obj[property][index].value;
