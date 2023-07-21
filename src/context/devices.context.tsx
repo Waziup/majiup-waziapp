@@ -96,6 +96,8 @@ type ContextValues={
     setReportRef: (ref: HTMLDivElement)=>void,
     loading: boolean,
     setLoadingFunc: (loading: boolean)=>void,
+    fetchinHours: ()=>void,
+    fetchInMinutes: ()=>void,
 }
 export const DevicesContext = createContext<ContextValues>({
     devices: [],
@@ -110,6 +112,8 @@ export const DevicesContext = createContext<ContextValues>({
     setReportRef: (ref) =>{console.log(ref);},
     loading: false,
     setLoadingFunc: (loading)=>{console.log(loading);},
+    fetchinHours: ()=>{console.log('');},
+    fetchInMinutes: ()=>{console.log('');},
 });
 
 //return an array of device data including level, temperature, quality, etc.
@@ -133,8 +137,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         }
     };
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
-    useEffect(()=>{
-        setLoading(true)
+    function fetchInMinutes(){
         axios.get('http://localhost:8080/tanks',{
             headers:{
                 'Accept': 'application/json',
@@ -148,7 +151,62 @@ export const  DevicesProvider = ({children}: Props)=>{
                         'Accept': 'application/json',
                     }
                 });
-          
+                console.log(sensorResponse.data);
+                return sensorResponse.data.map((sensor:Sensor) => {
+                    const date = new Date(sensor.time);
+                    return {
+                        y: getLiters(sensor.value,device.meta.settings.height, device.meta.settings.capacity),
+                        x: parseFloat((date.getHours() + (date.getMinutes()/60)).toFixed(2)),
+                    };
+                });
+            });
+            const consumption = await Promise.all(devicePromises);
+
+            return {
+                consumption: consumption[0] as Consumption[],
+                res: response.data,
+            };
+        })
+        .then(({res,consumption})=>{
+            console.log('Devices: ', res,consumption);
+            setDevices(res.map(function(device: X){
+                return{
+                    ...device,
+                    capacity: device.meta.settings.capacity,
+                    length: device.meta.settings.length,
+                    width: device.meta.settings.width,
+                    height: device.meta.settings.height,
+                    consumption: consumption,
+                    liters:  getLiters(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,device.meta.settings.height, device.meta.settings.capacity),
+                    tds: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0,
+                    temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
+                    isSelect: false,
+                    
+                    on: true,
+                }
+            }));
+            console.log('Devices: ',devices);
+            setLoading(false);
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+    function fetchinHours(){
+        axios.get('http://localhost:8080/tanks',{
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type':'application/json'
+            }
+        })
+        .then(async (response)=>{
+            const devicePromises = response.data.map(async (device:Device) => {
+                const sensorResponse = await axios.get(`http://localhost:8080/tanks/${device.id}/tank-sensors/waterlevel/values`, {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                console.log(sensorResponse.data);
                 return sensorResponse.data.map((sensor:Sensor) => {
                     const date = new Date(sensor.time);
                     return {
@@ -188,6 +246,10 @@ export const  DevicesProvider = ({children}: Props)=>{
         .catch((err)=>{
             console.log(err);
         })
+    }
+    useEffect(()=>{
+        setLoading(true)
+        fetchInMinutes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
     useEffect(()=>{
@@ -212,7 +274,12 @@ export const  DevicesProvider = ({children}: Props)=>{
         setReportRef,
         loading,
         setLoadingFunc,
+        fetchinHours,
+        fetchInMinutes,
     }
+    setInterval(()=>{
+        fetchInMinutes();
+    },1000*60);
     return(
         <DevicesContext.Provider value={value}>
             {children}
