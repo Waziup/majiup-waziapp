@@ -138,7 +138,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     };
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     function fetchInMinutes(){
-        axios.get('http://localhost:8080/tanks',{
+        axios.get('http://192.168.1.101:8081/tanks',{
             headers:{
                 'Accept': 'application/json',
                 'Content-Type':'application/json'
