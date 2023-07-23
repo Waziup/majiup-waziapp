@@ -1,4 +1,4 @@
-import { MoreVert, SaveAlt } from '@mui/icons-material';
+import { Delete, MoreVert, SaveAlt } from '@mui/icons-material';
 import { Box, Modal, Stack } from '@mui/material';
 import FrameSVG from '../assets/frame.svg';
 import React, { useContext, useState } from 'react';
@@ -135,6 +135,11 @@ function SettingsPage() {
                                     <input value={selectedDevice?.height} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
                                 </Box>
                             </Box>
+                            <Box sx={{display:'flex', justifyContent: 'space-between'}}>
+                                <h4 style={InputLabel}>Notifications</h4>
+                                <Android12Switch checked={false}/>
+                            </Box>
+                            
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
                                 <Box mb={2}>
                                     <h4 style={InputLabel}>Tank Diameter</h4>
@@ -163,6 +168,13 @@ function SettingsPage() {
                                         <input key={id} value={actuator.name} required style={inputbox1} className="input_box" type={'text'} placeholder={'Enter Device Name'} />    
                                     ))
                                 }
+                            </Box>
+                            <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
+                                    <h4 style={InputLabel}>Delete this device?</h4>
+                                <button style={{...ButtonStyle,backgroundColor: 'red',width: '40%'}} className="button">
+                                    <Delete sx={{cursor:'pointer'}}/>
+                                    <span>Delete</span>
+                                </button>
                             </Box>
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-between'}}>
                                 <button style={ButtonStyle} className="button">
