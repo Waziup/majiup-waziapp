@@ -139,7 +139,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     function fetchInMinutes(){
         
-        axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
+        axios.get(`http://localhost:8080/tanks`,{
             headers:{
                 'Accept': 'application/json',
                 'Content-Type':'application/json'

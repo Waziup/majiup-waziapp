@@ -31,100 +31,105 @@ A step by step series of examples that tell you how to get a development env run
     ```
         pnpm dev
     ```
+## Compiling applications
+1. After we have finished building our applications, it is now time to build and compile them to run in the wazigate.
+Navigate the the project's directory, ensure you have ftp, docker and docker compose installed in your PC. If you don't have them installed, you can install them by following the instructions [here](https://docs.docker.com/get-docker/) and [here](https://docs.docker.com/compose/install/).
+2. Now run the following command to build the docker image
+    ```
+        sudo docker build --platform linux/arm64  -t frontend .
+    ```
+    With this command, you will build the docker image for the application to work on the Wazigate, which only supports arm64 architecture arm arm64, aarch64 and arm64/v8.
+3. Similarly, navigate to the folder where you have the backend application and run the following command
+    ```
+        sudo docker build --platform linux/arm64  -t backend .
+    ```
+4. After successfully building the images, we need to save the images in a **.tar** file
+    ```
+        sudo docker save -o backend.tar backend
+    ```
+    ```
+        sudo docker save -o frontend.tar frontend
+    ```
+5. This will create a tar file in your PC's current directory, you can list them by running the following command
+    ```
+        ls
+    ```
 ## Installing in Wazigate
-1. After cloning the repo, we have to do a couple of stuff.
-    - ssh into your Wazigate
-        ```
-            ssh pi@<ip_address>
-        ```
-    -  Install ftp server on the Wazigate by running the following commands
-        ```
-            sudo apt-get install -y pure-ftpd
-            sudo groupadd ftpgroup
-            sudo usermod -a -G ftpgroup $USER
-            sudo chown -R $USER:ftpgroup "$PWD"
-            sudo pure-pw useradd upload -u $USER -g ftpgroup -d "$PWD" -m <<EOF
-            loragateway
-            loragateway
-            EOF
-            sudo pure-pw mkdb
-            sudo service pure-ftpd restart
-        ```
-    - Exit the Wazigate by typing the following command
-        ```
-            exit
-        ```
+1. After building the images, now we need to transfer the images to our wazigate, ensure you are connected to the same network with the wazigate.
     - Test if you have successfully installed the ftp server by running the following command
         ```
             ftp <ip_address>
         ```
         You will be prompted to enter your username and password, enter the username (pi) and password (loragateway). If you are able to login, then you have successfully installed the ftp server.
-    - Now exit the pi. 
+    - Inside your host PC, Navigate to the folder you built the two **.tar** files and then run the following command
         ```
-            exit
-        ```
-    - Inside your host PC, navigate to the folder you clone your application and run the      following command
-        ```
-            zip -r majiup-waziapp.zip majiup-waziapp
-            ftp <ip_address>
+            ftp <Wazigate IP Address>
         ```
         You will be prompted to enter your username and password, enter the username (upload) and password (loragateway). If you are able to login, then you have successfully installed the ftp server.
-    - Now make a folder called ``majiup`` and ``cd`` into it
-        ```
-            mkdir majiup
-            cd majiup
-        ```
     - Now copy the contents of the application into the folder you just created
         ```
-            put majiup-waziapp.zip
+            put frontend.tar
         ```
-        With this command, you will copy the contents from the  host machine application into wazigatethe folder you just created. Now exit the ftp server by typing the following command
+        ```
+            put backend.tar
+        ```
+    - We also need to copy our compose file to spin the two containers easily, navigate to the directory where you hve the **docker-compose.yml** file
+        ```
+            put docker-compose.yml
+        ```
+        With this command, you will copy the contents from the  host machine application into wazigate the folder you just created. Now exit the ftp server by typing the following command
         ```
             exit
         ```
-2. Build the docker image
+2. After successfully transferring the files to the wazigate.
     - ssh into your Wazigate
         ```
             ssh pi@<ip_address>
         ```
-    - Extract the files we just copied
+        The password is loragateway by default.
+    - To ensure the files we copied successfully run this
         ```
-            unzip majiup-waziapp.zip
+            ls
         ```
-    - Navigate to the application directory
+        you should be able to see the files, 
+    - Now let us load the images from the **tar** files
         ```
-            cd majiup-waziapp
+            sudo docker image load -i frontend.tar
         ```
-    - Inside the application directory, run the following command
         ```
-            docker build --platform linux/arm64  -t majiup_waziapp:1.1.0 .
+            sudo docker image load -i backend.tar
         ```
-        With this command, you will build the docker image for the application to work on the Wazigate, which only supports arm64 architecture arm arm64, aarch64 and arm64/v8.
-    - Wait for the image to build.
-    - After succesfull build, run the following command to check if the image is present
+    - This will unpack the two files and add them to the docker registry as images, you can view the images by running
+        ```
+            sudo docker image ls
+        ```
+        With this command, you will see the two images frontend and backend
+    - After succesfull unpacking, run the following command to check if the image is present
         ```
             docker images
         ```
         You should see the image you just built with it's name and tag. Copy the image id.
-    - Now run the following command to run the application
+    - Now, we need to start the containers, this is where our compose file comes in handy, navigate to the directory you have the compose file and run thet following
         ```
-            docker run --name majiup-frontend -d -p 4173:4173 <image_id>
+            sudo docker-compose up
         ```
-        With this command, you will run the application in the background and expose it to port 3000. You can change the port to any port of your liking.
-        This command will print the id of the container you just created. Copy the first 5 items id, you will need it in the next step.
+        By default, docker-compose looks for a **docker-compose.yml** file. If the compose file is named differently, there's an option to specify the file
+        ```
+            sudo docker-compose -f <name of your compose file> up
+        ```
+        With this command, you will run the two application, you can be able to see them running throug the printing in your console, if you want them to run in the background, stop the running instance then run the following
+        ```
+            sudo docker-compose -f <name of your compose file> -d up
+        ```
 3. Now 
-    - run the following command to check if the container is running
+    - run the following command to check if the containers are running
         ```
-            docker ps
+            sudo docker ps
         ```
     - You should see the container you just created with it's name and id.
       Now, we need to see if the application is running. To do that, we need to check the logs of the container. To do that, run the following command
         ```
-            docker logs <container_id>
+            sudo docker logs <container_id or container_name>
         ```
-    - You should see the logs of the application. If you see the logs, then the          application is running. If you don't see the logs, then the application is not running. To run the application, run the following command
-        ```
-            docker start <container_id>
-        ```
-    - Navigate to your browser, type the ip address of your Wazigate and the port you exposed the application to. For example, if you exposed the application to port 4173, then you should type ``<ip_address>:4173``. You should see the application running.
+    - Navigate to your browser, type the ip address of your Wazigate and the port you exposed the application to. For example, if you exposed the application to port 5173, then you should type ``http://<ip_address>:5173``. You should see the application running.
 
