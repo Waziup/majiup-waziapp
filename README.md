@@ -54,6 +54,13 @@ Navigate the the project's directory, ensure you have ftp, docker and docker com
     ```
         ls
     ```
+6. For us to copy the files to the wazigate, we need to change permissions
+    ```
+        sudo chmod 777 frontend.tar
+    ```
+    ```
+        sudo chmod 777 backend.tar
+    ```
 ## Installing in Wazigate
 1. After building the images, now we need to transfer the images to our wazigate, ensure you are connected to the same network with the wazigate.
     - Test if you have successfully installed the ftp server by running the following command

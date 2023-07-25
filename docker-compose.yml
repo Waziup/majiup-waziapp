@@ -6,21 +6,13 @@ services:
       - 8081:8080
     restart: unless-stopped
     command: ["./majiup_backend"]
-    networks:
-      - default
+    network_mode: host
   frontend:
     image: frontend
     ports:
-      - 5173:80
+      - 5173:5173
     restart: unless-stopped
     depends_on:
       - backend
     command: ["nginx", "-g", "daemon off;"]
-    networks:
-      - default
-    environment:
-      - VITE_BACKEND_URL=http://backend:8081
-networks:
-  default:
-    external:
-      name: wazigate
+    network_mode: host
