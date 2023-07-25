@@ -2,9 +2,8 @@ FROM node:18.13.0-alpine3.16 AS build-stage
 WORKDIR /app
 COPY package.json  ./
 RUN npm install --force
-RUN ls -l
 COPY . .
-CMD ["npm", "run", "build"]
+RUN npm run build
 
 # Stage 2
 FROM nginx:1.21.3-alpine AS production-stage
