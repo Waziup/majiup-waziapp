@@ -110,7 +110,7 @@ function TankDetailComponent({id,capacity,height, owner,waterTemp,waterQuality,l
         setTemperatureConsumption(consumption)
     },[consumption]);
     async function runFetch(){
-        const temperatureConsumptionVal =await axios.get(`http://localhost:8080/tanks/${id}/tank-sensors/water-temperature/values`,{
+        const temperatureConsumptionVal =await axios.get(`http://localhost:8081/tanks/${id}/tank-sensors/water-temperature/values`,{
             headers:{
                 'Accept': 'application/json',
             }
