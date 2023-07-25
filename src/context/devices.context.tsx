@@ -139,7 +139,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     function fetchInMinutes(){
         
-        axios.get(`http://localhost:8081/tanks`,{
+        axios.get(`http://192.168.88.248:8081/tanks`,{
             headers:{
                 'Accept': 'application/json',
                 'Content-Type':'application/json'
@@ -147,7 +147,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .then(async (response)=>{
             const devicePromises = response.data.map(async (device:Device) => {
-                const sensorResponse = await axios.get(`http://localhost:8081/tanks/${device.id}/tank-sensors/waterlevel/values`, {
+                const sensorResponse = await axios.get(`http://192.168.88.248:8081/tanks/${device.id}/tank-sensors/waterlevel/values`, {
                     headers: {
                         'Accept': 'application/json',
                     }
@@ -194,7 +194,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
     }
     function fetchinHours(){
-        axios.get('http://localhost:8081/tanks',{
+        axios.get('http://192.168.88.248:8081/tanks',{
             headers:{
                 'Accept': 'application/json',
                 'Content-Type':'application/json'
@@ -202,7 +202,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .then(async (response)=>{
             const devicePromises = response.data.map(async (device:Device) => {
-                const sensorResponse = await axios.get(`http://localhost:8081/tanks/${device.id}/tank-sensors/waterlevel/values`, {
+                const sensorResponse = await axios.get(`http://192.168.88.248:8081/tanks/${device.id}/tank-sensors/waterlevel/values`, {
                     headers: {
                         'Accept': 'application/json',
                     }
