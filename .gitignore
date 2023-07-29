@@ -28,3 +28,4 @@ src/pages/ProductsPage.tsx
 .firebase
 .firebaserc
 firebase.json
+Dockerfile.test

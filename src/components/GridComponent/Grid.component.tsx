@@ -64,7 +64,7 @@ function GridComponent() {
         if(!matches){
             setTanks(newTanks);
             navigate(`/devices/${tank.id}`,{
-                state: tank,                
+                state: tank,
             });
             return;
         }
@@ -166,7 +166,7 @@ function GridComponent() {
                                     </p>
                                     <MoreVert sx={{fontSize: 25, color: '#4592F6'}}/>
                                 </Box>
-                                <WatertankComponent percentage={(tank.liters/tank.capacity)*100} waterQuality={getWaterQuality(tank.tds)} />
+                                <WatertankComponent percentage={Math.round((tank.liters/tank.capacity)*100)} waterQuality={getWaterQuality(tank.tds)} />
                                 <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '90%',}}>
                                     <Box sx={TankDetails}>
                                         <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
