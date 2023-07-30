@@ -280,7 +280,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     }
     setInterval(()=>{
         fetchInMinutes();
-    },1000*60);
+    },1000*30);
     return(
         <DevicesContext.Provider value={value}>
             {children}
