@@ -110,7 +110,7 @@ function TankDetailComponent({id,capacity,height, owner,waterTemp,waterQuality,l
         setTemperatureConsumption(consumption)
     },[consumption]);
     async function runFetch(){
-        const temperatureConsumptionVal =await axios.get(`http://192.168.88.248:8081/tanks/${id}/tank-sensors/water-temperature/values`,{
+        const temperatureConsumptionVal =await axios.get(`http://localhost:8081/tanks/${id}/tank-sensors/water-temperature/values`,{
             headers:{
                 'Accept': 'application/json',
             }
@@ -154,12 +154,12 @@ function TankDetailComponent({id,capacity,height, owner,waterTemp,waterQuality,l
                 (consumption?.length || waterQuality && waterTemp) ?(
                     <>
                     <h3 style={{display: 'inline-block'}}>{owner}</h3>
-                    <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
+                    {/* <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
                         <p style={{display: 'inline-flex',paddingLeft: '5px', color:'#B69E09', alignItems: 'center'}}>
                             Tank overflow detected.
                         </p>
                         <p style={{color:'#B69E09'}} >&#10006;</p>
-                    </Box>
+                    </Box> */}
                     <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
                         <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
                             <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>

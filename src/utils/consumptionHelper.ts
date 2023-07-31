@@ -12,7 +12,7 @@ type ObjProps={
     [key: string]: number | string
 }
 export async function getConsumption(deviceId: string, tankHeight: number, tankCapacity: number) {
-    const response = await axios.get(`http://192.168.88.248:8081/tanks/${deviceId}/tank-info`, {
+    const response = await axios.get(`http://localhost:8081/tanks/${deviceId}/tank-info`, {
         headers:{
             'Accept': 'application/json',
         }
@@ -62,9 +62,9 @@ export const getLiters = (waterLevel: number, tankHeight: number, tankCapacity: 
     return (waterLevel / tankHeight) * tankCapacity;
 }
 export function handleFetchTableComponents(deviceId: string){
-    const getLevel = axios.get(`http://192.168.88.248:8081/tanks/${deviceId}/waterlevel/value`)
-    const getWaterQuality = axios.get(`http://192.168.88.248:8081/tanks/${deviceId}/water-quality/value`)
-    const getTemp = axios.get(`http://192.168.88.248:8081/tanks/${deviceId}/water-temperature/value`)
+    const getLevel = axios.get(`http://localhost:8081/tanks/${deviceId}/waterlevel/value`)
+    const getWaterQuality = axios.get(`http://localhost:8081/tanks/${deviceId}/water-quality/value`)
+    const getTemp = axios.get(`http://localhost:8081/tanks/${deviceId}/water-temperature/value`)
 
     axios.all([getLevel,getWaterQuality,getTemp])
     .then(axios.spread(function (respLevel,respQuality,respTemp){
