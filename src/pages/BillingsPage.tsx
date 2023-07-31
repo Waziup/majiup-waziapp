@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // @ts-nocheck
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useContext,useLayoutEffect, useEffect } from 'react';
@@ -13,21 +13,21 @@ import jsPDF from 'jspdf';
 import { DevicesContext } from '../context/devices.context';
 import CanvasJSReact from '@canvasjs/react-charts';
 // import ReportcardComponent from '../components/ReportCard/Reportcard.component';
-import DocumentComponent from '../components/Document/Document.component';
+// import DocumentComponent from '../components/Document/Document.component';
 import { X as Device } from '../context/devices.context';
-import { PDFDownloadLink } from '@react-pdf/renderer';
+// import { PDFDownloadLink } from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
-const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+// const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const date = new Date();
 const todaysDate = `${months[date.getMonth()]}, ${date.getDate()}, ${date.getFullYear()}`;
 import { getConsumption } from '../utils/consumptionHelper';
-const ReportsActiveText={
-    cursor: 'pointer', 
-    color: '#2C2D38',
-    padding: '0 .4vw',
-    fontSize: '13px'
-}
+// const ReportsActiveText={
+//     cursor: 'pointer', 
+//     color: '#2C2D38',
+//     padding: '0 .4vw',
+//     fontSize: '13px'
+// }
 type SelectedTankInfo = {
     name: string,
     litres: number,
@@ -37,10 +37,10 @@ type SelectedTankInfo = {
         y: number
     }[]
 }
-const ReportsText={cursor: 'pointer',color: '#9291A5',padding: '0 .4vw',fontSize: '13px' }
+// const ReportsText={cursor: 'pointer',color: '#9291A5',padding: '0 .4vw',fontSize: '13px' }
 export type Consumption = {
     time: string,
-    litres: number
+    liters: number
     waterLevel: number
     waterQuality: string
     waterTemperature: number
@@ -53,11 +53,9 @@ function getLitres(capacity: number, height: number,level: number): number{
 function BillingsPage() {
     const { devices, reportRef,fetchinHours,fetchInMinutes, setReportRef} = useContext(DevicesContext)
     console.log('Ref handler: ',reportRef)
-	const divEl = document.getElementById('divEl');
-	setReportRef(divEl as HTMLDivElement);
-	console.log('Ref handler: ',divEl);
+	
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
-    const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[]}>([]);
+    const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[] }>({consumption: []});
     const [optionsToRender, setOptionsToRender] = useState({})
     
     const options = {
@@ -82,8 +80,7 @@ function BillingsPage() {
     const handleGeneratePdf = () => {
         console.log('Report TemplateRef template: ',reportRef)
         document.body.appendChild(reportRef);
-        // console.log('REf current state is: ',reportTemplateRef.current)
-        html2canvas(reportRef)
+        html2canvas(reportRef as HTMLDivElement)
         .then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
             console.log('====================================');
@@ -91,30 +88,19 @@ function BillingsPage() {
             // setImage(imgData)
             console.log('====================================');
             const pdf = new jsPDF();
-            pdf.addImage(imgData, 'JPEG', 0, 0);
+            pdf.addImage(imgData, 'JPEG', 15, 4, 180, 160);
+            // pdf.addImage(imgData, 'JPEG', 0, 0, 0, 0);
             pdf.save("download.pdf");
+            document.body.removeChild(reportRef);
         })
         .catch((err) => console.log(err));
-		const doc = new jsPDF({
-			format: 'a4',
-			unit: 'px',
-		});
-
-		// Adding the fonts.
-		// doc.setFont('Inter-Regular', 'normal');
-        // doc.setFillColor({ch1: 'black'})
-		doc.html(reportRef as HTMLDivElement, {
-			callback(doc) {
-				doc.save('report_document');
-			},
-		});
 	};
     async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
         console.log(event.target.value)
         const selectedTableTank1 = devices.filter((device: Device) => device.id === event.target.value)[0];
         console.log('Selected table tank', selectedTableTank1)
         if (selectedTableTank1) {
-            const responseData =await getConsumption(selectedTableTank1.id);
+            const responseData =await getConsumption(selectedTableTank1.id, selectedTableTank1.capacity, selectedTableTank1.height);
             console.log('Response data', responseData)
             setSelectedTableTank({
                 consumption: responseData
@@ -307,9 +293,6 @@ function BillingsPage() {
                 {/* <Box alt="water Tank." sx={{width: '100%'}} component="img" src={ChatFlow}/> */}
                 <CanvasJSChart options = {optionsToRender}/>
             </Box>
-            <PDFDownloadLink document={<DocumentComponent reportRef={reportRef} totalDevices={devices.length} user={'Oliver'} totalLiters={devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.liters), 0)} />} fileName="somename.pdf">
-                {({blob,data, loading,}) => (loading ? 'Loading document...' : 'Download now!')}
-            </PDFDownloadLink>
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>
                     <Box sx={{border: '1px solid #ccc',marginRight:'5px', padding:'5px', width: '75%', borderRadius: '20px'}}>
@@ -329,7 +312,7 @@ function BillingsPage() {
                         </Box>
                     </Box>
                 </Box>
-                <div id='divEl'>
+                <div>
                     <h4 style={{margin:'10px 0'}}>Tabular Overview</h4>
                     {
                         selectedTableTank.consumption?(
