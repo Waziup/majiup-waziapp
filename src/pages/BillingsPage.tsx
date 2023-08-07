@@ -46,13 +46,11 @@ export type Consumption = {
     waterTemperature: number
 }
 function getLitres(capacity: number, height: number,level: number): number{
-    console.log(capacity,' ',height,' ',level)
     return (level/height)*capacity;
 }
 
 function BillingsPage() {
     const { devices, reportRef,fetchinHours,fetchInMinutes, setReportRef} = useContext(DevicesContext)
-    console.log('Ref handler: ',reportRef)
 	
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[] }>({consumption: []});
@@ -78,30 +76,24 @@ function BillingsPage() {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 	const reportTemplateRef = useRef<HTMLDivElement>(null);
     const handleGeneratePdf = () => {
-        console.log('Report TemplateRef template: ',reportRef)
+        setIsOpenModal(!isOpenModal)
+        setIsOpenModal(!isOpenModal)
         document.body.appendChild(reportRef);
         html2canvas(reportRef as HTMLDivElement)
         .then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
-            console.log('====================================');
-            console.log(imgData);
-            // setImage(imgData)
-            console.log('====================================');
             const pdf = new jsPDF();
             pdf.addImage(imgData, 'JPEG', 15, 4, 180, 160);
             // pdf.addImage(imgData, 'JPEG', 0, 0, 0, 0);
             pdf.save("download.pdf");
             document.body.removeChild(reportRef);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => alert(err));
 	};
     async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
-        console.log(event.target.value)
         const selectedTableTank1 = devices.filter((device: Device) => device.id === event.target.value)[0];
-        console.log('Selected table tank', selectedTableTank1)
         if (selectedTableTank1) {
             const responseData =await getConsumption(selectedTableTank1.id, selectedTableTank1.capacity, selectedTableTank1.height);
-            console.log('Response data', responseData)
             setSelectedTableTank({
                 consumption: responseData
             })
@@ -119,11 +111,8 @@ function BillingsPage() {
             //     ]
             // })
         }
-        console.log('Selected table tank', selectedTableTank);
-        //setSelectedTableTank(selectedTableTank);
     }
     useLayoutEffect(()=>{
-        console.log('Component mounted');
         setSelectedTank({
             ...selectedTank,
             id: "All",
@@ -133,15 +122,13 @@ function BillingsPage() {
         if (devices.length>=1) {
             const getData= async()=>{
                 const responseData =await getConsumption(devices[0].id,devices[0].height,devices[0].capacity);
-                console.log('Response data', responseData)
+                
                 setSelectedTableTank({
                     consumption: responseData
                 })
             }
             getData();
-            console.log('Devices to be loaded are:', selectedTank)
             if(selectedTank.id==='All'){
-                console.log('All tanks',devices.reduce((acc, curr)=>acc+curr.liters,0));
                 setSelectedTank({
                     ...selectedTank,
                     consumption: devices[0].consumption??[],
@@ -157,7 +144,6 @@ function BillingsPage() {
                 return;
                 //setSelectedTank({...selectedTank, litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)})
             }
-            console.log('Devicces', devices.length)
             setSelectedTank({
                 ...selectedTank,
                 consumption: devices[0].consumption ??[],
@@ -172,12 +158,10 @@ function BillingsPage() {
                     dataPoints: devices[0]?.consumption??[],
                 }]
             })
-            console.log('Table tank consumption',selectedTableTank.consumption)
         }
     },[devices.length])
     useEffect(()=>{
         if(selectedTank.id==='All'){
-            console.log('All tanks',devices);
             setSelectedTank({
                 ...selectedTank,
                 consumption: devices[0]?.consumption,
@@ -192,10 +176,8 @@ function BillingsPage() {
             })
             return;
         }
-        console.log('Tank ID has changed', selectedTank.id)
         const device = devices.filter((d)=>d.id===selectedTank.id);
         if (device.length >=1) {
-            console.log('This is a single device',device)
             setSelectedTank({
                 ...selectedTank, 
                 consumption: device[0]?.consumption, 
@@ -218,7 +200,6 @@ function BillingsPage() {
     },[selectedTank.id])
     const CanvasJSChart = CanvasJSReact.CanvasJSChart;
     function handleToggle(event: React.ChangeEvent<HTMLSelectElement>){
-        console.log(event.target.value)
         if(event.target.value==='minutes'){
             fetchInMinutes();
         }else{
@@ -239,7 +220,7 @@ function BillingsPage() {
                     View Analytics
                 </p>
             </Box>
-            <ModalComponent handleClose={()=>{console.log(reportTemplateRef.current); setIsOpenModal(!isOpenModal)}} open={isOpenModal}>
+            <ModalComponent handleClose={()=>{setIsOpenModal(!isOpenModal)}} open={isOpenModal}>
                 <div >
                     <h3 style={{fontSize: '16px', margin:'10px 0'}}>Consumption Chart</h3>
                     <div style={{border: '1px solid black', padding:'8px 10px', borderRadius:'4px'}}>
