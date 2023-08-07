@@ -12,6 +12,7 @@ import { DevicesContext } from "../../context/devices.context";
 import FrameSVG from '../../assets/frame.svg';
 import { DeviceThermostatSharp, MoreVert, WaterDrop } from "@mui/icons-material";
 import WatertankComponent from "../WaterTank/Watertank.component";
+import axios from "axios";
 
 /** 
  * ToDo
@@ -77,15 +78,32 @@ function GridComponent() {
     
     console.log(devices);
     function toogleActuatorHandler(id:string) {
-        const newTanks = devices.map((item: Device) => {
-            if(item.id === id){
-                item.actuators[0].value = !item.actuators[0].value;
-            }else{
-                item.isSelect = false;
-            }
-            return item;
-        })
-        setTanks(newTanks);
+        let currentValue;
+        // const newTanks = devices.map((item: Device) => {
+        //     if(item.id === id){
+        //         item.actuators[0].value = !item.actuators[0].value;
+        //     }else{
+        //         item.isSelect = false;
+        //     }
+        //     return item;
+        // })
+        const tank = devices.find((item: Device) => item.id === id);
+        if(tank){
+            currentValue = tank.actuators[0].value ? 0 : 1;
+            axios.post(`http://localhost:8081/tanks/${id}/tank-actuators/valves`,{
+                value: currentValue,
+            },{
+                headers:{
+                    'Accept': 'application/json',
+                }
+            })
+            .then((response)=>{
+                console.log(response.data);
+            })
+            .catch((error)=>{
+                console.log(error);
+            })
+        }
     }
     if(loading){
         return(
@@ -205,6 +223,7 @@ function GridComponent() {
                                         height={selectedDevice.height}
                                         capacity={selectedDevice.capacity}
                                         toggleActuator={toogleActuatorHandler}
+                                        notification={selectedDevice.notification}
                                     />
                                 )
                             }
