@@ -1,29 +1,36 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Stack,Box, styled, Switch} from '@mui/material';
 import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome, DeviceThermostat, Opacity } from "@mui/icons-material";
 import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useEffect, useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
-import CanvasJSReact from '@canvasjs/react-charts';
+// import CanvasJSReact from '@canvasjs/react-charts';
 import FrameSVG from '../../assets/not-found.svg';
 import { Actuator } from '../../context/devices.context';
 import { getLiters } from '../../utils/consumptionHelper';
 import axios from 'axios';
+type Consumption = {
+    x: number,
+    y: number,
+}
+import Chart from 'react-apexcharts';
 type Props={
     owner: string,
     liters: number,
     waterTemp: number,
     waterQuality: string,
     on: boolean,
-	consumption: any[],
+	consumption: Consumption[],
     actuator?: Actuator[],
     height: number,
     capacity: number,
-    toggleActuator?: (id: string, value: boolean) => void,
+    toggleActuator?: (id: string) => void,
     id: string,
+    notification: {
+        id: string,
+        message: string,
+        read_status: boolean
+    }
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
@@ -68,46 +75,63 @@ const BoxStyle={
 }
 
 const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
-function TankDetailComponent({id,capacity,height, owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
+function TankDetailComponent({id,capacity,height,notification, owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
 	const [toggleHot, setToggleHot] = useState(false);
 	// const CanvasJS = CanvasJSReact.CanvasJS;
-	const CanvasJSChart = CanvasJSReact.CanvasJSChart;
-    const [temperatureConsumption, setTemperatureConsumption] = useState<any[]>([]);
-	const options = {
-		// animationEnabled: true,
-		// exportEnabled: true,
-		// theme: "light2", // "light1", "dark1", "dark2"
-		title:{
-			// text: "Bounce Rate by Week of Year"
-		},
-		toolTip:{
-			// shared: true,
-		},
-		axisY: {
-			// title: "Bounce Rate",
-			// suffix: "%"
-			interval: 2,
-            color : toggleHot? "#FF5C00": "#3F51B5",
-		},
-		axisX: {
-			// title: "Week of Year",
-			suffix: "AM",
-			interval: 2
-		},
-		data: [{
-			type: "line",
-			yValueFormatString: "#,##0.0#\"%\"",
-			// toolTipContent: "Week {x}: {y}%",
-			dataPoints: temperatureConsumption
-		}]
-	}
+	// const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+    const [temperatureConsumption, setTemperatureConsumption] = useState<Consumption[]>([]);
+    const apexChartOptions = {
+        series: [{
+            name: 'Consumption',
+            data: temperatureConsumption.map((item)=>item.y),
+            type: "area"
+        }],
+        options: {
+            chart: {
+                height: 350,
+                type: "rangeArea",
+                zoom: {
+                    enabled: true
+                },
+                toolbar: {
+                    show: false
+                }
+            },
+            colors: ['#4592F6'],
+            
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            xaxis: {
+                categories: temperatureConsumption.map((item)=>item.x),
+            },
+            fill: {
+                type: "gradient",
+                gradient: {
+                  shadeIntensity: 1,
+                  opacityFrom: 0.7,
+                  opacityTo: 0.9,
+                  stops: [0, 90, 100]
+                }
+            },
+        },
+    }
+    
+      
     function switchActuator(){
-        console.log(actuator[0].value)
-        toggleActuator(id);
+        if(actuator && toggleActuator){
+            console.log(actuator[0].value)
+            toggleActuator(id);
+        }
     }
     useEffect(()=>{
-        console.log(consumption,'IS consumption')
-        setTemperatureConsumption(consumption)
+        console.log(consumption.map((item)=>item.y),'IS consumption')
+        setTemperatureConsumption(consumption);
+        // const chart = new ApexCharts(document.querySelector("#chart"), apexChartOptions);
+        // chart.render();
     },[consumption]);
     async function runFetch(){
         const temperatureConsumptionVal =await axios.get(`http://localhost:8081/tanks/${id}/tank-sensors/water-temperature/values`,{
@@ -149,23 +173,27 @@ function TankDetailComponent({id,capacity,height, owner,waterTemp,waterQuality,l
     }
     console.log('Water quality ', waterQuality,consumption,actuator,liters,waterTemp)
     return (
-        <Stack sx={BoxStyle,(consumption?.length || waterQuality && waterTemp)?{bgcolor: "#fff"}:{bgcolor:'inherit'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
+        <Stack sx={(consumption?.length || waterQuality && waterTemp)?{...BoxStyle,bgcolor: "#fff"}:{...BoxStyle, bgcolor:'inherit'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             {
                 (consumption?.length || waterQuality && waterTemp) ?(
                     <>
                     <h3 style={{display: 'inline-block'}}>{owner}</h3>
-                    {/* <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
-                        <p style={{display: 'inline-flex',paddingLeft: '5px', color:'#B69E09', alignItems: 'center'}}>
-                            Tank overflow detected.
-                        </p>
-                        <p style={{color:'#B69E09'}} >&#10006;</p>
-                    </Box> */}
+                    {
+                        notification.message.length >0?(
+                            <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
+                                <p style={{display: 'inline-flex',paddingLeft: '5px', color:'#B69E09', alignItems: 'center'}}>
+                                    {notification.message}
+                                </p>
+                                <p style={{color:'#B69E09'}} >&#10006;</p>
+                            </Box>
+                        ):(null)
+                    }
                     <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
                         <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
                             <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>
-                            {actuator[0].name??'Water Pump Control'}
+                            {actuator?actuator[0].name: 'Water Pump Control'}
                         </p>
-                        <Android12Switch onClick={switchActuator} checked={actuator[0].value} sx={{color:'#FF5C00'}}  />
+                        <Android12Switch onClick={switchActuator} checked={actuator?actuator[0].value: false} sx={{color:'#FF5C00'}}  />
                     </Box>
                     <WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/capacity)*100)} />
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '80%',}}>
@@ -230,8 +258,47 @@ function TankDetailComponent({id,capacity,height, owner,waterTemp,waterQuality,l
                                 <DeviceThermostat style={toggleHot?{ color:'#fff',cursor: 'pointer', borderRadius:'50%',backgroundColor:'#FF5C00'}:{ color:'#888992',cursor: 'pointer', }}/>
                             </Box>
                         </Box>
-                        <CanvasJSChart style={{innerHeighteight:'200px'}}  options = {options}/>
-                        
+                        {/* <CanvasJSChart style={{innerHeighteight:'200px'}}  options = {options}/> */}
+                        <Chart
+                            options={{
+                                chart: {
+                                    height: 350,
+                                    type: "rangeArea",
+                                    zoom: {
+                                        enabled: true
+                                    },
+                                    toolbar: {
+                                        show: false
+                                    }
+                                },
+                                colors: ['#4592F6'],
+                                
+                                dataLabels: {
+                                    enabled: false
+                                },
+                                stroke: {
+                                    curve: 'smooth'
+                                },
+                                xaxis: {
+                                    categories: temperatureConsumption.map((item)=>item.x),
+                                },
+                                fill: {
+                                    type: "gradient",
+                                    gradient: {
+                                      shadeIntensity: 1,
+                                      opacityFrom: 0.7,
+                                      opacityTo: 0.9,
+                                      stops: [0, 90, 100]
+                                    }
+                                },
+                            }}
+                            series={apexChartOptions.series}
+                            type="line"
+                            height={350}
+                            width={380}
+                        />
+                        <Box id='#chart'>
+                        </Box>
                         <MapComponent />
                     </Box>
                 </>)

@@ -35,8 +35,7 @@ export type Actuator={
 type Notification={
     id: string,
     message: string,
-    meta: unknown,
-    date: Date,
+    read_status: boolean
 }
 type MetaInformation={
     receivenotifications: false,
@@ -69,7 +68,7 @@ interface Device{
     meta: MetaInformation,
     modified: Date,
     name: string,
-    notifications: Notification[],
+    notification: Notification,
     radius: number,
     sensors: Sensor[],
     width: number,
@@ -237,7 +236,7 @@ export const  DevicesProvider = ({children}: Props)=>{
                     tds: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0,
                     temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
                     isSelect: false,
-                    
+                    notification: device.meta.notifications,
                     on: true,
                 }
             }));
