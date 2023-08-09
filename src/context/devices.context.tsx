@@ -130,7 +130,6 @@ export const  DevicesProvider = ({children}: Props)=>{
     const [reportRef,setReportRefFunch] = useState<HTMLDivElement | null>(null);
     // const [devicesID, setDevicesID] = useState<{deviceID:string,sensorID:string}[]>([]);
     const setReportRef = (ref: HTMLDivElement)=>{
-        console.log('Ref i have received',ref);
         if (ref !==null) {
             setReportRefFunch(ref)
         }
@@ -138,7 +137,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     function fetchInMinutes(){
         
-        axios.get(`http://localhost:8081/tanks`,{
+        axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
             headers:{
                 'Accept': 'application/json',
                 'Content-Type':'application/json'
@@ -146,12 +145,11 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .then(async (response)=>{
             const devicePromises = response.data.map(async (device:Device) => {
-                const sensorResponse = await axios.get(`http://localhost:8081/tanks/${device.id}/tank-sensors/waterlevel/values`, {
+                const sensorResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/tank-sensors/waterlevel/values`, {
                     headers: {
                         'Accept': 'application/json',
                     }
                 });
-                console.log(sensorResponse.data);
                 return sensorResponse.data.map((sensor:Sensor) => {
                     const date = new Date(sensor.time);
                     return {
@@ -168,7 +166,6 @@ export const  DevicesProvider = ({children}: Props)=>{
             };
         })
         .then(({res,consumption})=>{
-            console.log('Devices: ', res,consumption);
             setDevices(res.map(function(device: X){
                 return{
                     ...device,
@@ -185,7 +182,6 @@ export const  DevicesProvider = ({children}: Props)=>{
                     on: true,
                 }
             }));
-            console.log('Devices: ',devices);
             setLoading(false);
         })
         .catch((err)=>{
@@ -193,7 +189,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
     }
     function fetchinHours(){
-        axios.get('http://localhost:8081/tanks',{
+        axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
             headers:{
                 'Accept': 'application/json',
                 'Content-Type':'application/json'
@@ -201,12 +197,11 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .then(async (response)=>{
             const devicePromises = response.data.map(async (device:Device) => {
-                const sensorResponse = await axios.get(`http://localhost:8081/tanks/${device.id}/tank-sensors/waterlevel/values`, {
+                const sensorResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/tank-sensors/waterlevel/values`, {
                     headers: {
                         'Accept': 'application/json',
                     }
                 });
-                console.log(sensorResponse.data);
                 return sensorResponse.data.map((sensor:Sensor) => {
                     const date = new Date(sensor.time);
                     return {
@@ -223,7 +218,6 @@ export const  DevicesProvider = ({children}: Props)=>{
             };
         })
         .then(({res,consumption})=>{
-            console.log('Devices: ', res,consumption);
             setDevices(res.map(function(device: X){
                 return{
                     ...device,
@@ -254,7 +248,6 @@ export const  DevicesProvider = ({children}: Props)=>{
     },[]);
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {
-            console.log('First device',Promise.all(devices).then((res)=>console.log(res)));
             setSelectedTank(devices[0])
             setLoading(false);
         }
