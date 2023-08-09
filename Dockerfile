@@ -3,6 +3,7 @@ WORKDIR /app
 COPY package.json  ./
 RUN npm install --force
 COPY . .
+ENV VITE_BACKEND_URL="http://192.168.1.245"
 RUN npm run build
 
 # Stage 2
