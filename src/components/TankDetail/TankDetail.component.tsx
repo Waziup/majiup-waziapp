@@ -75,10 +75,8 @@ const BoxStyle={
 }
 
 const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
-function TankDetailComponent({id,capacity,height,notification, owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
+function TankDetailComponent({id,capacity,on, height,owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
 	const [toggleHot, setToggleHot] = useState(false);
-	// const CanvasJS = CanvasJSReact.CanvasJS;
-	// const CanvasJSChart = CanvasJSReact.CanvasJSChart;
     const [temperatureConsumption, setTemperatureConsumption] = useState<Consumption[]>([]);
     const apexChartOptions = {
         series: [{
@@ -123,24 +121,21 @@ function TankDetailComponent({id,capacity,height,notification, owner,waterTemp,w
       
     function switchActuator(){
         if(actuator && toggleActuator){
-            console.log(actuator[0].value)
             toggleActuator(id);
         }
     }
     useEffect(()=>{
-        console.log(consumption.map((item)=>item.y),'IS consumption')
         setTemperatureConsumption(consumption);
         // const chart = new ApexCharts(document.querySelector("#chart"), apexChartOptions);
         // chart.render();
     },[consumption]);
     async function runFetch(){
-        const temperatureConsumptionVal =await axios.get(`http://localhost:8081/tanks/${id}/tank-sensors/water-temperature/values`,{
+        const temperatureConsumptionVal =await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/tank-sensors/water-temperature/values`,{
             headers:{
                 'Accept': 'application/json',
             }
         })
         .then((response)=>{
-            console.log(response.data);
             return response.data.map((sensor: {value: number,time: string})=>{
                 const date = new Date(sensor.time)
                 return{
@@ -153,13 +148,9 @@ function TankDetailComponent({id,capacity,height,notification, owner,waterTemp,w
         .catch((err)=>{
             alert(err);
         })
-        console.log('====================================');
-        console.log(temperatureConsumptionVal);
-        console.log('====================================');
         setTemperatureConsumption(temperatureConsumptionVal);
     }
     useEffect(()=>{
-        console.log('Togglehot is ', toggleHot);
         if(toggleHot){
             runFetch();
         }else{
@@ -171,7 +162,21 @@ function TankDetailComponent({id,capacity,height,notification, owner,waterTemp,w
         setToggleHot(!toggleHot);
         // setTemperatureConsumption(consumption);
     }
-    console.log('Water quality ', waterQuality,consumption,actuator,liters,waterTemp)
+    if(!on){
+        return (
+            <Stack sx={{...BoxStyle, bgcolor: '#fff'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
+                <Box sx={{width: '100%'}} component='img' src={FrameSVG}/>
+                <Box sx={{position: 'relative'}}>
+                    <Box sx={{marginTop: '10px'}}>
+                        <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
+                            Oh no!
+                        </h3>
+                        <p style={{color: 'red',fontWeight: '600',textAlign: 'center', fontSize: 16}}>seems the connection is lost</p>
+                    </Box>
+                </Box>
+            </Stack>
+        )
+    }
     return (
         <Stack sx={(consumption?.length || waterQuality && waterTemp)?{...BoxStyle,bgcolor: "#fff"}:{...BoxStyle, bgcolor:'inherit'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             {
@@ -179,10 +184,10 @@ function TankDetailComponent({id,capacity,height,notification, owner,waterTemp,w
                     <>
                     <h3 style={{display: 'inline-block'}}>{owner}</h3>
                     {
-                        notification.message.length >0?(
+                        "".length>0?(
                             <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
                                 <p style={{display: 'inline-flex',paddingLeft: '5px', color:'#B69E09', alignItems: 'center'}}>
-                                    {notification.message}
+                                    ""
                                 </p>
                                 <p style={{color:'#B69E09'}} >&#10006;</p>
                             </Box>
@@ -304,14 +309,11 @@ function TankDetailComponent({id,capacity,height,notification, owner,waterTemp,w
                 </>)
                 :(
                     <Box sx={{position: 'relative'}}>
-                        <Box sx={{
-                            marginTop: '10px'
-                        }}>
+                        <Box sx={{marginTop: '10px'}}>
                             <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
                                 {owner}
                             </h3>
                             <Box sx={{width: '100%'}} component='img' src={FrameSVG}/>
-                            
                             <p style={{color: 'red',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No readings detected for this device!</p>
                         </Box>
                     </Box>
