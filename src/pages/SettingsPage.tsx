@@ -87,6 +87,7 @@ const cancelButtonStyle={
     outline: 'none',
     cursor: 'pointer',
 }
+// type Changes = Omit<Device, 'id' | 'diameter'| 'sensors' | 'actuators'>;
 function SettingsPage() {
     const { devices } = useContext(DevicesContext);
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -98,6 +99,12 @@ function SettingsPage() {
         setIsOpenModal(true);
         console.log(e.target,selectedDevice);
     }
+    const deleteAlert = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>,id: string) => {
+        e.preventDefault();
+        const rs = prompt(`Are you sure you want to delete this device ${id}?`);
+        console.log(e.target,selectedDevice,rs);
+    }
+    
     return (
         <Box pl={2} pr={2}>
             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -117,22 +124,22 @@ function SettingsPage() {
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
                                 <Box mb={2}>
                                     <h4 style={InputLabel}>Device Name*</h4>
-                                    <input value={selectedDevice?.name} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                    <input readOnly value={selectedDevice?.name} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
                                 </Box>
                                 <Box mb={2} >
                                     <h4 style={InputLabel}>Gateway ID</h4>
-                                    <input value={selectedDevice?.id} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                    <input readOnly={true} value={selectedDevice?.id} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
                                     
                                 </Box>
                             </Box>
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
                                 <Box mb={2}>
                                     <h4 style={InputLabel}>Tank Capacity</h4>
-                                    <input value={selectedDevice?.capacity} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                    <input readOnly value={selectedDevice?.capacity} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
                                 </Box>
                                 <Box mb={2} >
                                     <h4 style={InputLabel}>Tank Height</h4>
-                                    <input value={selectedDevice?.height} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                    <input readOnly value={selectedDevice?.height} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
                                 </Box>
                             </Box>
                             <Box sx={{display:'flex', justifyContent: 'space-between'}}>
@@ -143,7 +150,7 @@ function SettingsPage() {
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
                                 <Box mb={2}>
                                     <h4 style={InputLabel}>Tank Diameter</h4>
-                                    <input value={selectedDevice?.meta.settings.radius? selectedDevice?.meta.settings.radius*2:0 } required style={inputbox} className="input_box" type={'number'} placeholder={'Enter Device Name'} />
+                                    <input readOnly value={selectedDevice?.meta.settings.radius? selectedDevice?.meta.settings.radius*2:0 } required style={inputbox} className="input_box" type={'number'} placeholder={'Enter Device Name'} />
                                 </Box>
                                 <Box mb={2} >
                                     <h4 style={InputLabel}>Tank Location</h4>
@@ -165,13 +172,13 @@ function SettingsPage() {
                             <Box sx={{display:'flex',alignItems: 'center', }}>
                                 {
                                     selectedDevice?.actuators.map((actuator,id)=>(
-                                        <input key={id} value={actuator.name} required style={inputbox1} className="input_box" type={'text'} placeholder={'Enter Device Name'} />    
+                                        <input readOnly key={id} value={actuator.name} required style={inputbox1} className="input_box" type={'text'} placeholder={'Enter Device Name'} />    
                                     ))
                                 }
                             </Box>
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
-                                    <h4 style={InputLabel}>Delete this device?</h4>
-                                <button style={{...ButtonStyle,backgroundColor: 'red',width: '40%'}} className="button">
+                                <h4 style={InputLabel}>Delete this device?</h4>
+                                <button onClick={(e)=>deleteAlert(e, selectedDevice?.id? selectedDevice.id:'')} style={{...ButtonStyle,backgroundColor: 'red',width: '40%'}} className="button">
                                     <Delete sx={{cursor:'pointer'}}/>
                                     <span>Delete</span>
                                 </button>
