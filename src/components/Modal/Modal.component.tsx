@@ -54,7 +54,6 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
     }
     return (
 		<>
-		<h2 >plsgfggfd</h2>
 		<Modal
 			open={open}
 			onClose={handleClose}
