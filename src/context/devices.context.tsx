@@ -66,7 +66,7 @@ interface Device{
     id: string,
     length: number,
     meta: MetaInformation,
-    modified: Date,
+    modified: string,
     name: string,
     notification: Notification,
     radius: number,
@@ -118,7 +118,13 @@ export const DevicesContext = createContext<ContextValues>({
 //return an array of device data including level, temperature, quality, etc.
 //extract the first row and add it as current waterTemp, waterQuality, liters, etc.
 //add the rest of the rows as consumption data
-
+function isActiveDevice(modifiedTime: string): boolean{
+    const now = new Date();
+    const modified = new Date(modifiedTime);
+    const diff = now.getTime() - modified.getTime();
+    const diffInMinutes = Math.floor(diff / 1000 / 60);
+    return diffInMinutes < 5;
+}
 export const  DevicesProvider = ({children}: Props)=>{
     const [devices,setDevices] = useState<X[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -128,7 +134,6 @@ export const  DevicesProvider = ({children}: Props)=>{
     const toggleModal = ()=> setIsOpenNav(!isOpenNav);
     const setTanks = (devices: X[])=> setDevices(devices);
     const [reportRef,setReportRefFunch] = useState<HTMLDivElement | null>(null);
-    // const [devicesID, setDevicesID] = useState<{deviceID:string,sensorID:string}[]>([]);
     const setReportRef = (ref: HTMLDivElement)=>{
         if (ref !==null) {
             setReportRefFunch(ref)
@@ -136,7 +141,6 @@ export const  DevicesProvider = ({children}: Props)=>{
     };
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     function fetchInMinutes(){
-        
         axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
             headers:{
                 'Accept': 'application/json',
@@ -178,8 +182,7 @@ export const  DevicesProvider = ({children}: Props)=>{
                     tds: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0,
                     temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
                     isSelect: false,
-                    
-                    on: true,
+                    on: isActiveDevice(device.modified),
                 }
             }));
             setLoading(false);
@@ -270,9 +273,9 @@ export const  DevicesProvider = ({children}: Props)=>{
         fetchinHours,
         fetchInMinutes,
     }
-    // setInterval(()=>{
-    //     fetchInMinutes();
-    // },1000*30);
+    setInterval(()=>{
+        fetchInMinutes();
+    },1000*10);
     return(
         <DevicesContext.Provider value={value}>
             {children}
