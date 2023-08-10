@@ -82,7 +82,7 @@ export interface X extends Device {
     on: boolean,
 }
 
-type ContextValues={
+interface ContextValues{
     devices: X[],
     user: {token:string,name:string},
     setUser:(user: string,token: string)=>void,
@@ -96,6 +96,7 @@ type ContextValues={
     loading: boolean,
     setLoadingFunc: (loading: boolean)=>void,
     fetchinHours: ()=>void,
+    searchDevices: (name: string)=>void,
     fetchInMinutes: ()=>void,
 }
 export const DevicesContext = createContext<ContextValues>({
@@ -113,6 +114,7 @@ export const DevicesContext = createContext<ContextValues>({
     setLoadingFunc: (loading)=>{console.log(loading);},
     fetchinHours: ()=>{console.log('');},
     fetchInMinutes: ()=>{console.log('');},
+    searchDevices: (name)=>{console.log(name);},
 });
 
 //return an array of device data including level, temperature, quality, etc.
@@ -249,6 +251,14 @@ export const  DevicesProvider = ({children}: Props)=>{
         fetchInMinutes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
+    function searchDevices(name: string){
+        if(name.length ===0){
+            return
+        }
+        const devicesCopy = [...devices];
+        const filteredDevices = devicesCopy.filter((device:X)=>device.name.toLowerCase().includes(name.toLowerCase()));
+        setDevices(filteredDevices);
+    }
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {
             setSelectedTank(devices[0])
@@ -272,6 +282,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         setLoadingFunc,
         fetchinHours,
         fetchInMinutes,
+        searchDevices,
     }
     setInterval(()=>{
         fetchInMinutes();
