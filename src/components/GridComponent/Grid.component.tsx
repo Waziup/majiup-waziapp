@@ -90,7 +90,7 @@ function GridComponent() {
         const tank = devices.find((item: Device) => item.id === id);
         if(tank){
             currentValue = tank.actuators[0].value ? 0 : 1;
-            axios.post(`http://localhost:8081/tanks/${id}/tank-actuators/valves`,{
+            axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/pumps/state`,{
                 value: currentValue,
             },{
                 headers:{
@@ -107,7 +107,7 @@ function GridComponent() {
     }
     if(loading){
         return(
-            <Grid container style={{background: '#F6F6F6'}} spacing={2}>
+            <Grid container style={{background: '#F6F6F6',}} spacing={2}>
                 <Grid item xs={12}>
                     <NavigationIndex matches={matches} />
                 </Grid>
