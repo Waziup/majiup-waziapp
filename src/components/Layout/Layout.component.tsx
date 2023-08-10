@@ -9,11 +9,11 @@ function LayoutComponent() {
     const matches = useMediaQuery(theme.breakpoints.up('md'));
     const { isOpenNav } = useContext(DevicesContext)
     return (
-        <Grid container style={{background: '#F6F6F6'}} spacing={2}>
+        <Grid container sx={{background: '#F6F6F6',height: '100vh',overflowY: 'hidden'}} spacing={2}>
             <Grid item  xs={12} >
                 <NavigationIndex matches={matches} />
             </Grid>
-            <Grid container spacing={2}>
+            <Grid sx={{overflow: 'hidden'}} container spacing={2}>
                 {isOpenNav && !matches &&(
                     <Box sx={{position:'absolute', height:'100vh', width:'110vw',bgcolor:'rgba(0,0,0,.25)'}}></Box>
                 )}

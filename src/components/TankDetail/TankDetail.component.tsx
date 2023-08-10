@@ -26,11 +26,7 @@ type Props={
     capacity: number,
     toggleActuator?: (id: string) => void,
     id: string,
-    notification: {
-        id: string,
-        message: string,
-        read_status: boolean
-    }
+    notifications?: {id: string,timestamp: string, message: string, read_status: boolean}[],
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,

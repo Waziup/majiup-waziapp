@@ -32,17 +32,16 @@ export type Actuator={
     time: Date | null,
     value: boolean,
 }
-type Notification={
+export type Notification={
     id: string,
     message: string,
     read_status: boolean
+    timestamp: string
 }
 type MetaInformation={
     receivenotifications: false,
     notifications: {
-        id: string,
-        message: string,
-        read_status: boolean
+        messages: Notification[]
     },
     location: {
         longitude: number,
@@ -68,7 +67,7 @@ interface Device{
     meta: MetaInformation,
     modified: string,
     name: string,
-    notification: Notification,
+    notifications: Notification[],
     radius: number,
     sensors: Sensor[],
     width: number,
@@ -185,6 +184,7 @@ export const  DevicesProvider = ({children}: Props)=>{
                     temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
                     isSelect: false,
                     on: isActiveDevice(device.modified),
+                    notifications: device.meta.notifications.messages,
                 }
             }));
             setLoading(false);

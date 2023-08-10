@@ -223,7 +223,7 @@ function GridComponent() {
                                         height={selectedDevice.height}
                                         capacity={selectedDevice.capacity}
                                         toggleActuator={toogleActuatorHandler}
-                                        notification={selectedDevice.notification}
+                                        notifications={selectedDevice.notifications}
                                     />
                                 )
                             }
