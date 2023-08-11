@@ -34,6 +34,11 @@ A step by step series of examples that tell you how to get a development env run
 ## Compiling applications
 1. After we have finished building our applications, it is now time to build and compile them to run in the wazigate.
 Navigate the the project's directory, ensure you have ftp, docker and docker compose installed in your PC. If you don't have them installed, you can install them by following the instructions [here](https://docs.docker.com/get-docker/) and [here](https://docs.docker.com/compose/install/).
+ - Now open the folder in your favourite code editor, I prefer [Visual Studio code](https://code.visualstudio.com).
+ - When you do this, you will see the folder directories.
+ ![Image of project directory](./images/project-folder.png)
+ - but pay attention to the Dockerfile file, you will see it has an environment variable written ``ENV VITE_BACKEND_URL="http://192.168.1.245:8081"``. This is the IP address of the wazigate, you need to change it to the IP address of your wazigate, it can be something like ``ENV VITE_BACKEND_URL="http://<YOUR_IP_ADDRESS>:8081"``
+
 2. Now run the following command to build the docker image
     ```
         sudo docker build --platform linux/arm64  -t frontend .
