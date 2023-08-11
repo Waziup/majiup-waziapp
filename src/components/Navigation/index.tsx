@@ -28,12 +28,12 @@ function NavigationIndex({matches}:Props) {
             return;
         }
     }, [user]);
-    const totalNotifications = devices.reduce((acc,dev)=>{
+    const totalNotifications =devices.length >0 ?devices.reduce((acc,dev)=>{
         if(dev.notifications){
             return acc + dev.notifications.length;
         }
         return acc;
-    },0);
+    },0):0;
     // console.log('Matches is: ',matches)
     return (
         <Box  sx={{padding: '10px 0', bgcolor: '#fff', display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center'}}>

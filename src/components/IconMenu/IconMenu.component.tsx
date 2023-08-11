@@ -1,16 +1,17 @@
-import {Menu,Divider, MenuItem,ListItemText, ListItemIcon} from '@mui/material'
+import {Menu,Divider, MenuItem,ListItemText, ListItemIcon, Box} from '@mui/material'
 import {Launch, Logout, AccountCircle} from '@mui/icons-material'
 import { useContext } from 'react';
 import { DevicesContext } from '../../context/devices.context';
 import {Link, useNavigate} from 'react-router-dom';
 import Fade from '@mui/material/Fade';
+import { Message } from '@mui/icons-material';
 interface Props {
     isOpen: boolean;
     anchorEl: null | HTMLElement;
     handleClose: () => void;
 }
 export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props) {
-    const {setUser} = useContext(DevicesContext)
+    const {setUser, devices} = useContext(DevicesContext)
     const navigate = useNavigate();
     const handleLogout = () => {
         setUser('','');
@@ -41,6 +42,33 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
                     </ListItemIcon>
                     <ListItemText>Wazigate</ListItemText>
                 </Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <ListItemIcon>
+                        <Message fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Notifications</ListItemText>
+                </div>
+                <div style={{fontSize: 12 }}>
+                    {
+                        devices.length >0? devices.map((dev)=>{
+                            if(dev.notifications){
+                                return dev.notifications.map((not, i)=>{
+                                    return (
+                                        <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'centre'}}>
+                                            <span key={i} style={{marginRight: 5}}>{not.message}</span>
+                                            <span style={{marginLeft: 5}}>{not.read_status?'':'MARK AS READ'}</span>
+                                        </Box>
+                                    )
+                                })
+                            }
+                            return null;
+                        }):(
+                            <p>No notifications</p>
+                        )
+                    }
+                </div>
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleLogout}>
