@@ -50,26 +50,26 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
                     </ListItemIcon>
                     <ListItemText>Notifications</ListItemText>
                 </div>
-                <div style={{fontSize: 12 }}>
-                    {
-                        devices.length >0? devices.map((dev)=>{
-                            if(dev.notifications){
-                                return dev.notifications.map((not, i)=>{
-                                    return (
-                                        <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'centre'}}>
-                                            <span key={i} style={{marginRight: 5}}>{not.message}</span>
-                                            <span style={{marginLeft: 5}}>{not.read_status?'':'MARK AS READ'}</span>
-                                        </Box>
-                                    )
-                                })
-                            }
-                            return null;
-                        }):(
-                            <p>No notifications</p>
-                        )
-                    }
-                </div>
             </MenuItem>
+            <div style={{fontSize: 12,borderTop: '1px solid black', width: 200, padding: '10px' }}>
+                {
+                    devices.length >0? devices.map((dev)=>{
+                        if(dev.notifications){
+                            return dev.notifications.map((not, i)=>{
+                                return (
+                                    <Box sx={{display: 'flex',padding: '9px', justifyContent: 'space-between', alignItems: 'centre'}}>
+                                        <span key={i} style={{marginRight: 5}}>{not.message}</span>
+                                        <span style={{marginLeft: 5,cursor: 'pointer', fontSize: 10, color: 'blue'}}>{not.read_status?'':'MARK AS READ'}</span>
+                                    </Box>
+                                )
+                            })
+                        }
+                        return null;
+                    }):(
+                        <p>No notifications</p>
+                    )
+                }
+            </div>
             <Divider />
             <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
