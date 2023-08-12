@@ -38,14 +38,14 @@ export type Notification={
     read_status: boolean
     timestamp: string
 }
-type MetaInformation={
-    receivenotifications: false,
+export type MetaInformation={
+    receivenotifications: boolean,
     notifications: {
         messages: Notification[]
     },
     location: {
         longitude: number,
-        latitude: 0
+        latitude: number
     },
     settings: {
         length: number,
@@ -67,7 +67,7 @@ interface Device{
     meta: MetaInformation,
     modified: string,
     name: string,
-    notifications: Notification[],
+    notifications: {messages:Notification[]},
     radius: number,
     sensors: Sensor[],
     width: number,
@@ -128,6 +128,7 @@ function isActiveDevice(modifiedTime: string): boolean{
 }
 export const  DevicesProvider = ({children}: Props)=>{
     const [devices,setDevices] = useState<X[]>([]);
+    const [filteredDevices,setFilteredDevices] = useState<X[]>(devices);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedTank, setSelectedTank] = useState<X>()
     const [user,setLoggedUser]=useState<{name: string,token:string}>({name:'',token:''});
@@ -236,7 +237,7 @@ export const  DevicesProvider = ({children}: Props)=>{
                     temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
                     isSelect: false,
                     notification: device.meta.notifications,
-                    on: true,
+                    on: isActiveDevice(device.modified),
                 }
             }));
             console.log('Devices: ',devices);
@@ -253,11 +254,12 @@ export const  DevicesProvider = ({children}: Props)=>{
     },[]);
     function searchDevices(name: string){
         if(name.length ===0){
-            return
+            setFilteredDevices(devices);
+            return;
         }
-        const devicesCopy = [...devices];
-        const filteredDevices = devicesCopy.filter((device:X)=>device.name.toLowerCase().includes(name.toLowerCase()));
-        setDevices(filteredDevices);
+        const filtered =devices.filter((device: X)=>device.name.toLowerCase().includes(name.toLowerCase()));
+        console.log(filtered);
+        setFilteredDevices(filtered)
     }
     useEffect(()=>{
         if ((devices !==undefined) && selectedTank === undefined) {
@@ -268,7 +270,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     const setSelectedDevice = (device: X)=> setSelectedTank(device);
     const setUser = (userName: string,token:string)=>setLoggedUser({name:userName,token})
     const value={
-        devices,
+        devices: filteredDevices,
         user, 
         setUser,
         isOpenNav,
@@ -284,9 +286,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         fetchInMinutes,
         searchDevices,
     }
-    setInterval(()=>{
-        fetchInMinutes();
-    },1000*10);
+    // setInterval(fetchInMinutes,1000*10);
     return(
         <DevicesContext.Provider value={value}>
             {children}
