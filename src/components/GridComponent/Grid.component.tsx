@@ -77,16 +77,8 @@ function GridComponent() {
     const matches = useMediaQuery(theme.breakpoints.up('md'));
     
     console.log(devices);
-    function toogleActuatorHandler(id:string) {
+    function toogleActuatorHandler(id:string): boolean {
         let currentValue;
-        // const newTanks = devices.map((item: Device) => {
-        //     if(item.id === id){
-        //         item.actuators[0].value = !item.actuators[0].value;
-        //     }else{
-        //         item.isSelect = false;
-        //     }
-        //     return item;
-        // })
         const tank = devices.find((item: Device) => item.id === id);
         if(tank){
             currentValue = tank.actuators[0].value ? 0 : 1;
@@ -99,11 +91,13 @@ function GridComponent() {
             })
             .then((response)=>{
                 console.log(response.data);
+                return true;
             })
             .catch((error)=>{
                 console.log(error);
             })
         }
+        return false;
     }
     if(loading){
         return(
@@ -174,14 +168,20 @@ function GridComponent() {
                                     handleOpen={handleOpen}
                                     open={open}
                                     temp={tank.temp}
+                                    modified={tank.modified}
                                 />
                             </Box>
                         ):(
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}>
                                 <Box sx={{display: 'flex',padding:'5px 10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', width:'90%', transition: '.5s'}}>
                                     <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
-                                        {tank.name.slice(0,10)}
+                                        {tank.name}
                                     </p>
+                                    <h3 style={
+                                            tank.on?{fontSize: '16px', color: '#85ea2d'}:{fontSize: '16px', color: '#888992'}
+                                        }>{
+                                            tank.on?'Active':'Inactive'
+                                        }</h3>
                                     <MoreVert sx={{fontSize: 25, color: '#4592F6'}}/>
                                 </Box>
                                 <WatertankComponent percentage={Math.round((tank.liters/tank.capacity)*100)} waterQuality={getWaterQuality(tank.tds)} />
@@ -223,7 +223,6 @@ function GridComponent() {
                                         height={selectedDevice.height}
                                         capacity={selectedDevice.capacity}
                                         toggleActuator={toogleActuatorHandler}
-                                        notifications={selectedDevice.notifications}
                                     />
                                 )
                             }
