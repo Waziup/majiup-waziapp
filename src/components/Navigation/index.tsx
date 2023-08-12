@@ -67,7 +67,7 @@ function NavigationIndex({matches}:Props) {
                             </Box>
                             <Box mr={2} sx={{display: 'flex',width:'100%', cursor:'pointer',  alignItems: 'center', justifyContent: 'space-evenly', height:'100%'}}>
                                 <AvatarComponent name={user.name} src='"https://mui.com/static/images/avatar/1.jpg"' />
-                                <p style={{fontSize: '15px', fontWeight:'normal'}}>{user.name}</p>
+                                <p style={{fontSize: '15px', fontWeight:'normal'}}>Admin Wazigate</p>
                                 <Box component='img' src={ArrowDropDownSVG} />
                             </Box>
                         </Box>
