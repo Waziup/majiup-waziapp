@@ -1,9 +1,10 @@
 import { Box, Button, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Visibility,  } from '@mui/icons-material';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import MajiUpIcon from '../assets/majiupicon.png';
 import {useNavigate} from 'react-router-dom'
+import { DevicesContext } from '../context/devices.context';
 const FormInput={
     border:'1px solid #ccc',
     outline: 'none',
@@ -41,12 +42,13 @@ const InputLabel={
     padding: '10px 0'
 }
 function LoginPage() {
+    const {setUser} = useContext(DevicesContext);
     const [isText, setIsText] = useState(false);
     const navigate = useNavigate();
     const [userData,setUserData] = useState({
         name:'',
         password:''
-    })
+    });
     function submitLoginHandler(e: React.SyntheticEvent){
         e.preventDefault();
         const correctPass = "loragateway";
@@ -55,6 +57,7 @@ function LoginPage() {
             alert('Wrong username or password');
             return;
         }
+        setUser('Admin','loragateway');
         navigate('/dashboard')
     }
     function handleInputChange(e: React.FormEvent<HTMLInputElement>){
