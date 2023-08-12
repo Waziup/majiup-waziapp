@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
 // import CanvasJSReact from '@canvasjs/react-charts';
 import FrameSVG from '../../assets/not-found.svg';
-import { Actuator } from '../../context/devices.context';
+import { Actuator,} from '../../context/devices.context';
 import { getLiters } from '../../utils/consumptionHelper';
 import axios from 'axios';
 type Consumption = {
@@ -24,9 +24,8 @@ type Props={
     actuator?: Actuator[],
     height: number,
     capacity: number,
-    toggleActuator?: (id: string) => void,
+    toggleActuator?: (id: string) => boolean,
     id: string,
-    notifications?: {id: string,timestamp: string, message: string, read_status: boolean}[],
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
@@ -71,9 +70,10 @@ const BoxStyle={
 }
 
 const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
-function TankDetailComponent({id,capacity,on, height,owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
+function TankDetailComponent({id,capacity, height,owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
 	const [toggleHot, setToggleHot] = useState(false);
     const [temperatureConsumption, setTemperatureConsumption] = useState<Consumption[]>([]);
+    const [pumpStatus, setPumpStatus] = useState(false);
     const apexChartOptions = {
         series: [{
             name: 'Consumption',
@@ -117,9 +117,14 @@ function TankDetailComponent({id,capacity,on, height,owner,waterTemp,waterQualit
       
     function switchActuator(){
         if(actuator && toggleActuator){
-            toggleActuator(id);
+            const response = toggleActuator(id);
+            setPumpStatus(response);
         }
     }
+    useEffect(()=>{
+        const actuatorValue: boolean | 0 | 1 = actuator!== undefined? actuator[0].value: false;
+        typeof actuatorValue === 'boolean'? setPumpStatus(actuatorValue): actuatorValue ===0? setPumpStatus(false): setPumpStatus(true);
+    },[actuator])
     useEffect(()=>{
         setTemperatureConsumption(consumption);
         // const chart = new ApexCharts(document.querySelector("#chart"), apexChartOptions);
@@ -158,21 +163,7 @@ function TankDetailComponent({id,capacity,on, height,owner,waterTemp,waterQualit
         setToggleHot(!toggleHot);
         // setTemperatureConsumption(consumption);
     }
-    if(!on){
-        return (
-            <Stack sx={{...BoxStyle, bgcolor: '#fff'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
-                <Box sx={{width: '100%'}} component='img' src={FrameSVG}/>
-                <Box sx={{position: 'relative'}}>
-                    <Box sx={{marginTop: '10px'}}>
-                        <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
-                            Oh no!
-                        </h3>
-                        <p style={{color: 'red',fontWeight: '600',textAlign: 'center', fontSize: 16}}>seems the connection is lost</p>
-                    </Box>
-                </Box>
-            </Stack>
-        )
-    }
+    
     return (
         <Stack sx={(consumption?.length || waterQuality && waterTemp)?{...BoxStyle,bgcolor: "#fff"}:{...BoxStyle, bgcolor:'inherit'}} alignItems={'center'}  direction='column' alignContent={'center'} spacing={2}>
             {
@@ -194,7 +185,7 @@ function TankDetailComponent({id,capacity,on, height,owner,waterTemp,waterQualit
                             <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>
                             {actuator?actuator[0].name: 'Water Pump Control'}
                         </p>
-                        <Android12Switch onClick={switchActuator} checked={actuator?actuator[0].value: false} sx={{color:'#FF5C00'}}  />
+                        <Android12Switch onClick={switchActuator} checked={pumpStatus} sx={{color:'#FF5C00'}}  />
                     </Box>
                     <WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/capacity)*100)} />
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '80%',}}>
