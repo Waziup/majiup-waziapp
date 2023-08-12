@@ -7,14 +7,16 @@ type Props = {
     open: boolean,
     handleClose: ()=>void,
     temp: number,
-    isOn: boolean
+    isOn: boolean,
+    modified: string
 }
 import TankSVG from '../../assets/tank.svg'
 const COMMON_P={
     fontSize: '14px',
     paddingTop: '10px',
 }
-function ItemCardComponent({name,amount,temp,isOn,}: Props) {
+function ItemCardComponent({name,modified, amount,temp,isOn,}: Props) {
+    const modifiedDate = new Date(modified);
     return (
         
         <Box  sx={{ ":hover":{bgcolor:'#FFE6D9'},cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '100%',boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',}}>
@@ -58,7 +60,7 @@ function ItemCardComponent({name,amount,temp,isOn,}: Props) {
                             </>
                         ):(
                             <>
-                                <p style={{fontSize: '14px', color: '#888992'}}>3hrs Ago</p>
+                                <p style={{fontSize: '14px', color: '#888992'}}>{modifiedDate.getHours()}:{modifiedDate.getMinutes() + 'hrs'}</p>
                             </>
                         )
                     }
