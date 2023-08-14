@@ -24,7 +24,7 @@ type Props={
     actuator?: Actuator[],
     height: number,
     capacity: number,
-    toggleActuator?: (id: string) => boolean,
+    toggleActuator?: (id: string) => Promise<boolean>,
     id: string,
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
@@ -115,15 +115,16 @@ function TankDetailComponent({id,capacity, height,owner,waterTemp,waterQuality,l
     }
     
       
-    function switchActuator(){
+    async function switchActuator(){
         if(actuator && toggleActuator){
-            const response = toggleActuator(id);
-            setPumpStatus(response);
+            const response =await toggleActuator(id);
+            console.log('Toggleing response',response)
+            setPumpStatus(!pumpStatus);
         }
     }
     useEffect(()=>{
-        const actuatorValue: boolean | 0 | 1 = actuator!== undefined? actuator[0].value: false;
-        typeof actuatorValue === 'boolean'? setPumpStatus(actuatorValue): actuatorValue ===0? setPumpStatus(false): setPumpStatus(true);
+        const actuatorValue = actuator!== undefined? actuator[0].value: false;
+        return actuatorValue ===0? setPumpStatus(false): setPumpStatus(true);
     },[actuator])
     useEffect(()=>{
         setTemperatureConsumption(consumption);
