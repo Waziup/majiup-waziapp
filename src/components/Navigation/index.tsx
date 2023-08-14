@@ -62,8 +62,8 @@ function NavigationIndex({matches}:Props) {
                     <>
                         <Box onClick={isOpen?handleClose:handleClick} sx={{display: 'flex',width:'20%',height:'100%', cursor:'pointer', ":hover":{bgcolor:'#f5f5f5'}, alignItems: 'center', justifyContent: 'space-around', }}>
                             <Box sx={{position:'relative'}} >
-                                <NotificationsNone sx={{fontWeight:'light',color:'#000'}} />
-                                <Box sx={{position:'absolute', top:0, right:0, width: '20px', height: '20px', borderRadius: '50%', bgcolor: '#4592F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: 'bold'}}>{totalNotifications}</Box>
+                                <NotificationsNone sx={{fontWeight:'light', fontSize:'20px',color:'#000'}} />
+                                <Box sx={{position:'absolute', top:0, right:0, width: '15px', height: '15px', borderRadius: '50%', bgcolor: '#4592F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: 'bold'}}>{totalNotifications}</Box>
                             </Box>
                             <Box mr={2} sx={{display: 'flex',width:'100%', cursor:'pointer',  alignItems: 'center', justifyContent: 'space-evenly', height:'100%'}}>
                                 <AvatarComponent name={user.name} src='"https://mui.com/static/images/avatar/1.jpg"' />
