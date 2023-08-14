@@ -21,7 +21,7 @@ type Sensor={
     quantity: number,
     time: string ,
     unit: string,
-    value: number,
+    value: 1 | 0,
 }
 export type Actuator={
     created: Date,
@@ -30,7 +30,7 @@ export type Actuator={
     modified: Date,
     name: string,
     time: Date | null,
-    value: boolean,
+    value: number,
 }
 export type Notification={
     id: string,
@@ -67,7 +67,7 @@ interface Device{
     meta: MetaInformation,
     modified: string,
     name: string,
-    notifications: {messages:Notification[]},
+    notifications:{ messages: Notification[]},
     radius: number,
     sensors: Sensor[],
     width: number,
@@ -250,6 +250,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     useEffect(()=>{
         setLoading(true)
         fetchInMinutes();
+        setFilteredDevices(devices);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
     function searchDevices(name: string){
@@ -270,7 +271,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     const setSelectedDevice = (device: X)=> setSelectedTank(device);
     const setUser = (userName: string,token:string)=>setLoggedUser({name:userName,token})
     const value={
-        devices: filteredDevices,
+        devices: filteredDevices.length===0?devices:filteredDevices,
         user, 
         setUser,
         isOpenNav,
