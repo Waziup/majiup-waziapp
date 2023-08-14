@@ -77,25 +77,27 @@ function GridComponent() {
     const matches = useMediaQuery(theme.breakpoints.up('md'));
     
     console.log(devices);
-    function toogleActuatorHandler(id:string): boolean {
-        let currentValue;
+    async function toogleActuatorHandler(id:string): Promise<boolean> {
+        let currentValue: number;
         const tank = devices.find((item: Device) => item.id === id);
         if(tank){
-            currentValue = tank.actuators[0].value ? 0 : 1;
-            axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/pumps/state`,{
-                value: currentValue,
+            currentValue = tank.actuators[0].value === 1? 0 : 1;
+            console.log(tank.actuators[0].value,id,tank.actuators[0].value === 1, currentValue)
+            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/pumps/state`,{
+                "value": currentValue,
             },{
                 headers:{
-                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
                 }
             })
             .then((response)=>{
                 console.log(response.data);
-                return true;
+                return response.data;
             })
             .catch((error)=>{
                 console.log(error);
-            })
+                return true;
+            });
         }
         return false;
     }
@@ -124,7 +126,7 @@ function GridComponent() {
         )
     }
     return (
-        <Grid container style={{background: '#F6F6F6'}} spacing={2}>
+        <Grid overflow={'hidden'} height={'100vh'} container style={{background: '#F6F6F6'}} spacing={2}>
             <Grid item xs={12}>
                 <NavigationIndex matches={matches} />
             </Grid>
@@ -208,7 +210,7 @@ function GridComponent() {
                 </Grid>
                 {
                     matches&&(
-                        <Grid item xs={3.4}>
+                        <Grid overflow={'auto'} height={'100vh'} item xs={3.4}>
                             {
                                 selectedDevice &&(
                                     <TankDetailComponent
