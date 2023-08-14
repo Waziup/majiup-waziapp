@@ -9,11 +9,11 @@ function LayoutComponent() {
     const matches = useMediaQuery(theme.breakpoints.up('md'));
     const { isOpenNav } = useContext(DevicesContext)
     return (
-        <Grid container sx={{background: '#F6F6F6',height: '100vh',overflowY: 'hidden'}} spacing={2}>
+        <Grid overflow={'hidden'} height={'100vh'} container sx={{background: '#F6F6F6', scrollbarWidth:'.5rem', "::-webkit-slider-thumb":{backgroundColor:'transparent'}}} spacing={2}>
             <Grid item  xs={12} >
                 <NavigationIndex matches={matches} />
             </Grid>
-            <Grid sx={{overflow: 'hidden'}} container spacing={2}>
+            <Grid container spacing={2}>
                 {isOpenNav && !matches &&(
                     <Box sx={{position:'absolute', height:'100vh', width:'110vw',bgcolor:'rgba(0,0,0,.25)'}}></Box>
                 )}
@@ -24,7 +24,7 @@ function LayoutComponent() {
                         </Grid>
                     )
                 }
-                <Grid style={{margin: '10px'}} md={9} item xs={matches? 9:12}>
+                <Grid style={{margin: '10px'}} overflow={'auto'} height={'100vh'} md={9} item xs={matches? 9:12}>
                     <Outlet context={[matches]} />
                 </Grid>
             </Grid>
