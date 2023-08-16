@@ -224,7 +224,10 @@ function GridComponent() {
                                         actuator={selectedDevice.actuators}
                                         height={selectedDevice.height}
                                         capacity={selectedDevice.capacity}
+                                        maxalert={selectedDevice.meta.settings.maxalert}
+                                        minalert={selectedDevice.meta.settings.minalert}
                                         toggleActuator={toogleActuatorHandler}
+                                        receiveNotifications={selectedDevice.meta.receivenotifications}
                                     />
                                 )
                             }
