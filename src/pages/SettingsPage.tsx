@@ -1,5 +1,5 @@
 import { Delete, MoreVert, SaveAlt } from '@mui/icons-material';
-import { Box, Modal, Stack } from '@mui/material';
+import { Box, Modal, Stack, SxProps, Theme, } from '@mui/material';
 import FrameSVG from '../assets/frame.svg';
 import React, { useContext, useState } from 'react';
 import { DevicesContext, MetaInformation } from '../context/devices.context';
@@ -7,15 +7,24 @@ import { Android12Switch } from '../components/TankDetail/TankDetail.component';
 import { useOutletContext } from 'react-router-dom';
 import { X as Device } from '../context/devices.context';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-const BoxStyle={ 
+import { useNavigate, } from 'react-router-dom';
+/*
+josee Musya10:30AM
+1. Edit name
+2. Edit Meta values, Height, Capacity, Max Alert, Min Alert
+3. Generate notifications on current water quantity reaching min or max alert
+4. Validation of meta fields (ParseFloata)
+5. Decimal point overflow
+6. /meta -> Body {notification
+*/
+const BoxStyle: SxProps<Theme> ={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
     mt:3,
     width:'30%',
     minWidth: '300px',
 }
-const ModalContainer={
+const ModalContainer : SxProps<Theme>={
 	bgcolor: '#fff',
 	padding: 2,
 	position: 'absolute',
@@ -36,12 +45,13 @@ const SensorContainer = {
     alignItems: 'center', 
     flexWrap:'wrap'
 }
-const boldText={
+const boldText: React.CSSProperties={
     fontWeight: 'bold',
     fontSize: '16px',
     margin: '10px 0',
+
 }
-const inputbox={
+const inputbox: React.CSSProperties={
     height: '100%',
     padding:'5px 15px', 
     outline:'none',
@@ -51,7 +61,7 @@ const inputbox={
     borderRadius: '20px'
 }
 
-const inputbox1={
+const inputbox1: React.CSSProperties={
     height: '100%',
     padding:'5px 3px',
     outline:'none',
@@ -61,7 +71,7 @@ const inputbox1={
     // width: '50%',
     margin: '0 10px', 
 }
-const ButtonStyle={
+const ButtonStyle: React.CSSProperties={
     borderRadius: '20px',
     padding: '8px 0px',
     fontSize: '16px',
@@ -91,7 +101,7 @@ const cancelButtonStyle={
     cursor: 'pointer',
 };
 function SettingsPage() {
-    const { devices } = useContext(DevicesContext);
+    const { devices, setTanks, } = useContext(DevicesContext);
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
     const [selectedDevice, setSelectedDevice] = useState<Device>();
     const [matches] = useOutletContext<[matches: boolean]>();
@@ -120,13 +130,18 @@ function SettingsPage() {
     }
     const deleteAlert =async  (e:React.MouseEvent<HTMLButtonElement, MouseEvent>,id: string) => {
         e.preventDefault();
-        const rs = confirm(`Are you sure you want to delete this device ${id}?`);
+        const rs = confirm(`Are you sure you want to remove ${selectedDevice?.name}?`);
         console.log(rs);
         if(rs){
             const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}`);
             console.log(response);
+            //remove device from the list
+            setTanks(devices.filter((device: Device) => device.id !== id));
             setIsOpenModal(false);
+            setSelectedDevice(undefined);
             navigate('/dashboard');
+            //refresh the page
+            navigate(0);
         }
     }
     function handleChange(e: React.ChangeEvent<HTMLInputElement>){
@@ -138,6 +153,7 @@ function SettingsPage() {
             })
             return;
         }
+        console.log('here..')
         setChangedMetaInfo({...changedMetaInfo, 
             metaData:{
                 ...changedMetaInfo.metaData,
@@ -153,20 +169,45 @@ function SettingsPage() {
         const rs = confirm(`Are you sure you want to save this device ${changedMetaInfo.name}?`);
         console.log(rs);
         if(rs){
-            // const nameResponse = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${selectedDevice?.id}/name`,{
-            //     name: changedMetaInfo.name
-            // })
+            const nameResponse = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${selectedDevice?.id}/name`,
+                changedMetaInfo.name,
+                {
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
+            });
+            console.log(nameResponse.data);
+            
             const responseMetaData = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${selectedDevice?.id}/meta`,{
-                settings:{...changedMetaInfo.metaData.settings},
+                ...changedMetaInfo.metaData,
+                settings:{
+                    capacity: parseFloat(changedMetaInfo.metaData.settings.capacity.toString()),
+                    height: parseFloat(changedMetaInfo.metaData.settings.height.toString()),
+                    maxalert: parseFloat(changedMetaInfo.metaData.settings.maxalert.toString()),
+                    minalert: parseFloat(changedMetaInfo.metaData.settings.minalert.toString()),
+                    radius: parseFloat(changedMetaInfo.metaData.settings.radius.toString()),
+                    width: parseFloat(changedMetaInfo.metaData.settings.width.toString()),
+                },
                 receivenotifications: changedMetaInfo.metaData.receivenotifications,
                 notifications:{...selectedDevice?.meta.notifications}
             });
             Promise.all([ responseMetaData]).then((rs)=>{
                 console.log(rs);
                 setIsOpenModal(false);
+                const device = devices.find((device)=>device.id === selectedDevice?.id);
+                if(device){
+                    const index = devices.indexOf(device);
+                    console.log(index)
+                    const newDevices = [...devices];
+                    newDevices[index].meta = changedMetaInfo.metaData;
+                    newDevices[index].name = changedMetaInfo.name;
+                    setTanks(newDevices);
+                }
+                setSelectedDevice(undefined);
             }).catch((err)=>{
                 console.log(err);
-                setIsOpenModal(false)
+                setIsOpenModal(false);
+                setSelectedDevice(undefined);
             })
         }
     }
@@ -198,7 +239,7 @@ function SettingsPage() {
                                 </Box>
                                 <Box mb={2} >
                                     <h4 style={InputLabel}>Gateway ID</h4>
-                                    <input name={'id'} readOnly={true} value={selectedDevice?.id} required style={inputbox} className="input_box" type={'text'} placeholder={'Enter Device Name'} />
+                                    <input name={'id'} readOnly={true} value={selectedDevice?.id} required style={inputbox} className="input_box" type={'text'} placeholder={'Device ID'} />
                                 </Box>
                             </Box>
                             <Box sx={{display:'flex',alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-evenly'}}>
@@ -212,7 +253,7 @@ function SettingsPage() {
                                         style={inputbox} 
                                         className="input_box" 
                                         type={'text'} 
-                                        placeholder={'Enter Device Name'} 
+                                        placeholder={'Enter Capacity'} 
                                     />
                                 </Box>
                                 <Box mb={2} >
@@ -237,7 +278,7 @@ function SettingsPage() {
                                         style={inputbox} 
                                         className="input_box" 
                                         type={'text'} 
-                                        placeholder={'Enter Device Name'} 
+                                        placeholder={'Enter MaxAlert'} 
                                     />
                                 </Box>
                                 <Box mb={2} >
@@ -261,7 +302,7 @@ function SettingsPage() {
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
                                 {
                                     selectedDevice?.sensors.map((sensor,id)=>(
-                                        <p key={id} style={inputbox1} className="input_box"  placeholder={'Enter Device Name'}>{sensor.name}</p>
+                                        <p key={id} style={inputbox1} className="input_box" >{sensor.name}</p>
                                     ))
                                 }
                             </Box>
@@ -269,7 +310,7 @@ function SettingsPage() {
                             <Box sx={{display:'flex',alignItems: 'center', }}>
                                 {
                                     selectedDevice?.actuators.map((actuator,id)=>(
-                                        <p key={id} style={inputbox1} className="input_box" placeholder={'Enter Device Name'}>{actuator.name}</p>
+                                        <p key={id} style={inputbox1} className="input_box" >{actuator.name}</p>
                                     ))
                                 }
                             </Box>
@@ -281,7 +322,7 @@ function SettingsPage() {
                                 </button>
                             </Box>
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-between'}}>
-                                <button style={ButtonStyle} className="button">
+                                <button type='submit' style={ButtonStyle} className="button">
                                     <SaveAlt sx={{cursor:'pointer'}}/>
                                     <span>Save</span>
                                 </button>
@@ -290,30 +331,30 @@ function SettingsPage() {
                         </form>
                     </Box>
             </Modal>
-                {
-                    devices.length<=0 && (
-                        <Box sx={{position: 'relative'}}>
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '10vh',
-                                left: '20vw',
-                            }}>
-                                <Box component='img' src={FrameSVG}/>
-                                <h3 style={{fontSize: '40px', textAlign: 'center', margin:'1px 0'}}>
-                                    Hi there!
-                                </h3>
-                                <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>Let's create your first device.</p>
-                            </Box>
+            {
+                devices.length<=0 && (
+                    <Box sx={{position: 'relative'}}>
+                        <Box sx={{
+                            position: 'absolute',
+                            top: '10vh',
+                            left: '20vw',
+                        }}>
+                            <Box component='img' src={FrameSVG}/>
+                            <h3 style={{fontSize: '40px', textAlign: 'center', margin:'1px 0'}}>
+                                Hi there!
+                            </h3>
+                            <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>Let's create your first device.</p>
                         </Box>
-                    )
-                }
+                    </Box>
+                )
+            }
             <Box sx={matches?{...SensorContainer}:{...SensorContainer,justifyContent:'center'}}>
                 {
                     devices.map((device,id)=>(
                         <Stack key={id} p={1} sx={BoxStyle} alignItems={'center'} flexWrap='wrap'  direction='column' alignContent={'center'} spacing={2}>
                             <Stack  width={'100%'} direction='row' justifyContent={'space-between'}>
                                 <h3 style={{fontSize: '20px',fontWeight: '500', }}>
-                                    {device.name.slice(0,10)}
+                                    {device.name}
                                     <p style={{color: '#888992',fontWeight: 'lighter',textAlign: 'center', fontSize: 12}}>{device.id}</p>
                                 </h3>
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>
@@ -337,7 +378,7 @@ function SettingsPage() {
                                         </h3>
                                         <p style={{fontSize: '16px',}}>
                                             {device.height}
-                                            <span>meters</span>
+                                            <span>cm</span>
                                         </p>
                                     </Box>
                                 </Box>
