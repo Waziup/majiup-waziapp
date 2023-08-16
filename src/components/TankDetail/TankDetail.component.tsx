@@ -2,12 +2,12 @@ import {Stack,Box, styled, Switch} from '@mui/material';
 import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome, DeviceThermostat, Opacity } from "@mui/icons-material";
 import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
 // import CanvasJSReact from '@canvasjs/react-charts';
 import FrameSVG from '../../assets/not-found.svg';
-import { Actuator,} from '../../context/devices.context';
-import { getLiters } from '../../utils/consumptionHelper';
+import { Actuator, DevicesContext, X} from '../../context/devices.context';
+import { getLiters, postNewNotificationMessage } from '../../utils/consumptionHelper';
 import axios from 'axios';
 type Consumption = {
     x: number,
@@ -26,6 +26,9 @@ type Props={
     capacity: number,
     toggleActuator?: (id: string) => Promise<boolean>,
     id: string,
+    receiveNotifications: boolean,
+    maxalert: number,
+    minalert: number
 }
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
@@ -63,17 +66,24 @@ export const Android12Switch = styled(Switch)(({ theme }) => ({
       margin: 2,
     },
 }));
-const BoxStyle={ 
-    borderRadius: "10px",
-    margin: "10px 0",
-	position: 'relative'
-}
+const BoxStyle: React.CSSProperties={borderRadius: "10px", margin: "10px 0",position: 'relative'}
 
-const TankDetails={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
-function TankDetailComponent({id,capacity, height,owner,waterTemp,waterQuality,liters,consumption, actuator, toggleActuator}:Props) {
+const TankDetails: React.CSSProperties={padding: '6px 20px',margin: '7px 0', width: '45%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
+async function checkForAlert(id: string,height: number, devices: X[],maxalert?: number, minalert?: number, ): Promise<boolean>{
+    if(maxalert && minalert){
+        if(height > maxalert || height < minalert){
+            await postNewNotificationMessage(id,devices,`Tank ${id} is ${height > maxalert? 'full, turn off pump': 'Empty, turn on pump'}`)
+            return true;
+        }
+    }
+    return false;
+}
+function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotifications, height,owner,waterTemp,waterQuality, liters,consumption, actuator, toggleActuator}:Props) {
 	const [toggleHot, setToggleHot] = useState(false);
     const [temperatureConsumption, setTemperatureConsumption] = useState<Consumption[]>([]);
     const [pumpStatus, setPumpStatus] = useState(false);
+    const {devices} = useContext(DevicesContext);
+    const [isalert, setAlert] = useState(false);
     const apexChartOptions = {
         series: [{
             name: 'Consumption',
@@ -122,6 +132,14 @@ function TankDetailComponent({id,capacity, height,owner,waterTemp,waterQuality,l
             setPumpStatus(!pumpStatus);
         }
     }
+    useEffect(()=>{
+        const checPump = (async ()=>{
+            const alert = await checkForAlert(id,height,devices,maxalert,minalert);
+            setAlert(alert);
+        })
+        checPump();
+        // return ()=> clearInterval(interval);
+    },[devices,minalert,maxalert,height,id])
     useEffect(()=>{
         const actuatorValue = actuator!== undefined? actuator[0].value: false;
         return actuatorValue ===0? setPumpStatus(false): setPumpStatus(true);
@@ -172,7 +190,7 @@ function TankDetailComponent({id,capacity, height,owner,waterTemp,waterQuality,l
                     <>
                     <h3 style={{display: 'inline-block'}}>{owner}</h3>
                     {
-                        "".length>0?(
+                        isalert?(
                             <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
                                 <p style={{display: 'inline-flex',paddingLeft: '5px', color:'#B69E09', alignItems: 'center'}}>
                                     ""
@@ -192,17 +210,17 @@ function TankDetailComponent({id,capacity, height,owner,waterTemp,waterQuality,l
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '80%',}}>
                         <Box sx={TankDetails}>
                             <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
-                                <WaterDrop style={{fontSize: 12,  color: '#4592F6'}}/>
-                                Water Amount
+                                <WaterDrop style={{fontSize: 10,  color: '#4592F6'}}/>
+                                Current Amount
                             </p>
-                            <p style={{fontSize: '24px',}}>{liters} Ltr</p>
+                            <p style={{fontSize: '24px'}}>{Math.round(liters)} Ltr</p>
                         </Box>
                         <Box sx={TankDetails}>
                             <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
                                 <DeviceThermostatSharp style={{fontSize: 12, display: 'inline-block', color: '#1C1B1F'}}/>
                                 Temperature
                             </p>
-                            <p style={{fontSize: '24px',}}>{waterTemp}&#8451;</p>
+                            <p style={{fontSize: '24px'}}>{Math.round(waterTemp)}&#8451;</p>
                         </Box>
                         <Box sx={TankDetails}>
                             <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
@@ -235,13 +253,11 @@ function TankDetailComponent({id,capacity, height,owner,waterTemp,waterQuality,l
                         </Box>
                     </Stack>
                     <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '1px 2px 1px rgba(0, 0, 0, 0.15)',}}>
-                        {/* <p style={{display: 'inline-block'}}>Notification</p>
-                        <Android12Switch checked/> */}
                         <p style={{fontSize: '14px',display: 'inline-flex', alignItems:'center'}}>
                             <NotificationsIcon style={{fontSize: 14,  }}/>
                             Notification
                         </p>
-                        <Android12Switch checked/>
+                        <Android12Switch checked={receiveNotifications}/>
                     </Box>
                     <Box sx={{ display: 'flex',flexDirection: 'column', alignItems:'center',  transition: '.5s',  }}>
                         <Box sx={{ display: 'flex',flexDirection: 'row', alignItems:'center', justifyContent:'space-between',  transition: '.5s',width:'75%'  }}>
