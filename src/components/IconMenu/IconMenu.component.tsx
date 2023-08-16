@@ -5,6 +5,7 @@ import { DevicesContext } from '../../context/devices.context';
 import {Link, useNavigate} from 'react-router-dom';
 import Fade from '@mui/material/Fade';
 import { Message } from '@mui/icons-material';
+import { markMessageAsRead } from '../../utils/consumptionHelper';
 interface Props {
     isOpen: boolean;
     anchorEl: null | HTMLElement;
@@ -17,6 +18,11 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
         setUser('','');
         navigate('/');
         handleClose();
+    }
+    async function handleReadNotification(deviceId: string,messageId: string){
+        console.log('Read notification')
+        const response = await markMessageAsRead(deviceId,devices,messageId);
+        console.log('Response for read message', response)
     }
     return (
         <Menu 
@@ -55,11 +61,15 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
                 {
                     devices.length >0? devices.map((dev)=>{
                         if(dev.notifications){
-                            return dev.notifications.map((not, i)=>{
+                            return dev.meta.notifications.messages.map((not, i)=>{
                                 return (
-                                    <Box sx={{display: 'flex',padding: '9px', justifyContent: 'space-between', alignItems: 'centre'}}>
+                                    <Box key={i} sx={{display: 'flex',padding: '9px', justifyContent: 'space-between', alignItems: 'centre'}}>
                                         <span key={i} style={{marginRight: 5}}>{not.message}</span>
-                                        <span style={{marginLeft: 5,cursor: 'pointer', fontSize: 10, color: 'blue'}}>{not.read_status?'':'MARK AS READ'}</span>
+                                        {
+                                            !not.read_status&&(
+                                                <span onClick={()=>handleReadNotification(dev.id,not.id)} style={{marginLeft: 5,cursor: 'pointer', fontSize: 10, color: 'blue'}}>{not.read_status?'':'MARK AS READ'}</span>
+                                            )
+                                        }
                                     </Box>
                                 )
                             })
