@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { X } from '../context/devices.context';
 export type Consumption = {
     time: string,
     litres: number
@@ -86,4 +87,46 @@ export function handleFetchTableComponents(deviceId: string){
         //     })
         // }
     }))
+}
+export const postNewNotificationMessage = async (deviceId: string,devices: X[], message: string) => {
+    const tank = devices.find((device: X) => device.id === deviceId);
+    if (tank) {
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${deviceId}/meta`, {
+            ...tank.meta,
+            notifications: {
+                ...tank.meta.notifications,
+                messages: [
+                    ...tank.meta.notifications.messages,
+                    {
+                        id: tank.meta.notifications.messages.length + 1,
+                        message,
+                        timestamp: new Date().toLocaleTimeString(),
+                        read_status: false
+                    }
+                ]
+            }
+        });
+        return response;
+    }
+}
+export const markMessageAsRead = async (deviceId: string,devices: X[], messageId: string) => {
+    const tank = devices.find((device: X) => device.id === deviceId);
+    if (tank) {
+        const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${deviceId}/meta`, {
+            ...tank.meta,
+            notifications: {
+                ...tank.meta.notifications,
+                messages: tank.meta.notifications.messages.map((message) => {
+                    if (message.id === messageId) {
+                        return {
+                            ...message,
+                            read_status: true
+                        }
+                    }
+                    return message;
+                })
+            }
+        });
+        return response;
+    }
 }
