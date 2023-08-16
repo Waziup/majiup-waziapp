@@ -30,7 +30,8 @@ function NavigationIndex({matches}:Props) {
     }, [user]);
     const totalNotifications =devices.length >0 ?devices.reduce((acc,dev)=>{
         if(dev.notifications){
-            return acc + dev.notifications.length;
+            console.log('notification',dev.notifications)
+            return acc + dev.meta.notifications.messages.length;
         }
         return acc;
     },0):0;
@@ -71,7 +72,7 @@ function NavigationIndex({matches}:Props) {
                                 <Box component='img' src={ArrowDropDownSVG} />
                             </Box>
                         </Box>
-                        <IconMenuComponent
+                        <IconMenuCompogitnent
                             anchorEl={anchorEl}
                             isOpen={isOpen}
                             handleClose={handleClose}

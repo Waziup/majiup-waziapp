@@ -287,7 +287,12 @@ export const  DevicesProvider = ({children}: Props)=>{
         fetchInMinutes,
         searchDevices,
     }
-    // setInterval(fetchInMinutes,1000*10);
+    // useEffect(()=>{
+    //     const interval = setInterval(async ()=>{
+    //         await fetchInMinutes();
+    //     },60000);
+    //     return ()=>clearInterval(interval);
+    // },[])
     return(
         <DevicesContext.Provider value={value}>
             {children}
