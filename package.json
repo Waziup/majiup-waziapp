@@ -20,6 +20,7 @@
     "google-maps-react": "^2.0.6",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
+    "precompiled-mqtt": "4.3.14-beta",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.1",
     "react-dom": "^18.2.0",

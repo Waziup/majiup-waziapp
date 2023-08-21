@@ -1,7 +1,9 @@
 import axios from "axios";
 import {ReactNode, createContext, useEffect, useState,} from "react";
 import { getLiters } from "../utils/consumptionHelper";
-
+import mqtt from "precompiled-mqtt";
+const brokerUrl = 'mqtt://localhost'; //localhost:8081
+const topic = 'devices/#';
 type Props={
     children: ReactNode
 }
@@ -127,6 +129,7 @@ function isActiveDevice(modifiedTime: string): boolean{
     return diffInMinutes < 5;
 }
 export const  DevicesProvider = ({children}: Props)=>{
+  const client = mqtt.connect(brokerUrl);
     const [devices,setDevices] = useState<X[]>([]);
     const [filteredDevices,setFilteredDevices] = useState<X[]>(devices);
     const [loading, setLoading] = useState<boolean>(false);
@@ -141,6 +144,17 @@ export const  DevicesProvider = ({children}: Props)=>{
             setReportRefFunch(ref)
         }
     };
+    client.on('connect', ()=>{
+        console.log("Connected");
+        client.subscribe( topic, (err)=>{
+            if (err){
+                console.log(err);
+            }
+            else if (!err){
+                console.log("Subscribed to ", topic);
+            }
+        })
+    });
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     function fetchInMinutes(){
         axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
@@ -173,16 +187,17 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .then(({res,consumption})=>{
             setDevices(res.map(function(device: X){
+                
                 return{
                     ...device,
                     capacity: device.meta.settings.capacity,
-                    length: device.meta.settings.length,
-                    width: device.meta.settings.width,
-                    height: device.meta.settings.height,
+                    length: Math.round(device.meta.settings.length),
+                    width: Math.round(device.meta.settings.width),
+                    height: Math.round(device.meta.settings.height),
                     consumption: consumption,
-                    liters:  getLiters(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,device.meta.settings.height, device.meta.settings.capacity),
-                    tds: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0,
-                    temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
+                    liters:  Math.round(getLiters(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,device.meta.settings.height, device.meta.settings.capacity)),
+                    tds: Math.round(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0),
+                    temp: Math.round(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0),
                     isSelect: false,
                     on: isActiveDevice(device.modified),
                     notifications: device.meta.notifications.messages,
@@ -287,6 +302,44 @@ export const  DevicesProvider = ({children}: Props)=>{
         fetchInMinutes,
         searchDevices,
     }
+    client.on('message', (topic, message) => {
+        console.log('topic: ',topic);
+        console.log('message: ',message.toString());
+        // const device = devices.find((device:X)=>device.id === topic.split('/')[1]); 
+        if(topic.toLowerCase().includes('sensors')){
+            const arr = topic.split('/');
+            const device = devices.find((device:X)=>device.id === topic.split('/')[1]);
+            if(device){
+                const sensorV = device.sensors.find((sensor:Sensor)=>sensor.id === arr[arr.length-1]);
+                if(sensorV && sensorV.name.toLowerCase().includes('level')){
+                    const liters = getLiters(parseInt(message.toString()),device.meta.settings.height, device.meta.settings.capacity);
+                    device.liters = liters;
+                    device.consumption.push({
+                        x: new Date().getHours(),
+                        y: liters,
+                    });
+                    setDevices([...devices]);
+                }else if(sensorV && sensorV.name.toLowerCase().includes('quality')){
+                    device.tds = parseInt(message.toString());
+                    setDevices([...devices]);
+                }else if(sensorV && sensorV.name.toLowerCase().includes('temperature')){
+                    device.temp = parseInt(message.toString());
+                    setDevices([...devices]);
+                }
+            }
+        }else if(topic.toLowerCase().includes('meta')){
+            const arr = topic.split('/');
+            const device = devices.find((device:X)=>device.id === topic.split('/')[1]);
+            if(device){
+                const metaField = {
+                    ...device.meta,
+                    ...JSON.parse(message.toString()),
+                }
+                device.meta = metaField;
+
+            }
+        }
+    })
     // useEffect(()=>{
     //     const interval = setInterval(async ()=>{
     //         await fetchInMinutes();

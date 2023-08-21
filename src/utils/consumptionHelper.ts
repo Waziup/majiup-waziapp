@@ -60,7 +60,7 @@ export async function getConsumption(deviceId: string, tankHeight: number, tankC
     //add the data to the table
 }
 export const getLiters = (waterLevel: number, tankHeight: number, tankCapacity: number) => {
-    return (waterLevel / tankHeight) * tankCapacity;
+    return Math.round((waterLevel / tankHeight) * tankCapacity);
 }
 export function handleFetchTableComponents(deviceId: string){
     const getLevel = axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${deviceId}/waterlevel/value`)
