@@ -72,7 +72,7 @@ function NavigationIndex({matches}:Props) {
                                 <Box component='img' src={ArrowDropDownSVG} />
                             </Box>
                         </Box>
-                        <IconMenuCompogitnent
+                        <IconMenuComponent
                             anchorEl={anchorEl}
                             isOpen={isOpen}
                             handleClose={handleClose}
@@ -80,7 +80,6 @@ function NavigationIndex({matches}:Props) {
                     </>
                 )
             }
-                
         </Box>
     );
 }
