@@ -39,21 +39,18 @@ export async function getConsumption(deviceId: string, tankHeight: number, tankC
             // eslint-disable-next-line no-prototype-builtins
             if (obj.hasOwnProperty(property) && Array.isArray(obj[property])) {
                 if (index < obj[property].length) {
-                    console.log('Date is :',obj[property][index].timestamp)
                     const date = new Date(obj[property][index].timestamp)
                     newObj.time = `${date.getHours()}hr:${date.getMinutes()}mins:${date.getSeconds()}s`;
                     newObj[property] = obj[property][index].value;
-                    newObj.liters=((obj['waterLevel'][0].value)/tankHeight)*tankCapacity;
-                    // console.log(property,previousValue)
+                    newObj.liters=((obj['waterLevel'][obj['waterLevel'].length-1].value)/tankHeight)*tankCapacity;
                 } else {
-                    newObj[property] = obj[property][0].value;
+                    newObj[property] = obj[property][obj[property].length-1].value;
                     // newObj[property] = previousValue;
                 }
             }
         }
         return newObj;
     });
-    console.log(newArray);
     return newArray;
     //find the element with the longest length
     //set the overall length of the other elements to the longest length
@@ -61,32 +58,6 @@ export async function getConsumption(deviceId: string, tankHeight: number, tankC
 }
 export const getLiters = (waterLevel: number, tankHeight: number, tankCapacity: number) => {
     return Math.round((waterLevel / tankHeight) * tankCapacity);
-}
-export function handleFetchTableComponents(deviceId: string){
-    const getLevel = axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${deviceId}/waterlevel/value`)
-    const getWaterQuality = axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${deviceId}/water-quality/value`)
-    const getTemp = axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${deviceId}/water-temperature/value`)
-
-    axios.all([getLevel,getWaterQuality,getTemp])
-    .then(axios.spread(function (respLevel,respQuality,respTemp){
-        console.log(respLevel.data,respQuality.data,respTemp.data)
-        // const lastArr = selectedTableTank.consumption[selectedTableTank.consumption.length];
-        // if (lastArr.level !==respLevel.data || lastArr.quality !== respQuality.data || lastArr.temp !== respTemp.data ){
-        //     const date = new Date();
-        //     setSelectedTableTank({
-        //         consumption: [
-        //             // ...selectedTableTank.consumption,
-        //             {
-        //                 time: `${date.getHours()}:${date.getMinutes()}`,
-        //                 litres:  selectedTableTank1.liters,
-        //                 level: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
-        //                 quality: selectedTableTank1.tds,
-        //                 waterTemperature: selectedTableTank1.temp,
-        //             }
-        //         ]
-        //     })
-        // }
-    }))
 }
 export const postNewNotificationMessage = async (deviceId: string,devices: X[], message: string) => {
     const tank = devices.find((device: X) => device.id === deviceId);
