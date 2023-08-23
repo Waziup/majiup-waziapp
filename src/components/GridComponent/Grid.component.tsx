@@ -76,13 +76,11 @@ function GridComponent() {
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
     
-    console.log(devices);
     async function toogleActuatorHandler(id:string): Promise<boolean> {
         let currentValue: number;
         const tank = devices.find((item: Device) => item.id === id);
         if(tank){
             currentValue = tank.actuators[0].value === 1? 0 : 1;
-            console.log(tank.actuators[0].value,id,tank.actuators[0].value === 1, currentValue)
             await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/pumps/state`,{
                 "value": currentValue,
             },{
@@ -91,11 +89,9 @@ function GridComponent() {
                 }
             })
             .then((response)=>{
-                console.log(response.data);
                 return response.data;
             })
             .catch((error)=>{
-                console.log(error);
                 return true;
             });
         }

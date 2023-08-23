@@ -131,11 +131,8 @@ function SettingsPage() {
     const deleteAlert =async  (e:React.MouseEvent<HTMLButtonElement, MouseEvent>,id: string) => {
         e.preventDefault();
         const rs = confirm(`Are you sure you want to remove ${selectedDevice?.name}?`);
-        console.log(rs);
         if(rs){
-            const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}`);
-            console.log(response);
-            //remove device from the list
+            await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}`);
             setTanks(devices.filter((device: Device) => device.id !== id));
             setIsOpenModal(false);
             setSelectedDevice(undefined);
@@ -145,7 +142,6 @@ function SettingsPage() {
         }
     }
     function handleChange(e: React.ChangeEvent<HTMLInputElement>){
-        console.log(e.target.value, e.target.name);
         if(e.target.name ==='name'){
             setChangedMetaInfo({
                 ...changedMetaInfo,
@@ -153,7 +149,6 @@ function SettingsPage() {
             })
             return;
         }
-        console.log('here..')
         setChangedMetaInfo({...changedMetaInfo, 
             metaData:{
                 ...changedMetaInfo.metaData,
@@ -167,16 +162,15 @@ function SettingsPage() {
     async function handeleSubmit(e: React.FormEvent<HTMLFormElement>){
         e.preventDefault();
         const rs = confirm(`Are you sure you want to save this device ${changedMetaInfo.name}?`);
-        console.log(rs);
+        
         if(rs){
-            const nameResponse = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${selectedDevice?.id}/name`,
+            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${selectedDevice?.id}/name`,
                 changedMetaInfo.name,
                 {
                 headers: {
                     'Content-Type': 'text/plain'
                 }
             });
-            console.log(nameResponse.data);
             
             const responseMetaData = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${selectedDevice?.id}/meta`,{
                 ...changedMetaInfo.metaData,
@@ -192,7 +186,6 @@ function SettingsPage() {
                 notifications:{...selectedDevice?.meta.notifications}
             });
             Promise.all([ responseMetaData]).then((rs)=>{
-                console.log(rs);
                 setIsOpenModal(false);
                 const device = devices.find((device)=>device.id === selectedDevice?.id);
                 if(device){
@@ -205,7 +198,6 @@ function SettingsPage() {
                 }
                 setSelectedDevice(undefined);
             }).catch((err)=>{
-                console.log(err);
                 setIsOpenModal(false);
                 setSelectedDevice(undefined);
             })

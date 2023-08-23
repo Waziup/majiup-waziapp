@@ -20,7 +20,6 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
         handleClose();
     }
     async function handleReadNotification(deviceId: string,messageId: string){
-        console.log('Read notification')
         const response = await markMessageAsRead(deviceId,devices,messageId);
         console.log('Response for read message', response)
     }

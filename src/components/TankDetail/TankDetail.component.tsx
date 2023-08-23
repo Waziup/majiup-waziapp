@@ -101,7 +101,7 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
                     show: false
                 }
             },
-            colors: ['#4592F6'],
+            colors: ['#FF0000'],
             
             dataLabels: {
                 enabled: false
@@ -128,7 +128,6 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
     async function switchActuator(){
         if(actuator && toggleActuator){
             const response =await toggleActuator(id);
-            console.log('Toggleing response',response)
             setPumpStatus(!pumpStatus);
         }
     }
@@ -280,7 +279,7 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
                                         show: false
                                     }
                                 },
-                                colors: ['#4592F6'],
+                                colors: [toggleHot? '#FF0000':'#4592F6'],
                                 
                                 dataLabels: {
                                     enabled: false

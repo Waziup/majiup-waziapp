@@ -5,7 +5,6 @@ import { StarHalfOutlined, StarOutlined, StarOutlineOutlined } from '@mui/icons-
 function RatingComponent({rating}: Props) {
     
         const ratingArr = [1,4,5,7,9]
-        console.log(rating%2===0)
         return (
             <div>
             {
@@ -29,7 +28,6 @@ function RatingComponent({rating}: Props) {
                     </>
                 ): (
                     ratingArr.slice(rating,ratingArr.length).map((_,i)=>{
-                        console.log(rating);
                         return (
                             <StarOutlineOutlined sx={{color: '#E46B26'}} key={i} />
                         );

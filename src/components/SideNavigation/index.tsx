@@ -56,7 +56,6 @@ export default function SideNavigation({matches}: Props) {
         }
         return acc;
     },0):0;
-    // console.log('Matches in side nav', matches)
     return (
         <Box sx={{ width: '100%', height: '100vh', 
                 maxWidth: 360, 
@@ -75,7 +74,7 @@ export default function SideNavigation({matches}: Props) {
                                     <Dashboard sx={{color: 'inherit'}}/>
                                 </ListItemIcon>
                                 <ListItemText primary="Dashboards" />
-                                <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', padding:'0 2%', background: '#fff', color: '#E46B26'}}>0</h4>
+                                <h4 style={{ borderRadius: '2px', fontWeight: 'bolder', padding:'0 2%', background: '#fff', color: '#E46B26'}}>{devices.length}</h4>
                             </ListItemButton>
                         </NavLink>
                     </ListItem>

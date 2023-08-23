@@ -59,14 +59,10 @@ function SignUpPage() {
                 'Content-Type':'text/plain'
             }
         }).then((res)=>{
-            console.log(res);
             setUser(userData.name,res.data);
         }).catch((err)=>{
-            console.log('====================================');
             setErr(err.response.data)
-            console.log(err);
             setUser(userData.name,'gffgg');
-            console.log('====================================');
         })
         navigate('/dashboard')
     }

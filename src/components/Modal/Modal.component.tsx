@@ -47,9 +47,7 @@ function ModalComponent({open, handleClose, children}: ModalComponentProps) {
 	// const notifications = devices.reduce((acc,dev)=> dev.notifications.length>0?(acc+dev.notifications.length):0,0);
 	const totalLiters = devices.reduce((acc,dev)=>(acc+dev.liters),0);
 	const divEl = document.querySelector('#divEl');
-    // console.log(divEl);
     if (divEl !== null) {
-        console.log(divEl);
         setReportRef(divEl as HTMLDivElement);
     }
     return (
