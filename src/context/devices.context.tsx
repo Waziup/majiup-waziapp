@@ -3,7 +3,6 @@ import {ReactNode, createContext, useEffect, useState,} from "react";
 import { getLiters } from "../utils/consumptionHelper";
 import mqtt from "precompiled-mqtt";
 const brokerUrl = 'mqtt://localhost'; //localhost:8081
-const topic = 'devices/#';
 type Props={
     children: ReactNode
 }
@@ -17,7 +16,9 @@ type Sensor={
     created: Date,
     id: string,
     kind: string,
-    meta: unknown,
+    meta: {
+        kind: string
+    },
     modified: Date,
     name: string,
     quantity: number,
@@ -128,6 +129,18 @@ function isActiveDevice(modifiedTime: string): boolean{
     const diffInMinutes = Math.floor(diff / 1000 / 60);
     return diffInMinutes < 5;
 }
+
+function subscriberFn(client: mqtt.MqttClient, topic: string, ){
+    client.subscribe(topic, (err)=>{
+        if (err){
+            console.log(err);
+        }
+        else if (!err){
+            console.log("Subscribed to ", topic);
+        }
+    })
+}
+
 export const  DevicesProvider = ({children}: Props)=>{
   const client = mqtt.connect(brokerUrl);
     const [devices,setDevices] = useState<X[]>([]);
@@ -145,15 +158,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         }
     };
     client.on('connect', ()=>{
-        console.log("Connected");
-        client.subscribe( topic, (err)=>{
-            if (err){
-                console.log(err);
-            }
-            else if (!err){
-                console.log("Subscribed to ", topic);
-            }
-        })
+        console.log("Connected to devices");
     });
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     function fetchInMinutes(){
@@ -187,6 +192,9 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .then(({res,consumption})=>{
             setDevices(res.map(function(device: X){
+                subscriberFn(client,`devices/${device.id}/meta/#`);
+                subscriberFn(client,`devices/${device.id}/sensors/#`);
+                subscriberFn(client,`devices/${device.id}/actuators/#`);
                 
                 return{
                     ...device,
@@ -255,7 +263,6 @@ export const  DevicesProvider = ({children}: Props)=>{
                     on: isActiveDevice(device.modified),
                 }
             }));
-            console.log('Devices: ',devices);
             setLoading(false);
         })
         .catch((err)=>{
@@ -274,7 +281,6 @@ export const  DevicesProvider = ({children}: Props)=>{
             return;
         }
         const filtered =devices.filter((device: X)=>device.name.toLowerCase().includes(name.toLowerCase()));
-        console.log(filtered);
         setFilteredDevices(filtered)
     }
     useEffect(()=>{
@@ -303,32 +309,33 @@ export const  DevicesProvider = ({children}: Props)=>{
         searchDevices,
     }
     client.on('message', (topic, message) => {
-        console.log('topic: ',topic);
-        console.log('message: ',message.toString());
-        // const device = devices.find((device:X)=>device.id === topic.split('/')[1]); 
         if(topic.toLowerCase().includes('sensors')){
             const arr = topic.split('/');
-            const device = devices.find((device:X)=>device.id === topic.split('/')[1]);
+            const device =devices.find((device:X)=>device.id === arr[1]);
             if(device){
-                const sensorV = device.sensors.find((sensor:Sensor)=>sensor.id === arr[arr.length-1]);
-                if(sensorV && sensorV.name.toLowerCase().includes('level')){
+                const sensorV = device.sensors.find((sensor:Sensor)=>sensor.id === arr[3]);
+                if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterLevel'.toLowerCase())){
                     const liters = getLiters(parseInt(message.toString()),device.meta.settings.height, device.meta.settings.capacity);
                     device.liters = liters;
+                    const date = new Date();
                     device.consumption.push({
-                        x: new Date().getHours(),
+                        x: parseFloat((date.getHours() + (date.getMinutes()/60)).toFixed(2)),
                         y: liters,
                     });
                     setDevices([...devices]);
-                }else if(sensorV && sensorV.name.toLowerCase().includes('quality')){
+                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
                     device.tds = parseInt(message.toString());
                     setDevices([...devices]);
-                }else if(sensorV && sensorV.name.toLowerCase().includes('temperature')){
+                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterThermometer'.toLowerCase())){
                     device.temp = parseInt(message.toString());
                     setDevices([...devices]);
+                }else{
+                    console.log(sensorV?.meta.kind)
+                    return;
                 }
+                return;
             }
         }else if(topic.toLowerCase().includes('meta')){
-            const arr = topic.split('/');
             const device = devices.find((device:X)=>device.id === topic.split('/')[1]);
             if(device){
                 const metaField = {
@@ -340,12 +347,6 @@ export const  DevicesProvider = ({children}: Props)=>{
             }
         }
     })
-    // useEffect(()=>{
-    //     const interval = setInterval(async ()=>{
-    //         await fetchInMinutes();
-    //     },60000);
-    //     return ()=>clearInterval(interval);
-    // },[])
     return(
         <DevicesContext.Provider value={value}>
             {children}
