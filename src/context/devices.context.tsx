@@ -1,6 +1,7 @@
 import axios from "axios";
 import {ReactNode, createContext, useEffect, useState,} from "react";
 import { getLiters } from "../utils/consumptionHelper";
+import { useNavigate } from "react-router-dom";
 import mqtt from "precompiled-mqtt";
 const brokerUrl = 'mqtt://localhost'; //localhost:8081
 type Props={
@@ -142,7 +143,7 @@ function subscriberFn(client: mqtt.MqttClient, topic: string, ){
 }
 
 export const  DevicesProvider = ({children}: Props)=>{
-  const client = mqtt.connect(brokerUrl);
+    const client = mqtt.connect(brokerUrl);
     const [devices,setDevices] = useState<X[]>([]);
     const [filteredDevices,setFilteredDevices] = useState<X[]>(devices);
     const [loading, setLoading] = useState<boolean>(false);
@@ -157,9 +158,8 @@ export const  DevicesProvider = ({children}: Props)=>{
             setReportRefFunch(ref)
         }
     };
-    client.on('connect', ()=>{
-        console.log("Connected to devices");
-    });
+    const navigate = useNavigate();
+    
     const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
     function fetchInMinutes(){
         axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
@@ -269,6 +269,9 @@ export const  DevicesProvider = ({children}: Props)=>{
             console.log(err);
         })
     }
+    client.on('connect', ()=>{
+        console.log("Connected to devices");
+    });
     useEffect(()=>{
         setLoading(true)
         fetchInMinutes();
@@ -289,6 +292,61 @@ export const  DevicesProvider = ({children}: Props)=>{
             setLoading(false);
         }
     },[devices, selectedTank]);
+    client.on('message', (topic, message) => {
+        const topicArr = topic.split('/');
+        console.log('message received', topicArr.includes('sensors'), message.toString())
+        if(topicArr.includes('sensors')){
+            const arr = topic.split('/');
+            const device =devices.find((device:X)=>device.id === topicArr[1]);
+            if(device){
+                console.log(arr,device)
+                const sensorV = device.sensors.find((sensor:Sensor)=>sensor.id === topicArr[3]);
+                if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterLevel'.toLowerCase())){
+                    const liters = getLiters(parseInt(message.toString()),device.meta.settings.height, device.meta.settings.capacity);
+                    device.liters = liters;
+                    device.modified = new Date().toISOString();
+                    device.on=true;
+                    const date = new Date();
+                    device.consumption.push({
+                        x: parseFloat((date.getHours() + (date.getMinutes()/60)).toFixed(2)),
+                        y: liters,
+                    });
+                    setDevices([...devices]);
+                    navigate(0)
+                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
+                    console.log('It is a pollutant sensor')
+                    device.tds = parseInt(message.toString());
+                    device.modified = new Date().toISOString();
+                    device.on=true;
+                    setDevices([...devices]);
+                    navigate(0)
+                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterThermometer'.toLowerCase())){
+                    console.log('It is a water thermometer');
+                    device.temp = parseInt(message.toString());
+                    device.modified = new Date().toISOString();
+                    device.on=true;
+                    setDevices([...devices]);
+                    navigate(0)
+                }else{
+                    device.on=true;
+                    console.log(sensorV?.meta.kind);
+                    navigate(0)
+                    return;
+                }
+                return;
+            }
+        }else if(topic.toLowerCase().includes('meta')){
+            const device = devices.find((device:X)=>device.id === topic.split('/')[1]);
+            if(device){
+                const metaField = {
+                    ...device.meta,
+                    ...JSON.parse(message.toString()),
+                }
+                device.meta = metaField;
+            }
+            navigate('/dashboard');
+        }
+    })
     const setSelectedDevice = (device: X)=> setSelectedTank(device);
     const setUser = (userName: string,token:string)=>setLoggedUser({name:userName,token})
     const value={
@@ -308,45 +366,6 @@ export const  DevicesProvider = ({children}: Props)=>{
         fetchInMinutes,
         searchDevices,
     }
-    client.on('message', (topic, message) => {
-        if(topic.toLowerCase().includes('sensors')){
-            const arr = topic.split('/');
-            const device =devices.find((device:X)=>device.id === arr[1]);
-            if(device){
-                const sensorV = device.sensors.find((sensor:Sensor)=>sensor.id === arr[3]);
-                if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterLevel'.toLowerCase())){
-                    const liters = getLiters(parseInt(message.toString()),device.meta.settings.height, device.meta.settings.capacity);
-                    device.liters = liters;
-                    const date = new Date();
-                    device.consumption.push({
-                        x: parseFloat((date.getHours() + (date.getMinutes()/60)).toFixed(2)),
-                        y: liters,
-                    });
-                    setDevices([...devices]);
-                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
-                    device.tds = parseInt(message.toString());
-                    setDevices([...devices]);
-                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterThermometer'.toLowerCase())){
-                    device.temp = parseInt(message.toString());
-                    setDevices([...devices]);
-                }else{
-                    console.log(sensorV?.meta.kind)
-                    return;
-                }
-                return;
-            }
-        }else if(topic.toLowerCase().includes('meta')){
-            const device = devices.find((device:X)=>device.id === topic.split('/')[1]);
-            if(device){
-                const metaField = {
-                    ...device.meta,
-                    ...JSON.parse(message.toString()),
-                }
-                device.meta = metaField;
-
-            }
-        }
-    })
     return(
         <DevicesContext.Provider value={value}>
             {children}
