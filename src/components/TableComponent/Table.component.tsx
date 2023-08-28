@@ -83,7 +83,7 @@ function getWaterQuality(tds: number):string{
 }
 export default function StickyHeadTable({rows1}: Props) {
     const rows = rows1.map((row)=>{
-        return createData(row.time, row.liters, row.waterLevel, row.waterTemperature, getWaterQuality(parseInt(row.waterQuality)))
+        return createData(row.time, Math.round(row.liters), Math.round(row.waterLevel), Math.round(row.waterTemperature), getWaterQuality(parseInt(row.waterQuality)))
     })
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -91,7 +91,6 @@ export default function StickyHeadTable({rows1}: Props) {
     const handleChangePage = (event: unknown,newPage: number) => {
         setPage(newPage);
     };
-
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(+event.target.value);
         setPage(0);
