@@ -90,6 +90,7 @@ function BillingsPage() {
         })
         .catch((err) => alert(err));
 	};
+    console.log('Options to render',optionsToRender);
     async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
         const selectedTableTank1 = devices.filter((device: Device) => device.id === event.target.value)[0];
         if (selectedTableTank1) {

@@ -127,7 +127,7 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
       
     async function switchActuator(){
         if(actuator && toggleActuator){
-            const response =await toggleActuator(id);
+            await toggleActuator(id);
             setPumpStatus(!pumpStatus);
         }
     }
