@@ -189,12 +189,12 @@ function SettingsPage() {
                 setIsOpenModal(false);
                 const device = devices.find((device)=>device.id === selectedDevice?.id);
                 if(device){
-                    const index = devices.indexOf(device);
-                    console.log(index)
-                    const newDevices = [...devices];
-                    newDevices[index].meta = changedMetaInfo.metaData;
-                    newDevices[index].name = changedMetaInfo.name;
-                    setTanks(newDevices);
+                    console.log(device)
+                    device.meta = changedMetaInfo.metaData;
+                    device.name = changedMetaInfo.name;
+                    setTanks([...devices]);
+                    setSelectedDevice(undefined);
+                    navigate(0)
                 }
                 setSelectedDevice(undefined);
             }).catch((err)=>{
@@ -269,7 +269,8 @@ function SettingsPage() {
                                         required 
                                         style={inputbox} 
                                         className="input_box" 
-                                        type={'text'} 
+                                        type={'number'}
+                                        max={changedMetaInfo.metaData.settings.capacity} 
                                         placeholder={'Enter MaxAlert'} 
                                     />
                                 </Box>
