@@ -6,13 +6,14 @@ import { useContext, useState } from 'react';
 import TankDetailComponent from "../TankDetail/TankDetail.component";
 import {useTheme, useMediaQuery} from "@mui/material";
 import { useNavigate, } from "react-router-dom";
-import { X as Device } from "../../context/devices.context";
+import { X as Device, client, Sensor } from "../../context/devices.context";
 import './Grid.styles.css'
 import { DevicesContext } from "../../context/devices.context";
 import FrameSVG from '../../assets/frame.svg';
 import { DeviceThermostatSharp, MoreVert, WaterDrop } from "@mui/icons-material";
 import WatertankComponent from "../WaterTank/Watertank.component";
 import axios from "axios";
+import { getLiters } from "../../utils/consumptionHelper";
 
 /** 
  * ToDo
@@ -51,7 +52,60 @@ function GridComponent() {
     const handleClose = () => setOpen(false);
     const { isOpenNav,loading, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
-
+    client.on('message', (topic, message) => { 
+        const topicArr = topic.split('/');
+        console.log('Devices length: ',devices.length)
+        console.log('message received', topicArr.includes('sensors'), message.toString())
+        if(topicArr.includes('sensors') &&(devices.length>0 )){
+            const arr = topic.split('/');
+            // console.log(filteredDevices);
+            const device =devices.find((device:Device)=>device.id === topicArr[1]);
+            if(device){
+                console.log(arr,device)
+                const sensorV = device.sensors.find((sensor:Sensor)=>sensor.id === topicArr[3]);
+                if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterLevel'.toLowerCase())){
+                    const liters = getLiters(parseInt(message.toString()),device.meta.settings.height, device.meta.settings.capacity);
+                    device.liters = liters;
+                    device.modified = new Date().toISOString();
+                    device.on=true;
+                    const date = new Date();
+                    device.consumption.push({
+                        x: parseFloat((date.getHours() + (date.getMinutes()/60)).toFixed(2)),
+                        y: liters,
+                    });
+                    setTanks([...devices]);
+                    // navigate(0)
+                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
+                    console.log('It is a pollutant sensor')
+                    device.tds = parseInt(message.toString());
+                    device.modified = new Date().toISOString();
+                    device.on=true;
+                    setTanks([...devices]);
+                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterThermometer'.toLowerCase())){
+                    console.log('It is a water thermometer');
+                    device.temp = parseInt(message.toString());
+                    device.modified = new Date().toISOString();
+                    device.on=true;
+                    setTanks([...devices]);
+                }else{
+                    device.on=true;
+                    console.log(sensorV?.meta.kind);
+                    return;
+                }
+                return;
+            }
+        }else if(topic.toLowerCase().includes('meta')){
+            const device = devices.find((device: Device)=>device.id === topic.split('/')[1]);
+            if(device){
+                const metaField = {
+                    ...device.meta,
+                    ...JSON.parse(message.toString()),
+                }
+                device.meta = metaField;
+            }
+            navigate('/dashboard');
+        }
+    })
     const handleSelectedTank = (tank: Device) => {
         const newTanks = devices.map((item: Device) => {
             
@@ -92,6 +146,7 @@ function GridComponent() {
                 return response.data;
             })
             .catch((error)=>{
+                console.log(error);
                 return true;
             });
         }
