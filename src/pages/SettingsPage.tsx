@@ -185,7 +185,7 @@ function SettingsPage() {
                 receivenotifications: changedMetaInfo.metaData.receivenotifications,
                 notifications:{...selectedDevice?.meta.notifications}
             });
-            Promise.all([ responseMetaData]).then((rs)=>{
+            Promise.all([ responseMetaData]).then(()=>{
                 setIsOpenModal(false);
                 const device = devices.find((device)=>device.id === selectedDevice?.id);
                 if(device){
@@ -197,7 +197,7 @@ function SettingsPage() {
                     navigate(0)
                 }
                 setSelectedDevice(undefined);
-            }).catch((err)=>{
+            }).catch(()=>{
                 setIsOpenModal(false);
                 setSelectedDevice(undefined);
             })
