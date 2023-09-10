@@ -30,3 +30,4 @@ src/pages/ProductsPage.tsx
 firebase.json
 Dockerfile.test
 .env
+*.tar

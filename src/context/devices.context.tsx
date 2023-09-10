@@ -2,7 +2,7 @@ import axios from "axios";
 import {ReactNode, createContext, useEffect, useState,} from "react";
 import { getLiters } from "../utils/consumptionHelper";
 import mqtt from "precompiled-mqtt";
-const brokerUrl = 'mqtt://localhost'; //localhost:8081
+const brokerUrl = `mqtt://localhost`; //localhost:8081
 type Props={
     children: ReactNode
 }

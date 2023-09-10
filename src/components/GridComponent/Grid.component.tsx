@@ -187,7 +187,7 @@ function GridComponent() {
                 )}
                 {
                     (matches || isOpenNav)&&(
-                        <Grid sx={!matches?{zIndex:100,position:'absolute', bgcolor:'#fff',transition:.5, width:'500px', height: '95vh', mt:2}:{}} item xs={matches?2.5:9}>
+                        <Grid sx={!matches?{zIndex:6,position:'absolute', bgcolor:'#fff',transition:.5, width:'500px', height: '95vh', mt:2}:{}} item xs={matches?2.5:9}>
                             <SideNavigation matches={matches} />
                         </Grid>
                     )
@@ -225,8 +225,8 @@ function GridComponent() {
                                 />
                             </Box>
                         ):(
-                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={[BoxStyle,tank.isSelect?{bgcolor: '#FFE6D9'}:{bgcolor: '#fff'}]}>
-                                <Box sx={{display: 'flex',padding:'5px 10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', width:'90%', transition: '.5s'}}>
+                            <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={{display: 'flex',flexDirection:'column',alignItems:'center', bgcolor:tank.isSelect? '#FFE6D9':'#fff'}}>
+                                <Box sx={{display: 'flex',padding:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', width:'90%', transition: '.5s'}}>
                                     <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
                                         {tank.name}
                                     </p>
@@ -234,7 +234,8 @@ function GridComponent() {
                                             tank.on?{fontSize: '16px', color: '#85ea2d'}:{fontSize: '16px', color: '#888992'}
                                         }>{
                                             tank.on?'Active':'Inactive'
-                                        }</h3>
+                                        }
+                                    </h3>
                                     <MoreVert sx={{fontSize: 25, color: '#4592F6'}}/>
                                 </Box>
                                 <WatertankComponent percentage={Math.round((tank.liters/tank.capacity)*100)} waterQuality={getWaterQuality(tank.tds)} />
