@@ -46,7 +46,6 @@ const SensorContainer = {
     flexWrap:'wrap'
 }
 const boldText: React.CSSProperties={
-    fontWeight: 'bold',
     fontSize: '16px',
     margin: '10px 0',
 
@@ -91,7 +90,6 @@ const cancelButtonStyle={
     borderRadius: '20px',
     padding: '10px 20px',
     fontSize: '16px',
-    fontWeight: 'bold',
     margin: '10px 5px',
     width: '60%',
     backgroundColor: '#Fff',
@@ -99,6 +97,7 @@ const cancelButtonStyle={
     border: '1px solid #888992',
     outline: 'none',
     cursor: 'pointer',
+    
 };
 function SettingsPage() {
     const { devices, setTanks, } = useContext(DevicesContext);
@@ -336,7 +335,7 @@ function SettingsPage() {
                             <h3 style={{fontSize: '40px', textAlign: 'center', margin:'1px 0'}}>
                                 Hi there!
                             </h3>
-                            <p style={{color: '#888992',fontWeight: '600',textAlign: 'center', fontSize: 16}}>Let's create your first device.</p>
+                            <p style={{color: '#888992',textAlign: 'center', fontSize: 16}}>Let's create your first device.</p>
                         </Box>
                     </Box>
                 )
@@ -346,7 +345,7 @@ function SettingsPage() {
                     devices.map((device,id)=>(
                         <Stack key={id} p={1} sx={BoxStyle} alignItems={'center'} flexWrap='wrap'  direction='column' alignContent={'center'} spacing={2}>
                             <Stack  width={'100%'} direction='row' justifyContent={'space-between'}>
-                                <h3 style={{fontSize: '20px',fontWeight: '500', }}>
+                                <h3 style={{fontSize: '20px', }}>
                                     {device.name}
                                     <p style={{color: '#888992',fontWeight: 'lighter',textAlign: 'center', fontSize: 12}}>{device.id}</p>
                                 </h3>
@@ -356,7 +355,7 @@ function SettingsPage() {
                                 </Box>
                             </Stack>
                             <Box p={1} sx={{border: '1px solid #ccc', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px',fontWeight: '700', }}>
+                                <h3 style={{fontSize: '18px',}}>
                                     Tank Information
                                 </h3>
                                 <Box p={1} sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
@@ -377,13 +376,13 @@ function SettingsPage() {
                                 </Box>
                             </Box>
                             <Box  p={1} sx={{border: '1px solid #CCC', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px',fontWeight: '700',margin:'10px 0'}}>
+                                <h3 style={{fontSize: '18px',margin:'10px 0'}}>
                                     SENSORS
                                 </h3>
                                 {
                                     device.sensors.map((sensor,idx)=>(
                                         <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
-                                            <h3 style={{fontSize: '13px',fontWeight: '600',margin:'5px 0' }}>
+                                            <h3 style={{fontSize: '13px',margin:'5px 0' }}>
                                                 {sensor.name}
                                             </h3>
                                             <Box>
@@ -398,13 +397,13 @@ function SettingsPage() {
                                 
                             </Box>
                             <Box  p={1} sx={{border: '1px solid #CCC', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px',fontWeight: '700',margin:'10px 0'}}>
+                                <h3 style={{fontSize: '18px',margin:'10px 0'}}>
                                     ACTUATORS
                                 </h3>
                                 {
                                     device.actuators.map((actuator,idx)=>(
                                         <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
-                                            <h3 style={{fontSize: '13px',fontWeight: '600',margin:'5px 0' }}>
+                                            <h3 style={{fontSize: '13px',margin:'5px 0' }}>
                                                 {actuator.name}
                                             </h3>
                                             
