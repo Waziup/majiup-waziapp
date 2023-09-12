@@ -20,7 +20,9 @@ a:hover {
     src: url('./assets/fonts/Poppins-Regular.ttf') format('truetype');
   };
 }
-
+body{
+  font-family: 'Poppins', sans-serif;
+}
 /* h1 {
   font-size: 3.2em;
   line-height: 1.1;

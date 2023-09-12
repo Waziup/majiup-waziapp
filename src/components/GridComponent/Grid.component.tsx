@@ -74,7 +74,6 @@ function GridComponent() {
                         y: liters,
                     });
                     setTanks([...devices]);
-                    // navigate(0)
                 }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
                     console.log('It is a pollutant sensor')
                     device.tds = parseInt(message.toString());

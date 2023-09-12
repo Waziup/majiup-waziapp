@@ -7,7 +7,7 @@ import { Android12Switch } from '../components/TankDetail/TankDetail.component';
 import { useOutletContext } from 'react-router-dom';
 import { X as Device } from '../context/devices.context';
 import axios from 'axios';
-import { useNavigate, } from 'react-router-dom';
+// import { useNavigate, } from 'react-router-dom';
 /*
 josee Musya10:30AM
 1. Edit name
@@ -39,11 +39,11 @@ const InputLabel={
     fontSize: '16px',
     margin: '10px 0',
 }
-const SensorContainer = {
+const SensorContainer: SxProps<Theme> = {
     display: 'flex', 
     justifyContent: 'space-evenly', 
     alignItems: 'center', 
-    flexWrap:'wrap'
+    flexWrap:'wrap',
 }
 const boldText: React.CSSProperties={
     fontSize: '16px',
@@ -104,7 +104,7 @@ function SettingsPage() {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
     const [selectedDevice, setSelectedDevice] = useState<Device>();
     const [matches] = useOutletContext<[matches: boolean]>();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const Alt = {
         location: {latitude:0, longitude:0},
         notifications: selectedDevice?.notifications? selectedDevice?.notifications: {messages:[]},
@@ -135,9 +135,8 @@ function SettingsPage() {
             setTanks(devices.filter((device: Device) => device.id !== id));
             setIsOpenModal(false);
             setSelectedDevice(undefined);
-            navigate('/dashboard');
+            // navigate('/dashboard');
             //refresh the page
-            navigate(0);
         }
     }
     function handleChange(e: React.ChangeEvent<HTMLInputElement>){
@@ -185,7 +184,7 @@ function SettingsPage() {
                 notifications:{...selectedDevice?.meta.notifications}
             });
             Promise.all([ responseMetaData]).then(()=>{
-                setIsOpenModal(false);
+                console.log(selectedDevice?.id)
                 const device = devices.find((device)=>device.id === selectedDevice?.id);
                 if(device){
                     console.log(device)
@@ -193,9 +192,11 @@ function SettingsPage() {
                     device.name = changedMetaInfo.name;
                     setTanks([...devices]);
                     setSelectedDevice(undefined);
-                    navigate(0)
+                    setIsOpenModal(false);
+                }else{
+                    setIsOpenModal(false);
+                    setSelectedDevice(undefined);
                 }
-                setSelectedDevice(undefined);
             }).catch(()=>{
                 setIsOpenModal(false);
                 setSelectedDevice(undefined);
@@ -214,7 +215,7 @@ function SettingsPage() {
     return (
         <Box pl={2} pr={2}>
             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <h3 style={{fontSize: '24px',margin:'10px 0'}}>Device Settings</h3>
+                <h3 style={{fontSize: '24px',fontWeight:'500',margin:'10px 0'}}>Device{devices.length>1?'s':''} Settings</h3>
             </Box>
             <Modal open={isOpenModal}
                 onClose={()=>setIsOpenModal(!isOpenModal)}
@@ -345,7 +346,7 @@ function SettingsPage() {
                     devices.map((device,id)=>(
                         <Stack key={id} p={1} sx={BoxStyle} alignItems={'center'} flexWrap='wrap'  direction='column' alignContent={'center'} spacing={2}>
                             <Stack  width={'100%'} direction='row' justifyContent={'space-between'}>
-                                <h3 style={{fontSize: '20px', }}>
+                                <h3 style={{fontSize: '20px',fontWeight:'normal' }}>
                                     {device.name}
                                     <p style={{color: '#888992',fontWeight: 'lighter',textAlign: 'center', fontSize: 12}}>{device.id}</p>
                                 </h3>
@@ -355,13 +356,13 @@ function SettingsPage() {
                                 </Box>
                             </Stack>
                             <Box p={1} sx={{border: '1px solid #ccc', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px',}}>
+                                <h3 style={{fontSize: '18px',fontWeight:'400'}}>
                                     Tank Information
                                 </h3>
                                 <Box p={1} sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                                     <Box>
-                                        <h3 style={{fontSize: '16px',fontWeight: 'normal', }}>Capacity </h3>
-                                        <p style={{fontSize: '16px',}}>Height</p>
+                                        <h3 style={{fontSize: '16px',fontWeight: '200', }}>Capacity </h3>
+                                        <p style={{fontSize: '16px',fontWeight: '200'}}>Height</p>
                                     </Box>
                                     <Box>
                                         <h3 style={{fontSize: '16px',fontWeight: 'normal', }}>
@@ -376,13 +377,13 @@ function SettingsPage() {
                                 </Box>
                             </Box>
                             <Box  p={1} sx={{border: '1px solid #CCC', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px',margin:'10px 0'}}>
+                                <h3 style={{fontSize: '18px',fontWeight:'400', margin:'10px 0'}}>
                                     SENSORS
                                 </h3>
                                 {
                                     device.sensors.map((sensor,idx)=>(
                                         <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
-                                            <h3 style={{fontSize: '13px',margin:'5px 0' }}>
+                                            <h3 style={{fontSize: '13px',margin:'5px 0',fontWeight:'200' }}>
                                                 {sensor.name}
                                             </h3>
                                             <Box>
@@ -397,13 +398,13 @@ function SettingsPage() {
                                 
                             </Box>
                             <Box  p={1} sx={{border: '1px solid #CCC', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px',margin:'10px 0'}}>
+                                <h3 style={{fontSize: '18px', fontWeight:'400', margin:'10px 0'}}>
                                     ACTUATORS
                                 </h3>
                                 {
                                     device.actuators.map((actuator,idx)=>(
                                         <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
-                                            <h3 style={{fontSize: '13px',margin:'5px 0' }}>
+                                            <h3 style={{fontSize: '13px',margin:'5px 0',fontWeight:'200' }}>
                                                 {actuator.name}
                                             </h3>
                                             
