@@ -294,8 +294,8 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
                                     type: "gradient",
                                     gradient: {
                                       shadeIntensity: 1,
-                                      opacityFrom: 0.7,
-                                      opacityTo: 0.9,
+                                      opacityFrom: 0.5,
+                                      opacityTo: 0.5,
                                       stops: [0, 90, 100]
                                     }
                                 },

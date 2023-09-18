@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// @ts-nocheck
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useContext,useLayoutEffect, useEffect } from 'react';
 import { Box} from '@mui/material';
+import { ApexAxisChartSeries,ApexCharts, ApexNonAxisChartSeries } from 'apexcharts';
 import { Visibility} from '@mui/icons-material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import StickyHeadTable from '../components/TableComponent/Table.component';
@@ -11,13 +9,10 @@ import DownloadSVG from '../assets/download.svg';
 import ModalComponent from '../components/Modal/Modal.component';
 import jsPDF from 'jspdf';
 import { DevicesContext } from '../context/devices.context';
-import CanvasJSReact from '@canvasjs/react-charts';
-// import ReportcardComponent from '../components/ReportCard/Reportcard.component';
-// import DocumentComponent from '../components/Document/Document.component';
+// import CanvasJSReact from '@canvasjs/react-charts';
+import Chart from 'react-apexcharts';
 import { X as Device } from '../context/devices.context';
-// import { PDFDownloadLink } from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
-// const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const date = new Date();
 const todaysDate = `${months[date.getMonth()]}, ${date.getDate()}, ${date.getFullYear()}`;
@@ -48,37 +43,20 @@ export type Consumption = {
 function getLitres(capacity: number, height: number,level: number): number{
     return (level/height)*capacity;
 }
-
 function BillingsPage() {
-    const { devices, reportRef,fetchinHours,fetchInMinutes, setReportRef} = useContext(DevicesContext)
+    const { devices, reportRef,fetchinHours,fetchInMinutes} = useContext(DevicesContext)
 	
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[] }>({consumption: []});
-    const [optionsToRender, setOptionsToRender] = useState({})
+    // const [optionsToRender, setOptionsToRender] = useState({});
     
-    const options = {
-        axisX:{
-            gridThickness: 0,
-            tickLength: 0,
-            interval: 2,
-        },
-        axisY:{
-            gridLegend: 'none',
-            interval: 50,
-        },
-        data: [
-            {
-                type: "column",
-                dataPoints: selectedTank.consumption? selectedTank?.consumption.filter((_,i)=>i%2):[]
-            }
-        ]
-    }
+    const [apexOptionsToRender, setApexOptionsToRender] = useState<{options: ApexCharts.ApexOptions,series: ApexAxisChartSeries| ApexNonAxisChartSeries} | {options:ApexCharts.ApexOptions,series: ApexAxisChartSeries | ApexNonAxisChartSeries}>({options:{},series:[]});
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 	const reportTemplateRef = useRef<HTMLDivElement>(null);
     const handleGeneratePdf = () => {
         setIsOpenModal(!isOpenModal)
         setIsOpenModal(!isOpenModal)
-        document.body.appendChild(reportRef);
+        document.body.appendChild(reportRef as HTMLDivElement);
         html2canvas(reportRef as HTMLDivElement)
         .then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
@@ -86,31 +64,18 @@ function BillingsPage() {
             pdf.addImage(imgData, 'JPEG', 15, 4, 180, 160);
             // pdf.addImage(imgData, 'JPEG', 0, 0, 0, 0);
             pdf.save("download.pdf");
-            document.body.removeChild(reportRef);
+            document.body.removeChild(reportRef as HTMLDivElement);
         })
         .catch((err) => alert(err));
 	};
-    console.log('Options to render',optionsToRender);
+    // console.log('Options to render',optionsToRender);
     async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
         const selectedTableTank1 = devices.filter((device: Device) => device.id === event.target.value)[0];
         if (selectedTableTank1) {
             const responseData =await getConsumption(selectedTableTank1.id, selectedTableTank1.capacity, selectedTableTank1.height);
             setSelectedTableTank({
-                consumption: responseData
-            })
-            // setSelectedTableTank({
-            //     consumption: [
-            //         // ...selectedTableTank.consumption,
-            //         {
-            //             time: `${selectedTableTank1.modified?  new Date(selectedTableTank1?.modified).getHours(): ''}:${selectedTableTank1.modified?new Date(selectedTableTank1?.modified).getMinutes():''}`,
-            //             litres:  selectedTableTank1.liters,
-            //             waterLevel: isNaN(Math.round((devices[0].liters/devices[0].capacity)*100))?0:Math.round((devices[0].liters/devices[0].capacity)*100),
-            //             // level: isNaN(getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.capacity))? 0: getPercentageOfWater(selectedTableTank1.liters,selectedTableTank1.capacity),
-            //             waterQuality: selectedTableTank1.tds,
-            //             waterTemperature: selectedTableTank1.temp,
-            //         }
-            //     ]
-            // })
+                consumption: (responseData as Consumption[])
+            });
         }
     }
     useLayoutEffect(()=>{
@@ -125,7 +90,7 @@ function BillingsPage() {
                 const responseData =await getConsumption(devices[0].id,devices[0].height,devices[0].capacity);
                 
                 setSelectedTableTank({
-                    consumption: responseData
+                    consumption: (responseData as Consumption[])
                 })
             }
             getData();
@@ -135,12 +100,40 @@ function BillingsPage() {
                     consumption: devices[0].consumption??[],
                     litres: devices.reduce((acc, curr)=>acc+curr.liters,0)
                 });
-                setOptionsToRender({
-                    ...options, 
-                    data: devices.map((d)=>({
-                        type: "spline",
-                        dataPoints: d.consumption? d?.consumption.filter((_,i)=>i%2):[]
-                    }))
+                setApexOptionsToRender({
+                    series:[
+                        ...devices.map((d)=>({
+                            name: d.name,
+                            data: d.consumption? d?.consumption.map((device4)=>device4.y):[]
+                        })),
+                    ],
+                    options: {
+                        chart: {
+                            height: 350,
+                            type: "area",
+                            zoom: {
+                                enabled: false
+                            },
+                            toolbar: {
+                                show: false
+                            }
+                        },
+                        colors:['#4592F6','#00e396'],
+                        dataLabels: {
+                            enabled: false
+                        },
+                        
+                        stroke: {
+                            curve: 'smooth',
+                        },
+                        title: {
+                            text: 'Water Consumption',
+                            align: 'left',
+                        },
+                        xaxis: {
+                            categories: devices[0]?.consumption? devices[0]?.consumption.map((d)=>d.x):[],
+                        },
+                    },
                 })
                 return;
                 //setSelectedTank({...selectedTank, litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)})
@@ -151,55 +144,103 @@ function BillingsPage() {
                 litres: devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.liters), 0)
             });
             setSelectedTank({name: devices[0].name, litres:devices[0].liters, id: devices[0].id, consumption: devices[0].consumption})
-            setOptionsToRender({
-                ...options,
-                data: [{
-                    // Change type to "doughnut", "line", "splineArea", etc.
-                    type: "column", 
-                    dataPoints: devices[0]?.consumption??[],
-                }]
-            })
+            setApexOptionsToRender({
+                series:[{
+                    name: devices[0].name,
+                    data: devices[0].consumption? devices[0]?.consumption.map((x)=>x.y):[],
+                    type: 'area'
+                }],
+                options:{
+                    chart:{
+                        height: 350,
+                        type: 'rangeArea',
+                    },
+                    xaxis: {
+                        categories: devices[0]?.consumption? devices[0]?.consumption.map((d)=>d.x):[],
+                    },
+                }
+            });
         }
-    },[devices.length])
+    },[devices, devices.length,  selectedTank])
     useEffect(()=>{
         if(selectedTank.id==='All'){
             setSelectedTank({
-                ...selectedTank,
-                consumption: devices[0]?.consumption,
+                id:'All',
+                name:'All',
+                consumption: [],
                 litres: devices.reduce((acc, curr)=>acc+(curr.liters), 0)
             });
-            setOptionsToRender({
-                ...options, 
-                data: devices.map((d)=>({
-                    type: "spline",
-                    dataPoints: d.consumption? d?.consumption:[]
-                }))
+            setApexOptionsToRender({
+                series:[
+                    ...devices.map((d)=>({
+                        name: d.name,
+                        data: d.consumption? d?.consumption.map((device4)=>device4.y):[]
+                    })),
+                ],
+                options: {
+                    chart: {
+                        height: 350,
+                        type: "area",
+                        zoom: {
+                            enabled: false
+                        },
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    colors:['#4592F6','#00e396'],
+                    dataLabels: {
+                        enabled: false
+                    },
+                    
+                    stroke: {
+                        curve: 'smooth',
+                    },
+                    title: {
+                        text: 'Water Consumption',
+                        align: 'left',
+                    },
+                    xaxis: {
+                        categories: devices[0]?.consumption? devices[0]?.consumption.map((d)=>d.x):[],
+                    },
+                },
             })
             return;
         }
-        const device = devices.filter((d)=>d.id===selectedTank.id);
-        if (device.length >=1) {
+        const device = devices.find((dxy)=>dxy.id===selectedTank.id);
+        if (device) {
+            console.log('We found the new device',device)
             setSelectedTank({
-                ...selectedTank, 
-                consumption: device[0]?.consumption, 
-                name: device[0]?.name, 
-                litres: device[0]?.liters
-            })
-            setOptionsToRender({
-                ...options, 
-                data: [{
-                    // Change type to "doughnut", "line", "splineArea", etc.
-                    type: "column",
-                    dataPoints: device[0].consumption? device[0].consumption:[],
-                }]
-            })
+                id: device.id,
+                consumption: device.consumption, 
+                name: device.name, 
+                litres: device.liters
+            });
+            setApexOptionsToRender({
+                series:[{
+                        name: device.name,
+                        data: device.consumption? device.consumption.map((x)=>x.y):[],
+                    }
+                ],
+                options:{
+                    chart: {
+                        height: 350,
+                        type: 'rangeArea',
+                    },
+                    colors:['#4592F6'],
+                    xaxis: {
+                        categories: device?.consumption? device?.consumption.map((d)=>d.x):[2,4,5,7,8],
+                    },
+                    stroke:{
+                        curve: 'smooth'
+                    }
+                },
+            });
             return;
         }
-        // setSelectedTank({...selectedTank, name: devices[0].name, litres:devices[0].liters, id: devices[0].id})
-        return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectedTank.id])
-    const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+    // const CanvasJSChart = CanvasJSReact.CanvasJSChart;
     function handleToggle(event: React.ChangeEvent<HTMLSelectElement>){
         if(event.target.value==='minutes'){
             fetchInMinutes();
@@ -207,6 +248,7 @@ function BillingsPage() {
             fetchinHours();
         }
     }
+    console.log(apexOptionsToRender);
     if(!devices && !selectedTableTank.consumption){
         return(
             <h1>Loading</h1>
@@ -227,7 +269,13 @@ function BillingsPage() {
                     <div style={{border: '1px solid black', padding:'8px 10px', borderRadius:'4px'}}>
                         <p style={{color: '#9291A5', fontSize: '15px', margin:'10px 0'}}>Water Consumption, {new Date().toDateString()}</p>
                         <h4 style={{margin:'10px 0'}}>{isNaN(selectedTank.litres)?0:selectedTank.litres} {selectedTank.id==='All'?'total litres consumed':'Litres'} </h4>
-                        <CanvasJSChart options = {optionsToRender}/>
+                        {/* <CanvasJSChart options={optionsToRender}/> */}
+                        <Chart
+                            options={apexOptionsToRender.options}
+                            series={apexOptionsToRender.series}
+                            type={"area"}
+                            height={350}
+                        />
                     </div>
                 </div>
                 {
@@ -272,8 +320,13 @@ function BillingsPage() {
                     </Box>
                 </Box>
                 <h2 style={{ fontSize: 'calc(10px + 1.8vw)'}} >{isNaN(selectedTank.litres)?0:selectedTank.litres} {selectedTank.id==='All'?'total litres consumed':'Litres'} </h2>
-                {/* <Box alt="water Tank." sx={{width: '100%'}} component="img" src={ChatFlow}/> */}
-                <CanvasJSChart options = {optionsToRender}/>
+                {/* <CanvasJSChart options = {optionsToRender}/> */}
+                <Chart
+                    options={apexOptionsToRender.options}
+                    series={apexOptionsToRender.series}
+                    type={'area'}
+                    height={350}
+                />
             </Box>
             <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>

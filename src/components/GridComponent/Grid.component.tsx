@@ -214,7 +214,7 @@ function GridComponent() {
                                 <ItemCardComponent
                                     isOn={tank.on}
                                     amount={tank.liters}
-                                    name={tank.name}
+                                    name={tank.name??'Tank'}
                                     litresPercent={(tank.liters/tank.capacity)*100}
                                     handleClose={handleClose}
                                     handleOpen={handleOpen}
@@ -227,7 +227,7 @@ function GridComponent() {
                             <Box key={i} onClick={()=>handleSelectedTank(tank)} sx={{display: 'flex',flexDirection:'column',alignItems:'center', bgcolor:tank.isSelect? '#FFE6D9':'#fff'}}>
                                 <Box sx={{display: 'flex',padding:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', width:'90%', transition: '.5s'}}>
                                     <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
-                                        {tank.name}
+                                        {tank.name??'Tank'}
                                     </p>
                                     <h3 style={
                                             tank.on?{fontSize: '16px', color: '#85ea2d'}:{fontSize: '16px', color: '#888992'}
@@ -266,7 +266,7 @@ function GridComponent() {
                                 selectedDevice &&(
                                     <TankDetailComponent
                                         id={selectedDevice.id}
-                                        owner={selectedDevice.name}
+                                        owner={selectedDevice.name??'Tank'}
                                         waterTemp={selectedDevice.temp}
                                         waterQuality={getWaterQuality(selectedDevice.tds)}
                                         liters={selectedDevice.liters}
