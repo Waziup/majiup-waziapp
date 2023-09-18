@@ -181,14 +181,14 @@ export const  DevicesProvider = ({children}: Props)=>{
                 });
             });
             const consumption = await Promise.all(devicePromises);
-
+            console.log('Devices all promises is: ',consumption)
             return {
-                consumption: consumption[0] as Consumption[],
+                consumption: consumption as Consumption[],
                 res: response.data,
             };
         })
         .then(({res,consumption})=>{
-            setDevices(res.map(function(device: X){
+            setDevices(res.map(function(device: X, index:number){
                 subscriberFn(client,`devices/${device.id}/meta/#`);
                 subscriberFn(client,`devices/${device.id}/sensors/#`);
                 subscriberFn(client,`devices/${device.id}/actuators/#`);
@@ -199,7 +199,7 @@ export const  DevicesProvider = ({children}: Props)=>{
                     length: Math.round(device.meta.settings.length),
                     width: Math.round(device.meta.settings.width),
                     height: Math.round(device.meta.settings.height),
-                    consumption: consumption,
+                    consumption: consumption[index],
                     liters:  Math.round(getLiters(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,device.meta.settings.height, device.meta.settings.capacity)),
                     tds: Math.round(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0),
                     temp: Math.round(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0),
