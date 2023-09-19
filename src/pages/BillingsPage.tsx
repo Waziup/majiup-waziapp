@@ -207,19 +207,19 @@ function BillingsPage() {
             })
             return;
         }
-        const device = devices.find((dxy)=>dxy.id===selectedTank.id);
-        if (device) {
-            console.log('We found the new device',device)
+        const deviceFound = devices.find((dxy)=>dxy.id===selectedTank.id);
+        if (deviceFound) {
+            console.log('We found the new device',deviceFound)
             setSelectedTank({
-                id: device.id,
-                consumption: device.consumption, 
-                name: device.name, 
-                litres: device.liters
+                id: deviceFound.id,
+                consumption: deviceFound.consumption, 
+                name: deviceFound.name, 
+                litres: deviceFound.liters
             });
             setApexOptionsToRender({
                 series:[{
-                        name: device.name,
-                        data: device.consumption? device.consumption.map((x)=>x.y):[],
+                        name: deviceFound.name,
+                        data: deviceFound.consumption? deviceFound.consumption.map((x)=>x.y):[],
                     }
                 ],
                 options:{
@@ -229,7 +229,7 @@ function BillingsPage() {
                     },
                     colors:['#4592F6'],
                     xaxis: {
-                        categories: device?.consumption? device?.consumption.map((d)=>d.x):[2,4,5,7,8],
+                        categories: deviceFound?.consumption? deviceFound?.consumption.map((d)=>d.x):[2,4,5,7,8],
                     },
                     stroke:{
                         curve: 'smooth'
@@ -238,6 +238,7 @@ function BillingsPage() {
             });
             return;
         }
+        return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectedTank.id])
     // const CanvasJSChart = CanvasJSReact.CanvasJSChart;
