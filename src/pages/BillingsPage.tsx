@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useContext,useLayoutEffect, useEffect } from 'react';
 import { Box} from '@mui/material';
-import { ApexAxisChartSeries,ApexCharts, ApexNonAxisChartSeries } from 'apexcharts';
+// import { ApexAxisChartSeries,ApexCharts, ApexNonAxisChartSeries } from 'apexcharts';
 import { Visibility} from '@mui/icons-material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import StickyHeadTable from '../components/TableComponent/Table.component';
@@ -40,9 +41,6 @@ export type Consumption = {
     waterQuality: string
     waterTemperature: number
 }
-function getLitres(capacity: number, height: number,level: number): number{
-    return (level/height)*capacity;
-}
 function BillingsPage() {
     const { devices, reportRef,fetchinHours,fetchInMinutes} = useContext(DevicesContext)
 	
@@ -50,7 +48,7 @@ function BillingsPage() {
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[] }>({consumption: []});
     // const [optionsToRender, setOptionsToRender] = useState({});
     
-    const [apexOptionsToRender, setApexOptionsToRender] = useState<{options: ApexCharts.ApexOptions,series: ApexAxisChartSeries| ApexNonAxisChartSeries} | {options:ApexCharts.ApexOptions,series: ApexAxisChartSeries | ApexNonAxisChartSeries}>({options:{},series:[]});
+    const [apexOptionsToRender, setApexOptionsToRender] = useState<{options: any,series: any} | {options:any,series: any}>({options:{},series:[]});
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 	const reportTemplateRef = useRef<HTMLDivElement>(null);
     const handleGeneratePdf = () => {

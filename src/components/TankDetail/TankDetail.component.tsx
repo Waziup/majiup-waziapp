@@ -1,4 +1,4 @@
-import {Stack,Box, styled, Switch} from '@mui/material';
+import {Stack,Box, styled, Switch, Typography} from '@mui/material';
 import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome, DeviceThermostat, Opacity } from "@mui/icons-material";
 import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -198,13 +198,19 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
                             </Box>
                         ):(null)
                     }
-                    <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
-                        <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
-                            <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>
-                            {actuator?actuator[0].name: 'Water Pump Control'}
-                        </p>
-                        <Android12Switch onClick={switchActuator} checked={pumpStatus} sx={{color:'#FF5C00'}}  />
-                    </Box>
+                    {
+                        (actuator?.length as number)>0?(
+                            <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', cursor: 'pointer', transition: '.5s', borderRadius: '5px', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
+                                <p style={{display: 'inline-flex',padding: 2, alignItems: 'center'}}>
+                                    <FireHydrantAlt  sx={{fontSize: 25, color: '#4592F6'}}/>
+                                    {(actuator)?actuator[0].name: 'Water Pump Control'}
+                                </p>
+                                <Android12Switch onClick={switchActuator} checked={pumpStatus} sx={{color:'#FF5C00'}}  />
+                            </Box>
+                        ):(
+                            <Typography>No actuator device.</Typography>
+                        )
+                    }
                     <WatertankComponent waterQuality={waterQuality} percentage={Math.round((liters/capacity)*100)} />
                     <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '80%',}}>
                         <Box sx={TankDetails}>

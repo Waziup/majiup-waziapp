@@ -51,7 +51,7 @@ function LoginPage() {
     });
     function submitLoginHandler(e: React.SyntheticEvent){
         e.preventDefault();
-        const correctPass = "loragateway";
+        const correctPass = "majiup";
         const correctUser = "admin";
         if(userData.name !== correctUser || userData.password !== correctPass){
             alert('Wrong username or password');
@@ -80,7 +80,7 @@ function LoginPage() {
                                     <Box sx={{display: 'flex',flexDirection:'column', justifyContent:'flex-start'}}>
                                         <label style={InputLabel} htmlFor="password">Password</label>
                                         <Stack sx={{border:'1px solid #ccc', borderRadius:'25px', height: 40}} alignItems={'center'} flexDirection={'row'}>
-                                            <input name='password' onChange={handleInputChange} required placeholder='loragateway' style={FormInput1} type={isText?'text':'password'}/>
+                                            <input name='password' onChange={handleInputChange} required placeholder='majiup' style={FormInput1} type={isText?'text':'password'}/>
                                             <Visibility onClick={()=>setIsText(!isText)} sx={{color:'#979797', cursor: 'pointer'}} />
                                         </Stack>
                                     </Box>

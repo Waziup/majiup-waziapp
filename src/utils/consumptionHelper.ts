@@ -57,7 +57,7 @@ export async function getConsumption(deviceId: string, tankHeight: number, tankC
     //add the data to the table
 }
 export const getLiters = (waterLevel: number, tankHeight: number, tankCapacity: number) => {
-    return Math.round((waterLevel / tankHeight) * tankCapacity);
+    return Math.round(((tankHeight-waterLevel) / tankHeight) * tankCapacity);
 }
 export const postNewNotificationMessage = async (deviceId: string,devices: X[], message: string) => {
     const tank = devices.find((device: X) => device.id === deviceId);
