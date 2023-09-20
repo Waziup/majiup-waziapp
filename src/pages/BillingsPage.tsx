@@ -62,13 +62,11 @@ function BillingsPage() {
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF();
             pdf.addImage(imgData, 'JPEG', 15, 4, 180, 160);
-            // pdf.addImage(imgData, 'JPEG', 0, 0, 0, 0);
             pdf.save("download.pdf");
             document.body.removeChild(reportRef as HTMLDivElement);
         })
         .catch((err) => alert(err));
 	};
-    // console.log('Options to render',optionsToRender);
     async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
         const selectedTableTank1 = devices.filter((device: Device) => device.id === event.target.value)[0];
         if (selectedTableTank1) {
@@ -136,32 +134,40 @@ function BillingsPage() {
                     },
                 })
                 return;
-                //setSelectedTank({...selectedTank, litres: devices.reduce((acc, curr)=>acc+curr.liters, 0)})
             }
-            setSelectedTank({
-                ...selectedTank,
-                consumption: devices[0].consumption ??[],
-                litres: devices.reduce((acc, curr)=>acc+getLitres(curr.capacity,curr.height,curr.liters), 0)
-            });
-            setSelectedTank({name: devices[0].name, litres:devices[0].liters, id: devices[0].id, consumption: devices[0].consumption})
-            setApexOptionsToRender({
-                series:[{
-                    name: devices[0].name,
-                    data: devices[0].consumption? devices[0]?.consumption.map((x)=>x.y):[],
-                    type: 'area'
-                }],
-                options:{
-                    chart:{
-                        height: 350,
-                        type: 'rangeArea',
+            const deviceFound = devices.find((dxy)=>dxy.id===selectedTank.id);
+            if (deviceFound) {
+                console.log('We found the new device',deviceFound)
+                setSelectedTank({
+                    id: deviceFound.id,
+                    consumption: deviceFound.consumption, 
+                    name: deviceFound.name, 
+                    litres: deviceFound.liters
+                });
+                setApexOptionsToRender({
+                    series:[{
+                            name: deviceFound.name,
+                            data: deviceFound.consumption? deviceFound.consumption.map((x)=>x.y):[],
+                        }
+                    ],
+                    options:{
+                        chart: {
+                            height: 350,
+                            type: 'rangeArea',
+                        },
+                        colors:['#4592F6'],
+                        xaxis: {
+                            categories: deviceFound?.consumption? deviceFound?.consumption.map((d)=>d.x):[2,4,5,7,8],
+                        },
+                        stroke:{
+                            curve: 'smooth'
+                        }
                     },
-                    xaxis: {
-                        categories: devices[0]?.consumption? devices[0]?.consumption.map((d)=>d.x):[],
-                    },
-                }
-            });
+                });
+                return;
+            }
         }
-    },[devices, devices.length,  selectedTank])
+    },[ devices.length])
     useEffect(()=>{
         if(selectedTank.id==='All'){
             setSelectedTank({
@@ -207,19 +213,19 @@ function BillingsPage() {
             })
             return;
         }
-        const device = devices.find((dxy)=>dxy.id===selectedTank.id);
-        if (device) {
-            console.log('We found the new device',device)
+        const deviceFound = devices.find((dxy)=>dxy.id===selectedTank.id);
+        if (deviceFound) {
+            console.log('We found the new device',deviceFound)
             setSelectedTank({
-                id: device.id,
-                consumption: device.consumption, 
-                name: device.name, 
-                litres: device.liters
+                id: deviceFound.id,
+                consumption: deviceFound.consumption, 
+                name: deviceFound.name, 
+                litres: deviceFound.liters
             });
             setApexOptionsToRender({
                 series:[{
-                        name: device.name,
-                        data: device.consumption? device.consumption.map((x)=>x.y):[],
+                        name: deviceFound.name,
+                        data: deviceFound.consumption? deviceFound.consumption.map((x)=>x.y):[],
                     }
                 ],
                 options:{
@@ -229,7 +235,7 @@ function BillingsPage() {
                     },
                     colors:['#4592F6'],
                     xaxis: {
-                        categories: device?.consumption? device?.consumption.map((d)=>d.x):[2,4,5,7,8],
+                        categories: deviceFound?.consumption? deviceFound?.consumption.map((d)=>d.x):[2,4,5,7,8],
                     },
                     stroke:{
                         curve: 'smooth'
@@ -238,6 +244,7 @@ function BillingsPage() {
             });
             return;
         }
+        return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[selectedTank.id])
     // const CanvasJSChart = CanvasJSReact.CanvasJSChart;
