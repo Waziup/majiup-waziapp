@@ -42,7 +42,7 @@ export type Consumption = {
     waterTemperature: number
 }
 function BillingsPage() {
-    const { devices, reportRef,fetchinHours,fetchInMinutes} = useContext(DevicesContext)
+    const { devices, reportRef,fetchInMinutes} = useContext(DevicesContext)
 	
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[] }>({consumption: []});
@@ -105,14 +105,8 @@ function BillingsPage() {
                     ],
                     options: {
                         chart: {
-                            height: 350,
-                            type: "area",
-                            zoom: {
-                                enabled: false
-                            },
-                            toolbar: {
-                                show: false
-                            }
+                            height: 350,                            
+                            type: "area",                                                
                         },
                         colors:['#4592F6','#00e396'],
                         dataLabels: {
@@ -121,9 +115,10 @@ function BillingsPage() {
                         
                         stroke: {
                             curve: 'smooth',
+                            width: 2,
                         },
                         title: {
-                            text: 'Water Consumption',
+                            // text: 'Water Consumption',
                             align: 'left',
                         },
                         xaxis: {
@@ -158,7 +153,8 @@ function BillingsPage() {
                             categories: deviceFound?.consumption? deviceFound?.consumption.map((d)=>d.x):[2,4,5,7,8],
                         },
                         stroke:{
-                            curve: 'smooth'
+                            curve: 'smooth',
+                            width: 2
                         }
                     },
                 });
@@ -184,13 +180,10 @@ function BillingsPage() {
                 options: {
                     chart: {
                         height: 350,
-                        type: "area",
-                        zoom: {
-                            enabled: false
-                        },
-                        toolbar: {
-                            show: false
-                        }
+                        type: "area",                        
+                        // toolbar: {
+                        //     show: false
+                        // }
                     },
                     colors:['#4592F6','#00e396'],
                     dataLabels: {
@@ -199,9 +192,11 @@ function BillingsPage() {
                     
                     stroke: {
                         curve: 'smooth',
+                        width: 2
                     },
+
                     title: {
-                        text: 'Water Consumption',
+                        // text: 'Water Consumption',
                         align: 'left',
                     },
                     xaxis: {
@@ -236,7 +231,8 @@ function BillingsPage() {
                         categories: deviceFound?.consumption? deviceFound?.consumption.map((d)=>d.x):[2,4,5,7,8],
                     },
                     stroke:{
-                        curve: 'smooth'
+                        curve: 'smooth',
+                        width: 2
                     }
                 },
             });
@@ -250,19 +246,19 @@ function BillingsPage() {
         if(event.target.value==='minutes'){
             fetchInMinutes();
         }else{
-            fetchinHours();
+            // fetchinHours();
         }
     }
     console.log(apexOptionsToRender);
     if(!devices && !selectedTableTank.consumption){
         return(
-            <h1>Loading</h1>
+            <article>Loading</article>
         )
     }
     return (
         <Box pl={2} pr={2}>
             <Box onClick={()=>setIsOpenModal(!isOpenModal)} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <h3 style={{fontSize: '24px'}}>Usage Volume</h3>
+                <h3 style={{fontSize: '24px'}}>Water Consumption</h3>
                 <p style={{color: '#fff',fontSize: '12px',cursor:'pointer', borderRadius: '20px', padding: '8px', display: 'flex',alignItems: 'center',backgroundColor: '#1C1B1F'}}>
                     <Visibility sx={{fontSize: 12, margin:'0 4px'}}/>
                     View Analytics
@@ -272,8 +268,8 @@ function BillingsPage() {
                 <div >
                     <h3 style={{fontSize: '16px', margin:'10px 0'}}>Consumption Chart</h3>
                     <div style={{border: '1px solid black', padding:'8px 10px', borderRadius:'4px'}}>
-                        <p style={{color: '#9291A5', fontSize: '15px', margin:'10px 0'}}>Water Consumption, {new Date().toDateString()}</p>
-                        <h4 style={{margin:'10px 0'}}>{isNaN(selectedTank.litres)?0:selectedTank.litres} {selectedTank.id==='All'?'total litres consumed':'Litres'} </h4>
+                        <p style={{color: '#9291A5', margin:'10px 0'}}>Water Consumption, {new Date().toDateString()}</p>
+                        {/* <article style={{margin:'10px 0', fontSize:'small'}}>{isNaN(selectedTank.litres)?0:selectedTank.litres} {selectedTank.id==='All'?'totallitres consumed':'Litres'} </article> */}
                         {/* <CanvasJSChart options={optionsToRender}/> */}
                         <Chart
                             options={apexOptionsToRender.options}
@@ -283,16 +279,16 @@ function BillingsPage() {
                         />
                     </div>
                 </div>
-                {
+                {/* {
                     selectedTableTank.consumption?(
                         <>
-                            <h4 style={{margin:'10px'}}>Tabular Overview</h4>
+                            <h4 style={{margin:'10px'}}>Data History</h4>
                             <StickyHeadTable 
                                 rows1={selectedTableTank.consumption}
                             />
                         </>
                     ):''
-                }
+                } */}
             </ModalComponent>
             
             <Box  ref={reportTemplateRef} sx={{display: 'flex',margin: '10px 0', flexWrap: 'wrap', alignItems: 'center'}}>
@@ -318,22 +314,25 @@ function BillingsPage() {
             <Box p={2} sx={{width: '100%',bgcolor: "#fff",borderRadius: "8px",}}>
                 <Box sx={{display: 'flex',alignItems: 'center',justifyContent: 'space-between', width:'100%',bgcolor: "#fff",borderRadius: "5px",marginTop: "10px",}} >
                     <p style={{color: '#9291A5', fontSize: '12px'}}>Water Consumption, {todaysDate}</p>
-                    <Box p={1} sx={{  display: 'flex',bgcolor: '#F3F8FF', borderRadius: "5px",justifyContent: 'space-between', alignItems: 'center'}}>
-                        {/* <p style={ReportsActiveText}>Daily</p>
-                        <p style={ReportsText}>Weekly</p>
-                        <p style={ReportsText}>Monthly</p> */}
+                    <Box p={1} sx={{  display: 'flex',bgcolor: '#F3F8FF', borderRadius: "5px",justifyContent: 'space-between', alignItems: 'center'}}>                       
                     </Box>
                 </Box>
-                <h2 style={{ fontSize: 'calc(10px + 1.8vw)'}} >{isNaN(selectedTank.litres)?0:selectedTank.litres} {selectedTank.id==='All'?'total litres consumed':'Litres'} </h2>
-                {/* <CanvasJSChart options = {optionsToRender}/> */}
+                <br />
+                <strong>{isNaN(selectedTank.litres)?0:selectedTank.litres} {selectedTank.id==='All'?'litres used':'Litres'} </strong>
                 <Chart
                     options={apexOptionsToRender.options}
                     series={apexOptionsToRender.series}
                     type={'area'}
                     height={350}
                 />
-            </Box>
-            <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
+            </Box>           
+            {/* <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
+                <article>Report</article>
+                <div>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum, atque aliquid. Consectetur architecto recusandae voluptatibus libero aperiam, molestias esse, dolores minima sed porro voluptatum facere possimus laboriosam iusto voluptatem! Dolorem.
+                </div>
+            </Box> */}
+            {/* <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <Box sx={{padding: '10px 5px',margin: '10px 0',width: '100%',display: 'flex',alignItems: 'center', bgcolor: "#fff",borderRadius: "5px",}}>
                     <Box sx={{border: '1px solid #ccc',marginRight:'5px', padding:'5px', width: '75%', borderRadius: '20px'}}>
                         <select onChange={(e)=>handleSelectedTableTank(e)} style={{border: 'none', width: '100%',outline: 'none', background: 'none'}} name="devs" id="devs">
@@ -351,9 +350,9 @@ function BillingsPage() {
                             <p style={{ fontWeight: 'bold'}}>Generate</p>
                         </Box>
                     </Box>
-                </Box>
+                </Box>                
                 <div>
-                    <h4 style={{margin:'10px 0'}}>Tabular Overview</h4>
+                    <h4 style={{margin:'10px 0'}}>Data History</h4>
                     {
                         selectedTableTank.consumption?(
                             <StickyHeadTable 
@@ -362,7 +361,7 @@ function BillingsPage() {
                         ):''
                     }
                 </div>
-            </Box>
+            </Box> */}
         </Box>
     );
 }

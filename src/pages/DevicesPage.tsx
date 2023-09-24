@@ -6,17 +6,7 @@ import { DevicesContext } from "../context/devices.context";
 import { useContext } from "react";
 import { X as Device } from "../context/devices.context";
 import axios from "axios";
-function getWaterQuality(tds: number){
-    if (tds>0 && tds<300) {
-        return 'Excellent'
-    }else if(tds>300 &&tds<900){
-        return'Good'
-    }else if(tds>900){
-        return 'Poor'
-    }else{
-        return('Not satisfied');
-    }
-}
+
 function DevicesPage() {
     const {devices} = useContext(DevicesContext);
     const data = useLocation();
@@ -50,7 +40,7 @@ function DevicesPage() {
                     liters={data.state.liters}
                     on={data.state.on}
                     owner={data.state.name}
-                    waterQuality={getWaterQuality(tdsValue)}
+                    waterQuality={tdsValue}
                     waterTemp={data.state.temp}
                     actuator={data.state.actuators}
                     consumption={data.state.consumption}

@@ -1,6 +1,5 @@
 import axios from "axios";
 import {ReactNode, createContext, useEffect, useState,} from "react";
-import { getLiters } from "../utils/consumptionHelper";
 import mqtt from "precompiled-mqtt";
 const brokerUrl = `mqtt://localhost`; //localhost:8081
 type Props={
@@ -51,13 +50,8 @@ export type MetaInformation={
         latitude: number
     },
     settings: {
-        length: number,
-        width: number,
         height: number,
-        radius: number,
         capacity: number,
-        maxalert: number,
-        minalert: number,
     }
 }
 interface Device{
@@ -80,7 +74,7 @@ export interface X extends Device {
     isSelect: boolean,
     liters: number
     temp: number,
-    tds: number,
+    tds: string,
     on: boolean,
 }
 
@@ -97,7 +91,7 @@ interface ContextValues{
     setReportRef: (ref: HTMLDivElement)=>void,
     loading: boolean,
     setLoadingFunc: (loading: boolean)=>void,
-    fetchinHours: ()=>void,
+    // fetchinHours: ()=>void,
     searchDevices: (name: string)=>void,
     fetchInMinutes: ()=>void,
 }
@@ -114,7 +108,7 @@ export const DevicesContext = createContext<ContextValues>({
     setReportRef: (ref: HTMLDivElement) =>{console.log(ref);},
     loading: false,
     setLoadingFunc: (loading)=>{console.log(loading);},
-    fetchinHours: ()=>{console.log('');},
+    // fetchinHours: ()=>{console.log('');},
     fetchInMinutes: ()=>{console.log('');},
     searchDevices: (name)=>{console.log(name);},
 });
@@ -157,8 +151,10 @@ export const  DevicesProvider = ({children}: Props)=>{
             setReportRefFunch(ref)
         }
     };
-    const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};
+    const setLoadingFunc = (loading: boolean)=>{setLoading(!loading)};  
+    
     function fetchInMinutes(){
+
         axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
             headers:{
                 'Accept': 'application/json',
@@ -172,15 +168,27 @@ export const  DevicesProvider = ({children}: Props)=>{
                         'Accept': 'application/json',
                     }
                 });
-                return sensorResponse.data.map((sensor:Sensor) => {
-                    const date = new Date(sensor.time);
+                                   
+                const plotVals = sensorResponse.data?.waterLevels.map((val: { timestamp: any; liters: any; })=>{
+                    const date = new Date(val.timestamp)
+                    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'];
+
+                    const dayOfWeek = daysOfWeek[date.getUTCDay()];
+
+                    const hours = String(date.getUTCHours()).padStart(2, '0');
+
+                    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
                     return {
-                        y: getLiters(sensor.value,device.meta.settings.height, device.meta.settings.capacity),
-                        x: parseFloat((date.getHours() + (date.getMinutes()/60)).toFixed(2)),
-                    };
-                });
+                        x: (`${dayOfWeek}, ${hours}:${minutes}`),
+                        y: val.liters
+                    }
+                })
+
+                return plotVals
+                
             });
             const consumption = await Promise.all(devicePromises);
+
             console.log('Devices all promises is: ',consumption)
             return {
                 consumption: consumption as Consumption[],
@@ -191,82 +199,80 @@ export const  DevicesProvider = ({children}: Props)=>{
             setDevices(res.map(function(device: X, index:number){
                 subscriberFn(client,`devices/${device.id}/meta/#`);
                 subscriberFn(client,`devices/${device.id}/sensors/#`);
-                subscriberFn(client,`devices/${device.id}/actuators/#`);
+                subscriberFn(client,`devices/${device.id}/actuators/#`);  
                 
+               
                 return{
                     ...device,
                     capacity: device.meta.settings.capacity,
-                    length: Math.round(device.meta.settings.length),
-                    width: Math.round(device.meta.settings.width),
                     height: Math.round(device.meta.settings.height),
                     consumption: consumption[index],
-                    liters:  Math.round(getLiters(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,device.meta.settings.height, device.meta.settings.capacity)),
-                    tds: Math.round(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0),
-                    temp: Math.round(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0),
+                    liters: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))?.value,
+                    tds: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterpollutantsensor'))?.value,
+                    temp: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterthermometer'))?.value,
                     isSelect: false,
                     on: isActiveDevice(device.modified),
                     notifications: device.meta.notifications.messages,
                 }
             }));
-            console.log(devices);
             setLoading(false);
         })
         .catch((err)=>{
             console.log(err);
         })
     }
-    function fetchinHours(){
-        axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
-            headers:{
-                'Accept': 'application/json',
-                'Content-Type':'application/json'
-            }
-        })
-        .then(async (response)=>{
-            const devicePromises = response.data.map(async (device:Device) => {
-                const sensorResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/tank-sensors/waterlevel/values`, {
-                    headers: {
-                        'Accept': 'application/json',
-                    }
-                });
-                return sensorResponse.data.map((sensor:Sensor) => {
-                    const date = new Date(sensor.time);
-                    return {
-                        y: getLiters(sensor.value,device.meta.settings.height, device.meta.settings.capacity),
-                        x: date.getHours(),
-                    };
-                });
-            });
-            const consumption = await Promise.all(devicePromises);
+    // function fetchinHours(){
+    //     axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
+    //         headers:{
+    //             'Accept': 'application/json',
+    //             'Content-Type':'application/json'
+    //         }
+    //     })
+    //     .then(async (response)=>{
+    //         const devicePromises = response.data.map(async (device:Device) => {
+    //             const sensorResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/tank-sensors/waterlevel/values`, {
+    //                 headers: {
+    //                     'Accept': 'application/json',
+    //                 }
+    //             });
+    //             return sensorResponse.data.map((sensor:Sensor) => {
+    //                 const date = new Date(sensor.time);
+    //                 return {
+    //                     y: sensor.value,
+    //                     x: date.getHours(),
+    //                 };
+    //             });
+    //         });
+    //         const consumption = await Promise.all(devicePromises);
 
-            return {
-                consumption: consumption[0] as Consumption[],
-                res: response.data,
-            };
-        })
-        .then(({res,consumption})=>{
-            setDevices(res.map(function(device: X){
-                return{
-                    ...device,
-                    capacity: device.meta.settings.capacity,
-                    length: device.meta.settings.length,
-                    width: device.meta.settings.width,
-                    height: device.meta.settings.height,
-                    consumption: consumption,
-                    liters:  getLiters(device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('level'))?.value ?? 0,device.meta.settings.height, device.meta.settings.capacity),
-                    tds: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('quality'))?.value ?? 0,
-                    temp: device.sensors.find((sensor:Sensor)=>sensor.name.toLowerCase().includes('temperature'.toLowerCase()))?.value ?? 0,
-                    isSelect: false,
-                    notification: device.meta.notifications,
-                    on: isActiveDevice(device.modified),
-                }
-            }));
-            setLoading(false);
-        })
-        .catch((err)=>{
-            console.log(err);
-        })
-    }
+    //         return {
+    //             consumption: consumption[0] as Consumption[],
+    //             res: response.data,
+    //         };
+    //     })
+    //     .then(({res,consumption})=>{
+    //         setDevices(res.map(function(device: X){
+
+    //             return{
+    //                 ...device,
+    //                 capacity: device.meta.settings.capacity,
+    //                 height: device.meta.settings.height,
+    //                 consumption: consumption,
+    //                 liters: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))?.value,
+    //                 tds: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterpollutantsensor'))?.value,
+    //                 temp: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterthermometer'))?.value,
+    //                 isSelect: false,
+    //                 notification: device.meta.notifications,
+    //                 on: isActiveDevice(device.modified),
+    //             }
+                
+    //         }));
+    //         setLoading(false);
+    //     })
+    //     .catch((err)=>{
+    //         console.log(err);
+    //     })
+    // }
     client.on('connect', ()=>{
         console.log("Connected to devices");
     });
@@ -305,7 +311,7 @@ export const  DevicesProvider = ({children}: Props)=>{
         setReportRef,
         loading,
         setLoadingFunc,
-        fetchinHours,
+        // fetchinHours,
         fetchInMinutes,
         searchDevices,
     }

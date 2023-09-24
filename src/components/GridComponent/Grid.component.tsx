@@ -35,17 +35,6 @@ const BoxStyle={
 }
 const TankDetails={padding: '10px 20px',margin: '7px 0px', width: '50%',borderRadius: '10px', boxShadow: '1px 1px 4px  rgba(0, 0, 0, 0.15)'}
 
-function getWaterQuality(tds: number):string{
-    if (tds>0 && tds<300) {
-        return 'Excellent'
-    }else if(tds>300 &&tds<900){
-        return'Good'
-    }else if(tds>900){
-        return 'Poor'
-    }else{
-        return('Not satisfied');
-    }
-}
 function GridComponent() {
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
@@ -76,7 +65,6 @@ function GridComponent() {
                     setTanks([...devices]);
                 }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
                     console.log('It is a pollutant sensor')
-                    device.tds = parseInt(message.toString());
                     device.modified = new Date().toISOString();
                     device.on=true;
                     setTanks([...devices]);
@@ -169,7 +157,7 @@ function GridComponent() {
                         )
                     }   
                     <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
-                        <h1>Loading...</h1>
+                        <article>Loading...</article>
                     </Grid>
                 </Grid>
             </Grid>
@@ -193,7 +181,8 @@ function GridComponent() {
                 }
                 <Grid ml={!matches ?3:0} mr={!matches?2:0} item xs={matches?6:12}>
                     {
-                        devices.length<=0 ?(
+                        devices.length<=0 ?
+                        (
                             <Box sx={{position: 'relative', width: '100%'}}>
                                 <Box sx={{
                                     display: 'flex',
@@ -237,7 +226,7 @@ function GridComponent() {
                                     </h3>
                                     <MoreVert sx={{fontSize: 25, color: '#4592F6'}}/>
                                 </Box>
-                                <WatertankComponent percentage={Math.round((tank.liters/tank.capacity)*100)} waterQuality={getWaterQuality(tank.tds)} />
+                                <WatertankComponent percentage={Math.round((tank.liters/tank.capacity)*100)} waterQuality={tank.tds} />
                                 <Stack direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} sx={{marginTop:'10px',width: '90%',}}>
                                     <Box sx={TankDetails}>
                                         <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
@@ -268,15 +257,15 @@ function GridComponent() {
                                         id={selectedDevice.id}
                                         owner={selectedDevice.name??'Tank'}
                                         waterTemp={selectedDevice.temp}
-                                        waterQuality={getWaterQuality(selectedDevice.tds)}
+                                        waterQuality={(selectedDevice.tds)}
                                         liters={selectedDevice.liters}
                                         on={selectedDevice.on??false}
                                         consumption={selectedDevice.consumption}
                                         actuator={selectedDevice.actuators}
                                         height={selectedDevice.height}
                                         capacity={selectedDevice.capacity}
-                                        maxalert={selectedDevice.meta.settings.maxalert}
-                                        minalert={selectedDevice.meta.settings.minalert}
+                                        maxalert={0}
+                                        minalert={0}
                                         toggleActuator={toogleActuatorHandler}
                                         receiveNotifications={selectedDevice.meta.receivenotifications}
                                     />

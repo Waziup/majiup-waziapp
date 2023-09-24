@@ -4,16 +4,17 @@ import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useContext, useEffect, useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
-// import CanvasJSReact from '@canvasjs/react-charts';
 import FrameSVG from '../../assets/not-found.svg';
 import { Actuator, DevicesContext, X} from '../../context/devices.context';
-import { getLiters, postNewNotificationMessage } from '../../utils/consumptionHelper';
 import axios from 'axios';
+
 type Consumption = {
     x: number,
     y: number,
 }
 import Chart from 'react-apexcharts';
+import { postNewNotificationMessage } from '../../utils/consumptionHelper';
+
 type Props={
     owner: string,
     liters: number,
@@ -30,6 +31,7 @@ type Props={
     maxalert: number,
     minalert: number
 }
+
 export const Android12Switch = styled(Switch)(({ theme }) => ({
     padding: 8,
 	bgcolor: '#FF5C00',
@@ -84,10 +86,11 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
     const [pumpStatus, setPumpStatus] = useState(false);
     const {devices} = useContext(DevicesContext);
     const [isalert, setAlert] = useState(false);
+
     const apexChartOptions = {
         series: [{
             name: 'Consumption',
-            data: temperatureConsumption.map((item)=>item.y),
+            data: temperatureConsumption?.map((item)=>item.y),
             type: "area"
         }],
         options: {
@@ -123,31 +126,32 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
             },
         },
     }
-    
-      
+          
     async function switchActuator(){
         if(actuator && toggleActuator){
             await toggleActuator(id);
             setPumpStatus(!pumpStatus);
         }
     }
+
     useEffect(()=>{
         const checPump = (async ()=>{
             const alert = await checkForAlert(id,height,devices,maxalert,minalert);
             setAlert(alert);
         })
         checPump();
-        // return ()=> clearInterval(interval);
     },[devices,minalert,maxalert,height,id])
+
     useEffect(()=>{
         const actuatorValue = actuator!== undefined? actuator[0].value: false;
         return actuatorValue ===0? setPumpStatus(false): setPumpStatus(true);
     },[actuator])
+
     useEffect(()=>{
         setTemperatureConsumption(consumption);
-        // const chart = new ApexCharts(document.querySelector("#chart"), apexChartOptions);
-        // chart.render();
+        
     },[consumption]);
+
     async function runFetch(){
         const temperatureConsumptionVal =await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/tank-sensors/water-temperature/values`,{
             headers:{
@@ -155,18 +159,29 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
             }
         })
         .then((response)=>{
-            return response.data.map((sensor: {value: number,time: string})=>{
-                const date = new Date(sensor.time)
-                return{
-                    // y: sensor.value,
-                    y: getLiters(sensor.value,height,capacity),
-                    x: date.getHours(),
+            console.log(response.data)
+            const plotVals = response.data.map((val: { time: any; value: any; })=>{
+                const date = new Date(val.time)
+                const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'];
+
+                const dayOfWeek = daysOfWeek[date.getUTCDay()];
+
+                const hours = String(date.getUTCHours()).padStart(2, '0');
+
+                const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                return {
+                    x: (`${dayOfWeek}, ${hours}:${minutes}`),
+                    y: val.value
                 }
-            });
+            })
+
+            return plotVals
+           
         })
         .catch((err)=>{
             alert(err);
         })
+
         setTemperatureConsumption(temperatureConsumptionVal);
     }
     useEffect(()=>{
@@ -175,11 +190,10 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
         }else{
             setTemperatureConsumption(consumption);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[toggleHot])
+
     function handleToggleTeemp(){
         setToggleHot(!toggleHot);
-        // setTemperatureConsumption(consumption);
     }
     
     return (
@@ -218,7 +232,7 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
                                 <WaterDrop style={{fontSize: 10,  color: '#4592F6'}}/>
                                 Current Amount
                             </p>
-                            <p style={{fontSize: '24px'}}>{Math.round(liters)} Ltr</p>
+                            <p style={{fontSize: '24px'}}>{liters} Ltr</p>
                         </Box>
                         <Box sx={TankDetails}>
                             <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
@@ -233,17 +247,17 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
                                 Water Quality
                             </p>
                             {
-                                waterQuality.toLowerCase().includes('Excellent') &&(
+                                waterQuality?.toLowerCase().includes('excellent') &&(
                                     <p style={{fontSize: '24px',color:'#85ea2d' }}>{waterQuality}</p>
                                 )
                             }
                             {
-                                waterQuality.includes('Poor') &&(
+                                waterQuality?.includes('Poor') &&(
                                     <p style={{fontSize: '24px',color:'#c5221f' }}>{waterQuality}</p>
                                 )
                             }
                             {
-                                waterQuality.includes('Good') &&(
+                                waterQuality?.includes('Good') &&(
                                     <p style={{fontSize: '24px',color:'#f35e19' }}>{waterQuality}</p>
                                 )
                             }
@@ -277,13 +291,7 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
                             options={{
                                 chart: {
                                     height: 350,
-                                    type: "rangeArea",
-                                    zoom: {
-                                        enabled: true
-                                    },
-                                    toolbar: {
-                                        show: false
-                                    }
+                                    type: "rangeArea",                                    
                                 },
                                 colors: [toggleHot? '#FF0000':'#4592F6'],
                                 
@@ -291,7 +299,8 @@ function TankDetailComponent({id,capacity, maxalert, minalert, receiveNotificati
                                     enabled: false
                                 },
                                 stroke: {
-                                    curve: 'smooth'
+                                    curve: 'smooth',
+                                    width:2,
                                 },
                                 xaxis: {
                                     categories: temperatureConsumption.map((item)=>item.x),
