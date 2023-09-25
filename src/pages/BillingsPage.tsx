@@ -4,16 +4,16 @@ import React, { useState, useRef, useContext,useLayoutEffect, useEffect } from '
 import { Box} from '@mui/material';
 // import { ApexAxisChartSeries,ApexCharts, ApexNonAxisChartSeries } from 'apexcharts';
 import { Visibility} from '@mui/icons-material';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import StickyHeadTable from '../components/TableComponent/Table.component';
-import DownloadSVG from '../assets/download.svg';
+// import AssessmentIcon from '@mui/icons-material/Assessment';
+// import StickyHeadTable from '../components/TableComponent/Table.component';
+// import DownloadSVG from '../assets/download.svg';
 import ModalComponent from '../components/Modal/Modal.component';
-import jsPDF from 'jspdf';
+// import jsPDF from 'jspdf';
 import { DevicesContext } from '../context/devices.context';
 // import CanvasJSReact from '@canvasjs/react-charts';
 import Chart from 'react-apexcharts';
-import { X as Device } from '../context/devices.context';
-import html2canvas from 'html2canvas';
+// import { X as Device } from '../context/devices.context';
+// import html2canvas from 'html2canvas';
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const date = new Date();
 const todaysDate = `${months[date.getMonth()]}, ${date.getDate()}, ${date.getFullYear()}`;
@@ -42,7 +42,7 @@ export type Consumption = {
     waterTemperature: number
 }
 function BillingsPage() {
-    const { devices, reportRef,fetchInMinutes} = useContext(DevicesContext)
+    const { devices, fetchInMinutes} = useContext(DevicesContext)
 	
     const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({name: '', litres:0, id: '', consumption:[]});
     const [selectedTableTank,setSelectedTableTank] = useState<{consumption: Consumption[] }>({consumption: []});
@@ -51,29 +51,29 @@ function BillingsPage() {
     const [apexOptionsToRender, setApexOptionsToRender] = useState<{options: any,series: any} | {options:any,series: any}>({options:{},series:[]});
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 	const reportTemplateRef = useRef<HTMLDivElement>(null);
-    const handleGeneratePdf = () => {
-        setIsOpenModal(!isOpenModal)
-        setIsOpenModal(!isOpenModal)
-        document.body.appendChild(reportRef as HTMLDivElement);
-        html2canvas(reportRef as HTMLDivElement)
-        .then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'JPEG', 15, 4, 180, 160);
-            pdf.save("download.pdf");
-            document.body.removeChild(reportRef as HTMLDivElement);
-        })
-        .catch((err) => alert(err));
-	};
-    async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
-        const selectedTableTank1 = devices.filter((device: Device) => device.id === event.target.value)[0];
-        if (selectedTableTank1) {
-            const responseData =await getConsumption(selectedTableTank1.id, selectedTableTank1.capacity, selectedTableTank1.height);
-            setSelectedTableTank({
-                consumption: (responseData as Consumption[])
-            });
-        }
-    }
+    // const handleGeneratePdf = () => {
+    //     setIsOpenModal(!isOpenModal)
+    //     setIsOpenModal(!isOpenModal)
+    //     document.body.appendChild(reportRef as HTMLDivElement);
+    //     html2canvas(reportRef as HTMLDivElement)
+    //     .then((canvas) => {
+    //         const imgData = canvas.toDataURL('image/png');
+    //         const pdf = new jsPDF();
+    //         pdf.addImage(imgData, 'JPEG', 15, 4, 180, 160);
+    //         pdf.save("download.pdf");
+    //         document.body.removeChild(reportRef as HTMLDivElement);
+    //     })
+    //     .catch((err) => alert(err));
+	// };
+    // async function handleSelectedTableTank(event: React.ChangeEvent<HTMLSelectElement>) {
+    //     const selectedTableTank1 = devices.filter((device: Device) => device.id === event.target.value)[0];
+    //     if (selectedTableTank1) {
+    //         const responseData =await getConsumption(selectedTableTank1.id, selectedTableTank1.capacity, selectedTableTank1.height);
+    //         setSelectedTableTank({
+    //             consumption: (responseData as Consumption[])
+    //         });
+    //     }
+    // }
     useLayoutEffect(()=>{
         setSelectedTank({
             ...selectedTank,

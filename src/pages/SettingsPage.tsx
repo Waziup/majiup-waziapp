@@ -175,10 +175,10 @@ function SettingsPage() {
                 settings:{
                     capacity: parseFloat(changedMetaInfo.metaData.settings.capacity.toString()),
                     height: parseFloat(changedMetaInfo.metaData.settings.height.toString()),
-                    maxalert: parseFloat(changedMetaInfo.metaData.settings.maxalert.toString()),
-                    minalert: parseFloat(changedMetaInfo.metaData.settings.minalert.toString()),
-                    radius: parseFloat(changedMetaInfo.metaData.settings.radius.toString()),
-                    width: parseFloat(changedMetaInfo.metaData.settings.width.toString()),
+                    // maxalert: parseFloat(changedMetaInfo.metaData.settings.maxalert.toString()),
+                    // minalert: parseFloat(changedMetaInfo.metaData.settings.minalert.toString()),
+                    // radius: parseFloat(changedMetaInfo.metaData.settings.radius.toString()),
+                    // width: parseFloat(changedMetaInfo.metaData.settings.width.toString()),
                 },
                 receivenotifications: changedMetaInfo.metaData.receivenotifications,
                 notifications:{...selectedDevice?.meta.notifications}
@@ -265,7 +265,7 @@ function SettingsPage() {
                                     <input 
                                         onChange={handleChange} 
                                         name={'maxalert'} 
-                                        value={changedMetaInfo.metaData.settings.maxalert}
+                                        // value={changedMetaInfo.metaData.settings.maxalert}
                                         required 
                                         style={inputbox} 
                                         className="input_box" 
@@ -279,7 +279,7 @@ function SettingsPage() {
                                     <input 
                                         onChange={handleChange} 
                                         name={'minalert'} 
-                                        value={changedMetaInfo.metaData.settings.minalert} 
+                                        // value={changedMetaInfo.metaData.settings.minalert} 
                                         required style={inputbox} className="input_box" 
                                         type={'number'} 
                                         placeholder={'Enter Minimum Alert'} />
