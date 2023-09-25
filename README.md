@@ -19,6 +19,10 @@ What things you need to install the software and how to install them
 4. Wazigate - The IoT gateway
 5. [Docker](https://docs.docker.com/get-docker/) - The containerization platform
 
+
+Instruction to run the Majiup application on gateway can be found [here]
+(https://github.com/Waziup/majiup-backend/blob/main/README.md)
+
 ## Installing in local machine
 
 A step by step series of examples that tell you how to get a development env running
