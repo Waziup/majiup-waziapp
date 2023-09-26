@@ -41,6 +41,7 @@ function GridComponent() {
     const handleClose = () => setOpen(false);
     const { isOpenNav,loading, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
+    
     client.on('message', (topic, message) => { 
         const topicArr = topic.split('/');
         // console.log('message received', topicArr.includes('sensors'), message.toString())
@@ -51,7 +52,6 @@ function GridComponent() {
             if(device){
                 const sensorV = device.sensors.find((sensor:Sensor)=>sensor.id === topicArr[3]);
                 if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterLevel'.toLowerCase())){
-                    console.log('Water level sensor')
                     const liters = getLiters(parseInt(message.toString()),device.meta.settings.height, device.meta.settings.capacity);
                     device.liters = liters;
 
@@ -72,19 +72,19 @@ function GridComponent() {
                                 headers:{
                                     'Content-Type': 'application/json',
                                 }
-                            }).then(res=>{
-                                console.log(res.data)
-                                "Pump Turned OFF"
-                            }).catch(err=>{
-                                console.log("Failed to Turn OFF",err)
                             })
+                            // .then(res=>{
+                            //     console.log(res.data)
+                            //     "Pump Turned OFF"
+                            // }).catch(err=>{
+                            //     console.log("Failed to Turn OFF",err)
+                            // })
                         }
                     }
                     else if (liters <= minSensor){
                         // If pump is off
                         postNewNotificationMessage(device.id, devices, `${device.name} almost empty, turning pump ON`, "HIGH")                                                      
                         // alert(`${device.name} almost empty, starting pump`)                        
-                        console.log(pumpStatus)
                         if (pumpStatus === 0){                            
                             alert(`${device.name} almost empty, turning on pump`);
                             
@@ -94,17 +94,18 @@ function GridComponent() {
                                 headers:{
                                     'Content-Type': 'application/json',
                                 }
-                            }).then(res=>{
-                                console.log(res.data)
-                                "Pump Turned ON"
-                            }).catch(err=>{
-                                console.log("Failed to Turn OFF",err)
-                            });
+                            })
+                            // .then(res=>{
+                            //     console.log(res.data)
+                            //     "Pump Turned ON"
+                            // }).catch(err=>{
+                            //     console.log("Failed to Turn OFF",err)
+                            // });
                             return;
                         }
                     }
 
-                    device.modified = new Date().toISOString();
+                    // device.modified = new Date().toISOString();
                     device.on=true;
                     const date = new Date();
                     device.consumption.push({
@@ -113,8 +114,8 @@ function GridComponent() {
                     });
                     setTanks([...devices]);
                 }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
-                    console.log('Pollutant sensor')
-                    device.modified = new Date().toISOString();
+                    // console.log('Pollutant sensor')
+                    // device.modified = new Date().toISOString();
                     device.on=true;   
                     
                     const maxSensor = sensorV.meta.critical_max;
@@ -129,9 +130,9 @@ function GridComponent() {
                     setTanks([...devices]);
                     
                 }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterThermometer'.toLowerCase())){
-                    console.log('Water thermometer');
+                    // console.log('Water thermometer');
                     device.temp = parseInt(message.toString());
-                    device.modified = new Date().toISOString();
+                    // device.modified = new Date().toISOString();
                     device.on=true;
 
                     const maxSensor = sensorV.meta.critical_max;
@@ -152,7 +153,7 @@ function GridComponent() {
                     setTanks([...devices]);
                 }else{
                     device.on=true;
-                    console.log(sensorV?.meta.kind);
+                    // console.log(sensorV?.meta.kind);
                     return;
                 }
                 return;
@@ -191,7 +192,7 @@ function GridComponent() {
         setSelectedDevice(tank);
     }
     const theme = useTheme();
-    const matches = useMediaQuery(theme.breakpoints.up('md'));
+    const matches = useMediaQuery(theme.breakpoints.up('md'));    
     
     async function toogleActuatorHandler(id:string): Promise<boolean> {
         let currentValue: number;
@@ -285,7 +286,7 @@ function GridComponent() {
                                     handleOpen={handleOpen}
                                     open={open}
                                     temp={tank.temp}
-                                    modified={tank.modified}
+                                    modified={tank.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))?.time}
                                 />
                             </Box>
                         ):(

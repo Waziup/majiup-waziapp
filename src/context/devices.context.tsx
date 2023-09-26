@@ -120,22 +120,19 @@ export const DevicesContext = createContext<ContextValues>({
 //return an array of device data including level, temperature, quality, etc.
 //extract the first row and add it as current waterTemp, waterQuality, liters, etc.
 //add the rest of the rows as consumption data
-function isActiveDevice(modifiedTime: string): boolean{
+function isActiveDevice(modifiedTime: any): boolean{
     const now = new Date();
     const modified = new Date(modifiedTime);
     const diff = now.getTime() - modified.getTime();
     const diffInMinutes = Math.floor(diff / 1000 / 60);
-    return diffInMinutes < 5;
+    return diffInMinutes < 7;
 }
 
 function subscriberFn(client: mqtt.MqttClient, topic: string, ){
     client.subscribe(topic, (err)=>{
         if (err){
             console.log(err);
-        }
-        else if (!err){
-            console.log("Subscribed to ", topic);
-        }
+        }        
     })
 }
 
@@ -204,6 +201,8 @@ export const  DevicesProvider = ({children}: Props)=>{
                 subscriberFn(client,`devices/${device.id}/sensors/#`);
                 subscriberFn(client,`devices/${device.id}/actuators/#`);  
                 
+                const sensor = device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))
+                const modified = sensor?.time;
                
                 return{
                     ...device,
@@ -214,7 +213,7 @@ export const  DevicesProvider = ({children}: Props)=>{
                     tds: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterpollutantsensor'))?.value,
                     temp: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterthermometer'))?.value,
                     isSelect: false,
-                    on: isActiveDevice(device.modified),
+                    on: isActiveDevice(modified),
                     notifications: device.meta.notifications.messages,
                 }
             }));
@@ -277,7 +276,7 @@ export const  DevicesProvider = ({children}: Props)=>{
     //     })
     // }
     client.on('connect', ()=>{
-        console.log("Connected to devices");
+        console.log("MQTT Connected");
     });
     useEffect(()=>{
         setLoading(true)

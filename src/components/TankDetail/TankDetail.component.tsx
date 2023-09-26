@@ -2,10 +2,10 @@ import {Stack,Box, styled, Switch, Typography} from '@mui/material';
 import {FireHydrantAlt, WaterDrop, DeviceThermostatSharp, AutoAwesome, DeviceThermostat, Opacity } from "@mui/icons-material";
 import WatertankComponent from '../WaterTank/Watertank.component';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import MapComponent from '../MapComponent/Map.component';
 import FrameSVG from '../../assets/not-found.svg';
-import { Actuator, } from '../../context/devices.context';
+import { Actuator, DevicesContext, X, } from '../../context/devices.context';
 import axios from 'axios';
 
 type Consumption = {
@@ -13,6 +13,7 @@ type Consumption = {
     y: number,
 }
 import Chart from 'react-apexcharts';
+import { postNewNotificationMessage } from '../../utils/consumptionHelper';
 // import { postNewNotificationMessage } from '../../utils/consumptionHelper';
 
 type Props={
@@ -84,7 +85,9 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
 	const [toggleHot, setToggleHot] = useState(false);
     const [temperatureConsumption, setTemperatureConsumption] = useState<Consumption[]>([]);
     const [pumpStatus, setPumpStatus] = useState(false);
-    // const {devices} = useContext(DevicesContext);
+    const {devices} = useContext(DevicesContext);    
+    const device = devices.find((device: X) => device.id === id);
+
     // const [isalert, setAlert] = useState(false);
 
     const apexChartOptions = {
@@ -130,7 +133,14 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
     async function switchActuator(){
         if(actuator && toggleActuator){
             await toggleActuator(id);
-            setPumpStatus(!pumpStatus);
+            const pumpUpdate = !pumpStatus
+            setPumpStatus(!pumpUpdate);
+            if (pumpUpdate===true){
+                postNewNotificationMessage(id, devices,`Pump turned ON! Tank, ${device?.name}`, "LOW")                                                                                  ;
+            } else if (pumpUpdate===false) {
+                postNewNotificationMessage(id, devices,`Pump turned OFF! Tank, ${device?.name}`, "LOW")                                                                                  ;
+            }
+            
         }
     }
 
