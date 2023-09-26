@@ -1,7 +1,9 @@
 import axios from "axios";
 import {ReactNode, createContext, useEffect, useState,} from "react";
 import mqtt from "precompiled-mqtt";
-const brokerUrl = `mqtt://wazigate.local`; //localhost:8081
+// const brokerUrl = `mqtt://wazigate.local`;
+const brokerUrl = `mqtt://localhost`;
+
 type Props={
     children: ReactNode
 }
@@ -16,6 +18,8 @@ export type Sensor={
     id: string,
     kind: string,
     meta: {
+        critical_min: number;
+        critical_max: number;
         kind: string
     },
     modified: Date,
@@ -189,7 +193,6 @@ export const  DevicesProvider = ({children}: Props)=>{
             });
             const consumption = await Promise.all(devicePromises);
 
-            console.log('Devices all promises is: ',consumption)
             return {
                 consumption: consumption as Consumption[],
                 res: response.data,

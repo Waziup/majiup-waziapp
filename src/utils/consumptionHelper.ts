@@ -59,18 +59,25 @@ export async function getConsumption(deviceId: string, tankHeight: number, tankC
 export const getLiters = (waterLevel: number, tankHeight: number, tankCapacity: number) => {
     return Math.round(((tankHeight-waterLevel) / tankHeight) * tankCapacity);
 }
-export const postNewNotificationMessage = async (deviceId: string,devices: X[], message: string) => {
+export const postNewNotificationMessage = async (deviceId: string, devices: X[], message: string, priority: string) => {
     const tank = devices.find((device: X) => device.id === deviceId);
+    const notificationPriority = priority;
+    
     if (tank) {
+        // Initialize messages as an empty array if it's null
+        const prevMessages = tank.meta.notifications.messages || [];
+        console.log(prevMessages)
         const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${deviceId}/meta`, {
             ...tank.meta,
             notifications: {
                 ...tank.meta.notifications,
                 messages: [
-                    ...tank.meta.notifications.messages,
+                    ...prevMessages, // Use the initialized messages array
                     {
-                        id: tank.meta.notifications.messages.length + 1,
+                        id: prevMessages.length + 1,
                         message,
+                        priority: notificationPriority,
+                        tank_name: tank.name,
                         timestamp: new Date().toLocaleTimeString(),
                         read_status: false
                     }
@@ -80,6 +87,7 @@ export const postNewNotificationMessage = async (deviceId: string,devices: X[], 
         return response;
     }
 }
+
 export const markMessageAsRead = async (deviceId: string,devices: X[], messageId: string) => {
     const tank = devices.find((device: X) => device.id === deviceId);
     if (tank) {

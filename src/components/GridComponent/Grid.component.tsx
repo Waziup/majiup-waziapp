@@ -13,7 +13,7 @@ import FrameSVG from '../../assets/frame.svg';
 import { DeviceThermostatSharp, MoreVert, WaterDrop } from "@mui/icons-material";
 import WatertankComponent from "../WaterTank/Watertank.component";
 import axios from "axios";
-import { getLiters } from "../../utils/consumptionHelper";
+import { getLiters, postNewNotificationMessage } from "../../utils/consumptionHelper";
 
 /** 
  * ToDo
@@ -43,18 +43,67 @@ function GridComponent() {
     const navigate = useNavigate();
     client.on('message', (topic, message) => { 
         const topicArr = topic.split('/');
-        console.log('Devices length: ',devices.length)
-        console.log('message received', topicArr.includes('sensors'), message.toString())
+        // console.log('message received', topicArr.includes('sensors'), message.toString())
         if(topicArr.includes('sensors') &&(devices.length>0 )){
-            const arr = topic.split('/');
+            // const arr = topic.split('/');
             // console.log(filteredDevices);
             const device =devices.find((device:Device)=>device.id === topicArr[1]);
             if(device){
-                console.log(arr,device)
                 const sensorV = device.sensors.find((sensor:Sensor)=>sensor.id === topicArr[3]);
                 if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterLevel'.toLowerCase())){
+                    console.log('Water level sensor')
                     const liters = getLiters(parseInt(message.toString()),device.meta.settings.height, device.meta.settings.capacity);
                     device.liters = liters;
+
+                    const maxSensor = sensorV.meta.critical_max;
+                    const minSensor = sensorV.meta.critical_min;
+                    const pumpStatus = (device.actuators[0].value)
+                                       
+                    // Generate notifiction for extreme water levels
+                    if (liters >= maxSensor) {
+                        // If pump is on
+                        const pumpStatus = (device.actuators[0].value)
+                        if (pumpStatus === 1){ 
+                            postNewNotificationMessage(device.id, devices, `${device.name} almost full, turning pump OFF`, "HIGH")                                                      
+                            alert(`${device.name} almost full, turning off pump`)
+                            axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/pumps/state`,{
+                                "value": 0,
+                            },{
+                                headers:{
+                                    'Content-Type': 'application/json',
+                                }
+                            }).then(res=>{
+                                console.log(res.data)
+                                "Pump Turned OFF"
+                            }).catch(err=>{
+                                console.log("Failed to Turn OFF",err)
+                            })
+                        }
+                    }
+                    else if (liters <= minSensor){
+                        // If pump is off
+                        postNewNotificationMessage(device.id, devices, `${device.name} almost empty, turning pump ON`, "HIGH")                                                      
+                        // alert(`${device.name} almost empty, starting pump`)                        
+                        console.log(pumpStatus)
+                        if (pumpStatus === 0){                            
+                            alert(`${device.name} almost empty, turning on pump`);
+                            
+                            axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/pumps/state`,{
+                                "value": 1,
+                            },{
+                                headers:{
+                                    'Content-Type': 'application/json',
+                                }
+                            }).then(res=>{
+                                console.log(res.data)
+                                "Pump Turned ON"
+                            }).catch(err=>{
+                                console.log("Failed to Turn OFF",err)
+                            });
+                            return;
+                        }
+                    }
+
                     device.modified = new Date().toISOString();
                     device.on=true;
                     const date = new Date();
@@ -64,15 +113,42 @@ function GridComponent() {
                     });
                     setTanks([...devices]);
                 }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
-                    console.log('It is a pollutant sensor')
+                    console.log('Pollutant sensor')
                     device.modified = new Date().toISOString();
-                    device.on=true;
+                    device.on=true;   
+                    
+                    const maxSensor = sensorV.meta.critical_max;
+                    
+
+                    if (parseInt(message.toString()) >= maxSensor){
+                        postNewNotificationMessage(device.id, devices,`Poor water quality detected in ${device.name}`, "HIGH")                                                      
+                        alert(`Poor water quality detected in ${device.name}`);
+                        return;
+                    }                    
+                                       
                     setTanks([...devices]);
+                    
                 }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterThermometer'.toLowerCase())){
-                    console.log('It is a water thermometer');
+                    console.log('Water thermometer');
                     device.temp = parseInt(message.toString());
                     device.modified = new Date().toISOString();
                     device.on=true;
+
+                    const maxSensor = sensorV.meta.critical_max;
+                    const minSensor = sensorV.meta.critical_min;
+
+                    if (parseInt(message.toString())>= maxSensor) {
+                        postNewNotificationMessage(device.id, devices,`Extreme hot temperatures, check ${device.name}`, "HIGH")                                                                      
+                        alert(`Extreme hot temperatures, check ${device.name}`);
+                        return;
+                    }
+
+                    else if (parseInt(message.toString())<=minSensor) {
+                        postNewNotificationMessage(device.id, devices,`Extreme cold temperatures in ${device.name}`, "HIGH")                                                                      
+                        alert(`Extreme cold temperatures in ${device.name}`);
+                        return;
+                    }
+
                     setTanks([...devices]);
                 }else{
                     device.on=true;
@@ -90,7 +166,7 @@ function GridComponent() {
                 }
                 device.meta = metaField;
             }
-            navigate('/dashboard');
+            // navigate('/dashboard');
         }
     })
     const handleSelectedTank = (tank: Device) => {
@@ -263,9 +339,7 @@ function GridComponent() {
                                         consumption={selectedDevice.consumption}
                                         actuator={selectedDevice.actuators}
                                         height={selectedDevice.height}
-                                        capacity={selectedDevice.capacity}
-                                        maxalert={0}
-                                        minalert={0}
+                                        capacity={selectedDevice.capacity}                                       
                                         toggleActuator={toogleActuatorHandler}
                                         receiveNotifications={selectedDevice.meta.receivenotifications}
                                     />
