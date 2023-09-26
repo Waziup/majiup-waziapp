@@ -1,7 +1,7 @@
 import axios from "axios";
 import {ReactNode, createContext, useEffect, useState,} from "react";
 import mqtt from "precompiled-mqtt";
-const brokerUrl = `mqtt://localhost`; //localhost:8081
+const brokerUrl = `mqtt://wazigate.local`; //localhost:8081
 type Props={
     children: ReactNode
 }
