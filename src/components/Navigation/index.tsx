@@ -28,9 +28,9 @@ function NavigationIndex({matches}:Props) {
             return;
         }
     }, [user]);
-    const totalNotifications =devices.length >0 ?devices.reduce((acc,dev)=>{
+    const totalNotifications = devices.length >0 ?devices.reduce((acc,dev)=>{
         if(dev.notifications){
-            console.log('notification',dev.notifications)
+            // console.log('notification',dev.notifications)
             return acc + dev.meta.notifications.messages.length;
         }
         return acc;

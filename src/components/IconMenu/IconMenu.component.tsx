@@ -6,6 +6,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import Fade from '@mui/material/Fade';
 import { Message } from '@mui/icons-material';
 import { markMessageAsRead } from '../../utils/consumptionHelper';
+import {NotificationsNone} from '@mui/icons-material';
 interface Props {
     isOpen: boolean;
     anchorEl: null | HTMLElement;
@@ -56,20 +57,41 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
                     <ListItemText>Notifications</ListItemText>
                 </div>
             </MenuItem>
-            <div style={{fontSize: 12,borderTop: '1px solid black', width: 200, padding: '10px' }}>
+            <div style={{fontSize: 14, borderTop: '1px solid black', width: '30rem', padding: '10px', wordSpacing:'2px',maxHeight:350, overflowY:'scroll',}}>
                 {
                     devices.length >0? devices.map((dev)=>{
                         if(dev.notifications){
-                            return dev.meta.notifications.messages.map((not, i)=>{
+                            return dev.meta.notifications.messages.map((notification, i)=>{
                                 return (
-                                    <Box key={i} sx={{display: 'flex',padding: '9px', justifyContent: 'space-between', alignItems: 'centre'}}>
-                                        <span key={i} style={{marginRight: 5}}>{not.message}</span>
-                                        {
-                                            !not.read_status&&(
-                                                <span onClick={()=>handleReadNotification(dev.id,not.id)} style={{marginLeft: 5,cursor: 'pointer', fontSize: 10, color: 'blue'}}>{not.read_status?'':'MARK AS READ'}</span>
-                                            )
-                                        }
-                                    </Box>
+                                    <Box sx={{display:'flex', alignItems:'center',overflow:'hidden'}}>
+                                        <NotificationsNone sx={{color:'#E46B26'}} />
+                                        <Box key={i} sx={{display: 'flex', flexDirection:'column', padding: '9px', justifyContent: 'space-between', alignItems: 'centre', lineHeight:1.5, borderBottom:'solid 1px',marginBottom:'2px', }}>                                        
+                                            <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:'5px'}}>
+                                                <strong>{notification.tank_name}</strong>
+                                                {/* {
+                                                    notification.priority === 'HIGH'?
+                                                    <article>Priority: <span style={{color:'red'}}>{notification.priority}</span></article>:
+                                                    <article>Priority: <span style={{color:'#E46B26'}}>{notification.priority}</span></article>                                                
+                                                } */}
+                                                <article>{notification.time}</article>
+                                            </div>
+                                            <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:'5px'}}>                                            
+                                                <article>{notification.message}</article>
+                                                {
+                                                    !notification.read_status?
+                                                    <article style={{color:'#E46B26', cursor:'pointer', fontSize:12, width:'fit-content'}}>Mark as Read</article>:''
+                                                }
+                                            </div>
+                                        </Box>
+                                    </Box>                                    
+                                    // <Box key={i} sx={{display: 'flex',padding: '9px', justifyContent: 'space-between', alignItems: 'centre'}}>                                        
+                                    //     <span key={i} style={{marginRight: 5}}>{not.message}</span>
+                                    //     {
+                                    //         !not.read_status&&(
+                                    //             <span onClick={()=>handleReadNotification(dev.id,not.id)} style={{marginLeft: 5,cursor: 'pointer', color: 'blue'}}>{not.read_status?'':'MARK AS READ'}</span>
+                                    //         )
+                                    //     }
+                                    // </Box>
                                 )
                             })
                         }

@@ -39,10 +39,12 @@ export type Actuator={
     value: number,
 }
 export type Notification={
-    id: string,
+    tank_name: string;
+    id: any,
     message: string,
     read_status: boolean
-    timestamp: string
+    time: string
+    priority: string,
 }
 export type MetaInformation={
     receivenotifications: boolean,
