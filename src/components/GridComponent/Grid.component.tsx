@@ -64,44 +64,18 @@ function GridComponent() {
                         // If pump is on
                         const pumpStatus = (device.actuators[0].value)
                         if (pumpStatus === 1){ 
-                            postNewNotificationMessage(device.id, devices, `Tank almost full, turning pump OFF`, "HIGH")                                                      
-                            alert(`${device.name} almost full, turning off pump`)
-                            axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/pumps/state`,{
-                                "value": 0,
-                            },{
-                                headers:{
-                                    'Content-Type': 'application/json',
-                                }
-                            })
-                            // .then(res=>{
-                            //     console.log(res.data)
-                            //     "Pump Turned OFF"
-                            // }).catch(err=>{
-                            //     console.log("Failed to Turn OFF",err)
-                            // })
+                            postNewNotificationMessage(device.id, devices, `Tank almost full, turning pump OFF`, "HIGH")                                                                              
+                            toogleActuatorHandler(device.id)
+                            
+                            return                            
                         }
                     }
                     else if (liters <= minSensor){
                         // If pump is off
-                        postNewNotificationMessage(device.id, devices, `Tank almost empty, turning pump ON`, "HIGH")                                                      
-                        alert(`${device.name} almost empty, starting pump`)                        
                         if (pumpStatus === 0){                            
-                            alert(`Tank almost empty, turning on pump`);
-                            
-                            axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/pumps/state`,{
-                                "value": 1,
-                            },{
-                                headers:{
-                                    'Content-Type': 'application/json',
-                                }
-                            })
-                            // .then(res=>{
-                            //     console.log(res.data)
-                            //     "Pump Turned ON"
-                            // }).catch(err=>{
-                            //     console.log("Failed to Turn OFF",err)
-                            // });
-                            return;
+                            postNewNotificationMessage(device.id, devices, `Tank almost empty, turning pump ON`, "HIGH")                                                      
+                            toogleActuatorHandler(device.id)   
+                            return                            
                         }
                     }
 
@@ -123,7 +97,6 @@ function GridComponent() {
 
                     if (parseInt(message.toString()) >= maxSensor){
                         postNewNotificationMessage(device.id, devices,`Poor water quality detected`, "HIGH")                                                      
-                        // alert(`Poor water quality detected in ${device.name}`);
                         return;
                     }                    
                                        
@@ -145,7 +118,6 @@ function GridComponent() {
 
                     else if (parseInt(message.toString())<=minSensor) {
                         postNewNotificationMessage(device.id, devices,`Extreme cold temperatures`, "HIGH")                                                                      
-                        alert(`Extreme cold temperatures`);
                         return;
                     }
 

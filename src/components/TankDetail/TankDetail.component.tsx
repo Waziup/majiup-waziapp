@@ -134,11 +134,13 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
         if(actuator && toggleActuator){
             await toggleActuator(id);
             const pumpUpdate = !pumpStatus
-            setPumpStatus(!pumpUpdate);
+            setPumpStatus(pumpUpdate);
             if (pumpUpdate===true){
                 postNewNotificationMessage(id, devices,`Pump turned ON! Tank, ${device?.name}`, "LOW")                                                                                  ;
+                alert(`Pump turned ON! Tank, ${device?.name}`);
             } else if (pumpUpdate===false) {
                 postNewNotificationMessage(id, devices,`Pump turned OFF! Tank, ${device?.name}`, "LOW")                                                                                  ;
+                alert(`Pump turned OFF! Tank, ${device?.name}`);
             }
             
         }
