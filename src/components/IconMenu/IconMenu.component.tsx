@@ -5,7 +5,7 @@ import { DevicesContext } from '../../context/devices.context';
 import {Link, useNavigate} from 'react-router-dom';
 import Fade from '@mui/material/Fade';
 import { Message } from '@mui/icons-material';
-import { markMessageAsRead } from '../../utils/consumptionHelper';
+// import { markMessageAsRead } from '../../utils/consumptionHelper';
 import {NotificationsNone} from '@mui/icons-material';
 interface Props {
     isOpen: boolean;
@@ -20,10 +20,10 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
         navigate('/');
         handleClose();
     }
-    async function handleReadNotification(deviceId: string,messageId: string){
-        const response = await markMessageAsRead(deviceId,devices,messageId);
-        console.log('Response for read message', response)
-    }
+    // async function handleReadNotification(deviceId: string,messageId: string){
+    //     const response = await markMessageAsRead(deviceId,devices,messageId);
+    //     console.log('Response for read message', response)
+    // }
     return (
         <Menu 
             TransitionComponent={Fade} 

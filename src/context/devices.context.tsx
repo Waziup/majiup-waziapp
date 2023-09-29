@@ -36,7 +36,7 @@ export type Actuator={
     modified: Date,
     name: string,
     time: Date | null,
-    value: number,
+    value: boolean,
 }
 export type Notification={
     tank_name: string;

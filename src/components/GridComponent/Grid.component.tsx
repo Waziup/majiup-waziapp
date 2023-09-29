@@ -42,7 +42,7 @@ function GridComponent() {
     const { isOpenNav,loading, devices,setTanks, setSelectedDevice, selectedDevice } = useContext(DevicesContext)
     const navigate = useNavigate();
     
-    client.on('message', (topic, message) => { 
+    client.on('message', (topic, message) => {
         const topicArr = topic.split('/');
         // console.log('message received', topicArr.includes('sensors'), message.toString())
         if(topicArr.includes('sensors') &&(devices.length>0 )){
@@ -54,6 +54,14 @@ function GridComponent() {
                 if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterLevel'.toLowerCase())){
                     const liters = getLiters(parseInt(message.toString()),device.meta.settings.height, device.meta.settings.capacity);
                     device.liters = liters;
+                    device.on=true;                    
+                    const date = new Date();
+                    device.consumption.push({
+                        x: parseFloat((date.getHours() + (date.getMinutes()/60)).toFixed(2)),
+                        y: liters,
+                    });  
+                    
+                    setTanks([...devices]);
 
                     const maxSensor = sensorV.meta.critical_max;
                     const minSensor = sensorV.meta.critical_min;
@@ -63,50 +71,38 @@ function GridComponent() {
                     if (liters >= maxSensor) {
                         // If pump is on
                         const pumpStatus = (device.actuators[0].value)
-                        if (pumpStatus === 1){ 
+                        if (pumpStatus === true){ 
                             postNewNotificationMessage(device.id, devices, `Tank almost full, turning pump OFF`, "HIGH")                                                                              
-                            toogleActuatorHandler(device.id)
-                            
+                            toogleActuatorHandler(device.id)                                                       
                             return                            
                         }
                     }
                     else if (liters <= minSensor){
                         // If pump is off
-                        if (pumpStatus === 0){                            
+                        if (pumpStatus === false){                            
                             postNewNotificationMessage(device.id, devices, `Tank almost empty, turning pump ON`, "HIGH")                                                      
-                            toogleActuatorHandler(device.id)   
+                            toogleActuatorHandler(device.id)                               
                             return                            
                         }
                     }
-
-                    // device.modified = new Date().toISOString();
-                    device.on=true;
-                    const date = new Date();
-                    device.consumption.push({
-                        x: parseFloat((date.getHours() + (date.getMinutes()/60)).toFixed(2)),
-                        y: liters,
-                    });
-                    setTanks([...devices]);
-                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){
-                    // console.log('Pollutant sensor')
-                    // device.modified = new Date().toISOString();
-                    device.on=true;   
                     
-                    const maxSensor = sensorV.meta.critical_max;
-                    
+                }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterPollutantSensor'.toLowerCase())){                    
+                    device.on=true;                      
+                    setTanks([...devices]);                                        
+                    const maxSensor = sensorV.meta.critical_max;                    
 
                     if (parseInt(message.toString()) >= maxSensor){
                         postNewNotificationMessage(device.id, devices,`Poor water quality detected`, "HIGH")                                                      
                         return;
                     }                    
-                                       
-                    setTanks([...devices]);
-                    
+                                                           
                 }else if(sensorV && sensorV.meta.kind.toLowerCase().includes('WaterThermometer'.toLowerCase())){
                     // console.log('Water thermometer');
                     device.temp = parseInt(message.toString());
                     // device.modified = new Date().toISOString();
                     device.on=true;
+
+                    setTanks([...devices]);
 
                     const maxSensor = sensorV.meta.critical_max;
                     const minSensor = sensorV.meta.critical_min;
@@ -121,7 +117,6 @@ function GridComponent() {
                         return;
                     }
 
-                    setTanks([...devices]);
                 }else{
                     device.on=true;
                     // console.log(sensorV?.meta.kind);
@@ -137,8 +132,18 @@ function GridComponent() {
                     ...JSON.parse(message.toString()),
                 }
                 device.meta = metaField;
+                setTanks([...devices]);
             }
             // navigate('/dashboard');
+        } else if (topic.toLowerCase().includes('actuators')){
+            const device = devices.find((device: Device)=>device.id === topic.split('/')[1]);
+            const pumpStatus = message.toString();            
+            if (device) {
+                device.on = true;
+                console.log("Updated....")
+                device.actuators[0].value = Boolean(pumpStatus)
+                setTanks([...devices]);
+            }
         }
     })
     const handleSelectedTank = (tank: Device) => {
@@ -166,10 +171,10 @@ function GridComponent() {
     const matches = useMediaQuery(theme.breakpoints.up('md'));    
     
     async function toogleActuatorHandler(id:string): Promise<boolean> {
-        let currentValue: number;
+        let currentValue: boolean;
         const tank = devices.find((item: Device) => item.id === id);
         if(tank){
-            currentValue = tank.actuators[0].value === 1? 0 : 1;
+            currentValue = tank.actuators[0].value === true? false : true;
             await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/pumps/state`,{
                 "value": currentValue,
             },{

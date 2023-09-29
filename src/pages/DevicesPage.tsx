@@ -13,10 +13,10 @@ function DevicesPage() {
     const navigate = useNavigate();
     const tdsValue= data.state.tds;
     async function toogleActuatorHandler(id:string) {
-        let currentValue: number;
+        let currentValue: boolean;
         const tank = devices.find((item: Device) => item.id === id);
         if(tank){
-            currentValue = tank.actuators[0].value === 1? 0 : 1;
+            currentValue = tank.actuators[0].value === true? false : true;
             await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/pumps/state`,{
                 "value": currentValue,
             },{
@@ -46,9 +46,7 @@ function DevicesPage() {
                     consumption={data.state.consumption}
                     height={data.state.height}
                     capacity={data.state.capacity}
-                    id={data.state.id}
-                    maxalert={data.state.meta.settings.maxalert}
-                    minalert={data.state.meta.settings.minalert}
+                    id={data.state.id}                    
                     toggleActuator={toogleActuatorHandler}
                     receiveNotifications={data.state.meta.receiveNotifications?? false}
                 />

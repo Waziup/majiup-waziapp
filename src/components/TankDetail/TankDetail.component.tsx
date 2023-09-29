@@ -14,7 +14,6 @@ type Consumption = {
 }
 import Chart from 'react-apexcharts';
 import { postNewNotificationMessage } from '../../utils/consumptionHelper';
-// import { postNewNotificationMessage } from '../../utils/consumptionHelper';
 
 type Props={
     owner: string,
@@ -28,9 +27,7 @@ type Props={
     capacity: number,
     toggleActuator?: (id: string) => Promise<boolean>,
     id: string,
-    receiveNotifications: boolean,
-    // maxalert: number,
-    // minalert: number
+    receiveNotifications: boolean,    
 }
 
 export const Android12Switch = styled(Switch)(({ theme }) => ({
@@ -156,7 +153,7 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
 
     useEffect(()=>{
         const actuatorValue = actuator!== undefined? actuator[0].value: false;
-        return actuatorValue ===0? setPumpStatus(false): setPumpStatus(true);
+        return actuatorValue ===false? setPumpStatus(false): setPumpStatus(true);
     },[actuator])
 
     useEffect(()=>{
