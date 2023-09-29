@@ -66,7 +66,6 @@ export const postNewNotificationMessage = async (deviceId: string, devices: X[],
     if (tank) {
         // Initialize messages as an empty array if it's null
         const prevMessages = tank.meta.notifications.messages || [];
-        console.log(prevMessages)
         const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tanks/${deviceId}/meta`, {
             ...tank.meta,
             notifications: {
