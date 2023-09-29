@@ -22,7 +22,6 @@ function ItemCardComponent({name,modified, amount,temp,isOn,}: Props) {
         const now = new Date();
         const timeDifference = now.getTime() - date.getTime();
         // Define time intervals in milliseconds
-        console.log(timeDifference)
         const minute = 60 * 1000;
         const hour = minute * 60;
         const day = hour * 24;
