@@ -7,6 +7,9 @@ import { Android12Switch } from '../components/TankDetail/TankDetail.component';
 import { useOutletContext } from 'react-router-dom';
 import { X as Device } from '../context/devices.context';
 import axios from 'axios';
+import { TbAlertHexagon } from 'react-icons/tb';
+import { MdModeEdit, MdSensors } from 'react-icons/md';
+import { ImSwitch } from 'react-icons/im';
 // import { useNavigate, } from 'react-router-dom';
 /*
 josee Musya10:30AM
@@ -20,9 +23,12 @@ josee Musya10:30AM
 const BoxStyle: SxProps<Theme> ={ 
     bgcolor: "#fff", 
     borderRadius: "10px",
-    mt:3,
-    width:'30%',
-    minWidth: '300px',
+    mt:1,
+    width:'38%',
+    minWidth: '35%',
+    minHeight: '30rem',
+    overflowY:'auto',
+    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)'
 }
 const ModalContainer : SxProps<Theme>={
 	bgcolor: '#fff',
@@ -174,11 +180,7 @@ function SettingsPage() {
                 ...changedMetaInfo.metaData,
                 settings:{
                     capacity: parseFloat(changedMetaInfo.metaData.settings.capacity.toString()),
-                    height: parseFloat(changedMetaInfo.metaData.settings.height.toString()),
-                    // maxalert: parseFloat(changedMetaInfo.metaData.settings.maxalert.toString()),
-                    // minalert: parseFloat(changedMetaInfo.metaData.settings.minalert.toString()),
-                    // radius: parseFloat(changedMetaInfo.metaData.settings.radius.toString()),
-                    // width: parseFloat(changedMetaInfo.metaData.settings.width.toString()),
+                    height: parseFloat(changedMetaInfo.metaData.settings.height.toString()),                
                 },
                 receivenotifications: changedMetaInfo.metaData.receivenotifications,
                 notifications:{...selectedDevice?.meta.notifications}
@@ -213,16 +215,13 @@ function SettingsPage() {
         });
     }
     return (
-        <Box pl={2} pr={2}>
-            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <h3 style={{fontSize: '24px',fontWeight:'500',margin:'10px 0'}}>Device{devices.length>1?'s':''} Settings</h3>
-            </Box>
+        <Box pl={2} pr={2}>            
             <Modal open={isOpenModal}
                 onClose={()=>setIsOpenModal(!isOpenModal)}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description">
                     <Box sx={matches?{...ModalContainer}:{...ModalContainer, maxHeight: '80vh', overflowY: 'scroll', minWidth:'80vw'}}>
-                        <h1 style={boldText}>Edit Information</h1>
+                        <h1 style={boldText}>Edit Tank</h1>
                         <form onSubmit={handeleSubmit} style={{width:'90%', alignItems:'center'}}>
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
                                 <Box mb={2}>
@@ -346,68 +345,94 @@ function SettingsPage() {
                     devices.map((device,id)=>(
                         <Stack key={id} p={1} sx={BoxStyle} alignItems={'center'} flexWrap='wrap'  direction='column' alignContent={'center'} spacing={2}>
                             <Stack  width={'100%'} direction='row' justifyContent={'space-between'}>
-                                <h3 style={{fontSize: '20px',fontWeight:'normal' }}>
+                                <h3 style={{fontSize: '20px',fontWeight:'bold', color:'black', lineHeight:1.5 }}>
                                     {device.name}
                                     <p style={{color: '#888992',fontWeight: 'lighter',textAlign: 'center', fontSize: 12}}>{device.id}</p>
                                 </h3>
-                                <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                    <Android12Switch checked={device.on}/>
-                                    <MoreVert sx={{cursor:'pointer'}} onClick={(e)=>handleSelectedTank(e,device)}/>
+                                <Box sx={{display: 'flex',}}>
+                                    {/* <Android12Switch checked={device.on}/> */}
+                                    <MdModeEdit size={23} style={{cursor:'pointer',}} onClick={(e: any)=>handleSelectedTank(e,device)}/>
                                 </Box>
                             </Stack>
-                            <Box p={1} sx={{border: '1px solid #ccc', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px',fontWeight:'400'}}>
-                                    Tank Information
-                                </h3>
-                                <Box p={1} sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                            <Box p={1} sx={{border: '1px solid #ccc', borderRadius: 1, width: '100%'}}>                                
+                                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', lineHeight:1.8}}>
                                     <Box>
-                                        <h3 style={{fontSize: '16px',fontWeight: '200', }}>Capacity </h3>
-                                        <p style={{fontSize: '16px',fontWeight: '200'}}>Height</p>
+                                        <article >Capacity </article>
+                                        <article>Height</article>
                                     </Box>
                                     <Box>
-                                        <h3 style={{fontSize: '16px',fontWeight: 'normal', }}>
+                                        <article>
                                             {device.capacity}
-                                            <span> litres</span>
-                                        </h3>
-                                        <p style={{fontSize: '16px',}}>
+                                            <span> Ltrs</span>
+                                        </article>
+                                        <p>
                                             {device.height}
-                                            <span>cm</span>
+                                            <span> mm</span>
                                         </p>
                                     </Box>
                                 </Box>
                             </Box>
-                            <Box  p={1} sx={{border: '1px solid #CCC', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px',fontWeight:'400', margin:'10px 0'}}>
-                                    SENSORS
-                                </h3>
+                            <Box  sx={{width: '100%', display:'flex', flexDirection:'column', gap:1.5}}>
+                                <Box sx={{display:'flex', alignItems:'center', gap:1}}>
+                                    <MdSensors size={23}/>
+                                    <strong style={{color:'#E46B26'}}>
+                                        Sensors
+                                    </strong>
+                                </Box>
+                                {
+                                    (device.sensors?.length > 0)?'':
+                                    <Box sx={{display:'flex', alignItems:'center', gap:1}}>
+                                        <TbAlertHexagon size={23} />
+                                        <small>No sensors connected</small>
+                                    </Box>
+                                }
                                 {
                                     device.sensors?.map((sensor,idx)=>(
-                                        <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
-                                            <h3 style={{fontSize: '13px',margin:'5px 0',fontWeight:'200' }}>
-                                                {sensor.name}
-                                            </h3>
+                                        <Box key={idx} width={'100%'} lineHeight={1.8}>
                                             <Box>
-                                                {/* <p>Edit</p> */}
-                                                {/* <Edit sx={{cursor:'pointer', color:'#14AE5D', fontSize:'18px'}} /> */}
-                                                {/* <Delete sx={{cursor:'pointer', color:'#F00', fontSize:'18px'}}/> */}
-                                                {/* <p>Delete</p> */}
-                                            </Box>
-                                        </Stack>
+                                                <article>
+                                                    {sensor.name}
+                                                </article>
+                                            </Box>    
+                                            <Box sx={{display:'flex',justifyContent:'space-between', borderBottom:'solid 1px gray'}}>
+                                                <small>Max Alert: {sensor.meta.critical_max}</small>
+                                                <small>Min Alert: {sensor.meta.critical_min}</small> 
+                                                {
+                                                    sensor.meta.kind === 'WaterLevel' && <small>Ltrs</small>
+                                                }
+                                                {
+                                                    sensor.meta.kind === 'WaterThermometer' && <small>Deg</small>
+                                                }
+                                                {
+                                                    sensor.meta.kind === 'WaterPollutantSensor' && <small>PPM</small>
+                                                }
+                                                <span></span>
+                                            </Box>  
+                                        </Box>
                                     ))
                                 } 
                                 
                             </Box>
-                            <Box  p={1} sx={{border: '1px solid #CCC', borderRadius: 1, width: '100%'}}>
-                                <h3 style={{fontSize: '18px', fontWeight:'400', margin:'10px 0'}}>
-                                    ACTUATORS
-                                </h3>
+                            <Box sx={{width: '100%', display:'flex', flexDirection:'column', gap:1.5}}>
+                                <Box sx={{display:'flex', alignItems:'center', gap:1}}>
+                                    <ImSwitch size={23} />
+                                    <strong style={{color:'#E46B26'}}>
+                                        Pumps
+                                    </strong>
+                                </Box>
+                                {
+                                    (device.actuators?.length > 0)?'':
+                                    <Box sx={{display:'flex', alignItems:'center', gap:1}}>
+                                        <TbAlertHexagon size={23} />
+                                        <small>No pumps connected</small>
+                                    </Box>                                    
+                                }
                                 {
                                     device.actuators?.map((actuator,idx)=>(
                                         <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
-                                            <h3 style={{fontSize: '13px',margin:'5px 0',fontWeight:'200' }}>
+                                            <h3 style={{fontSize: '13px',fontWeight:'200' }}>
                                                 {actuator.name}
-                                            </h3>
-                                            
+                                            </h3>                                            
                                         </Stack>
                                     ))
                                 } 

@@ -12,6 +12,7 @@ type Props = {
 }
 import TankSVG from '../../assets/tank.svg'
 import { useNavigate } from 'react-router-dom';
+import { TbAlertHexagon } from 'react-icons/tb';
 const COMMON_P={
     fontSize: '14px',
     paddingTop: '10px',
@@ -96,10 +97,15 @@ function ItemCardComponent({name,modified, amount,temp,isOn,}: Props) {
                     <h3 style={
                         isOn?{fontSize: '16px', color: '#85ea2d'}:{fontSize: '16px', color: '#888992'}
                     }>{
-                        lastSeen? (isOn?'Active':`${lastSeen}`):<h3 style={{fontSize:'16px', color:'red', cursor:'pointer'}} onClick={handleNavigate}>Finish Setup</h3>
+                        lastSeen? (isOn?'Active':`${lastSeen}`):
+                        <Box sx={{display:'flex', alignItems:'center', gap:1}}>
+                            <TbAlertHexagon size={23} color='#E46B26'/>
+                            <h3 style={{fontSize:'14px', color:'#E46B26', cursor:'pointer'}} onClick={handleNavigate}>Finish Setup</h3>
+                        </Box>                        
                     }</h3>
                     {
                     (
+                        lastSeen &&
                         <>
                             <p style={COMMON_P}>{amount} Ltrs</p>
                             <p style={COMMON_P}>{temp}&#8451;</p>

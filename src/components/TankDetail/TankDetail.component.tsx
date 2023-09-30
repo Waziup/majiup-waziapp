@@ -152,8 +152,9 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
     // },[devices,minalert,maxalert,height,id])
 
     useEffect(()=>{
-        const actuatorValue = actuator!== undefined? actuator[0].value: false;
-        return actuatorValue ===false? setPumpStatus(false): setPumpStatus(true);
+        const actuatorValue = actuator!== undefined? actuator[0]?.value: false;
+        return actuatorValue ===false? setPumpStatus(false): setPumpStatus(true);        
+        
     },[actuator])
 
     useEffect(()=>{
@@ -341,7 +342,7 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
                                 {owner}
                             </h3> */}
                             <Box sx={{width: '100%'}} component='img' src={FrameSVG}/>
-                            <p style={{color: 'red',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No readings detected for this device!</p>
+                            <p style={{color: 'red',fontWeight: '600',textAlign: 'center', fontSize: 16}}>No readings detected for this tank!</p>
                         </Box>
                     </Box>
                 )
