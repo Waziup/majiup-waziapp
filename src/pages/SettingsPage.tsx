@@ -1,4 +1,4 @@
-import { Delete, MoreVert, SaveAlt } from '@mui/icons-material';
+import { Delete, SaveAlt } from '@mui/icons-material';
 import { Box, Modal, Stack, SxProps, Theme, } from '@mui/material';
 import FrameSVG from '../assets/frame.svg';
 import React, { useContext, useState } from 'react';
