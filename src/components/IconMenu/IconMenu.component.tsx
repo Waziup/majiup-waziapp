@@ -119,7 +119,7 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
                                 const formattedDateTime = `${formattedTime}, ${formattedDate}`;
 
                                 return (
-                                    <Box key={i} sx={{display:'flex', alignItems:'center',minWidth:'100%',overflow:'hidden', borderBottom:'solid 1px'}}>
+                                    <Box key={i} sx={{display:'flex', alignItems:'center',minWidth:'100%',overflow:'hidden', borderBottom:'solid 1px gray'}}>
                                         <NotificationsNone sx={{color:'#E46B26'}} />
                                         <Box key={i} sx={{display: 'flex', flexDirection:'column', width:'100%',padding: '9px', justifyContent: 'space-between', alignItems: 'centre', lineHeight:1.6,marginBottom:'2px', }}>                                        
                                             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:'5px'}}>
