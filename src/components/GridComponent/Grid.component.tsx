@@ -262,7 +262,7 @@ function GridComponent() {
                                     handleOpen={handleOpen}
                                     open={open}
                                     temp={tank.temp}
-                                    modified={tank.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))?.time}
+                                    modified={tank.sensors?.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))?.time}
                                 />
                             </Box>
                         ):(

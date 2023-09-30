@@ -294,7 +294,7 @@ function SettingsPage() {
                             <h4 style={InputLabel}>Sensors</h4>
                             <Box sx={{display:'flex',alignItems: 'center', justifyContent: 'space-evenly'}}>
                                 {
-                                    selectedDevice?.sensors.map((sensor,id)=>(
+                                    selectedDevice?.sensors?.map((sensor,id)=>(
                                         <p key={id} style={inputbox1} className="input_box" >{sensor.name}</p>
                                     ))
                                 }
@@ -302,7 +302,7 @@ function SettingsPage() {
                             <h4 style={InputLabel}>Actuators</h4>
                             <Box sx={{display:'flex',alignItems: 'center', }}>
                                 {
-                                    selectedDevice?.actuators.map((actuator,id)=>(
+                                    selectedDevice?.actuators?.map((actuator,id)=>(
                                         <p key={id} style={inputbox1} className="input_box" >{actuator.name}</p>
                                     ))
                                 }
@@ -381,7 +381,7 @@ function SettingsPage() {
                                     SENSORS
                                 </h3>
                                 {
-                                    device.sensors.map((sensor,idx)=>(
+                                    device.sensors?.map((sensor,idx)=>(
                                         <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
                                             <h3 style={{fontSize: '13px',margin:'5px 0',fontWeight:'200' }}>
                                                 {sensor.name}
@@ -402,7 +402,7 @@ function SettingsPage() {
                                     ACTUATORS
                                 </h3>
                                 {
-                                    device.actuators.map((actuator,idx)=>(
+                                    device.actuators?.map((actuator,idx)=>(
                                         <Stack key={idx} width={'100%'} direction='row'  alignItems={'center'} justifyContent={'space-between'}>
                                             <h3 style={{fontSize: '13px',margin:'5px 0',fontWeight:'200' }}>
                                                 {actuator.name}

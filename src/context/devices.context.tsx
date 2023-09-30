@@ -166,28 +166,30 @@ export const  DevicesProvider = ({children}: Props)=>{
         })
         .then(async (response)=>{
             const devicePromises = response.data.map(async (device:Device) => {
-                const sensorResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/tank-sensors/waterlevel/values`, {
-                    headers: {
-                        'Accept': 'application/json',
-                    }
-                });
-                                   
-                const plotVals = sensorResponse.data?.waterLevels.map((val: { timestamp: any; liters: any; })=>{
-                    const date = new Date(val.timestamp)
-                    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'];
-
-                    const dayOfWeek = daysOfWeek[date.getUTCDay()];
-
-                    const hours = String(date.getUTCHours()).padStart(2, '0');
-
-                    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-                    return {
-                        x: (`${dayOfWeek}, ${hours}:${minutes}`),
-                        y: val.liters
-                    }
-                })
-
-                return plotVals
+                if (device.sensors) {
+                    const sensorResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/tank-sensors/waterlevel/values`, {
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    });
+                                       
+                    const plotVals = sensorResponse.data?.waterLevels?.map((val: { timestamp: any; liters: any; })=>{
+                        const date = new Date(val.timestamp)
+                        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'];
+    
+                        const dayOfWeek = daysOfWeek[date.getUTCDay()];
+    
+                        const hours = String(date.getUTCHours()).padStart(2, '0');
+    
+                        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                        return {
+                            x: (`${dayOfWeek}, ${hours}:${minutes}`),
+                            y: val.liters
+                        }
+                    })
+    
+                    return plotVals
+                }                
                 
             });
             const consumption = await Promise.all(devicePromises);
@@ -201,23 +203,23 @@ export const  DevicesProvider = ({children}: Props)=>{
             setDevices(res.map(function(device: X, index:number){
                 subscriberFn(client,`devices/${device.id}/meta/#`);
                 subscriberFn(client,`devices/${device.id}/sensors/#`);
-                subscriberFn(client,`devices/${device.id}/actuators/#`);  
-                
-                const sensor = device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))
+                subscriberFn(client,`devices/${device.id}/actuators/#`);
+
+                const sensor = device.sensors?.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))
                 const modified = sensor?.time;
-               
+            
                 return{
                     ...device,
-                    capacity: device.meta.settings.capacity,
-                    height: Math.round(device.meta.settings.height),
+                    capacity: device.meta?.settings.capacity,
+                    height: Math.round(device.meta?.settings.height),
                     consumption: consumption[index],
-                    liters: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))?.value,
-                    tds: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterpollutantsensor'))?.value,
-                    temp: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterthermometer'))?.value,
+                    liters: device.sensors?.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))?.value,
+                    tds: device.sensors?.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterpollutantsensor'))?.value,
+                    temp: device.sensors?.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterthermometer'))?.value,
                     isSelect: false,
                     on: isActiveDevice(modified),
-                    notifications: device.meta.notifications.messages,
-                }
+                    notifications: device.meta?.notifications.messages,
+                }                                
             }));
             setLoading(false);
         })

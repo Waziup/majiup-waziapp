@@ -113,7 +113,7 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
                 curve: 'smooth'
             },
             xaxis: {
-                categories: temperatureConsumption.map((item)=>item.x),
+                categories: temperatureConsumption?.map((item)=>item.x),
             },
             fill: {
                 type: "gradient",
@@ -312,7 +312,7 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
                                     width:2,
                                 },
                                 xaxis: {
-                                    categories: temperatureConsumption.map((item)=>item.x),
+                                    categories: temperatureConsumption?.map((item)=>item.x),
                                 },
                                 fill: {
                                     type: "gradient",

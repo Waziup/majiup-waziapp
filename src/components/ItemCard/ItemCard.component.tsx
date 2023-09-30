@@ -11,11 +11,18 @@ type Props = {
     modified: any
 }
 import TankSVG from '../../assets/tank.svg'
+import { useNavigate } from 'react-router-dom';
 const COMMON_P={
     fontSize: '14px',
     paddingTop: '10px',
 }
 function ItemCardComponent({name,modified, amount,temp,isOn,}: Props) {
+
+    const navigate = useNavigate();
+
+    const handleNavigate = () => {
+        navigate('/settings')
+    }
 
     const getLastSeen = () => {     
         const date = new Date(modified);
@@ -48,10 +55,12 @@ function ItemCardComponent({name,modified, amount,temp,isOn,}: Props) {
         } else if (timeDifference < year) {
             const monthsAgo = Math.floor(timeDifference / month);
             return `${monthsAgo} ${monthsAgo === 1 ? 'month' : 'months'} ago`;
-        } else {
+        } else if (timeDifference > year) {
             const yearsAgo = Math.floor(timeDifference / year);
             return `${yearsAgo} ${yearsAgo === 1 ? 'year' : 'years'} ago`;
-        }    
+        } else {
+            return false
+        }   
     }   
     
     const lastSeen = getLastSeen();
@@ -87,7 +96,7 @@ function ItemCardComponent({name,modified, amount,temp,isOn,}: Props) {
                     <h3 style={
                         isOn?{fontSize: '16px', color: '#85ea2d'}:{fontSize: '16px', color: '#888992'}
                     }>{
-                        isOn?'Active':`${lastSeen}`
+                        lastSeen? (isOn?'Active':`${lastSeen}`):<h3 style={{fontSize:'16px', color:'red', cursor:'pointer'}} onClick={handleNavigate}>Finish Setup</h3>
                     }</h3>
                     {
                     (
