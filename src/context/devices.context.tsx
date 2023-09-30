@@ -43,7 +43,7 @@ export type Notification={
     id: any,
     message: string,
     read_status: boolean
-    time: string
+    time: Date
     priority: string,
 }
 export type MetaInformation={

@@ -139,8 +139,7 @@ function GridComponent() {
             const device = devices.find((device: Device)=>device.id === topic.split('/')[1]);
             const pumpStatus = message.toString();            
             if (device) {
-                device.on = true;
-                console.log("Updated....")
+                // device.on = true;
                 device.actuators[0].value = Boolean(pumpStatus)
                 setTanks([...devices]);
             }

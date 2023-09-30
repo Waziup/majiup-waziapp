@@ -57,30 +57,81 @@ export default function IconMenuComponent({isOpen, anchorEl, handleClose}:Props)
                     <ListItemText>Notifications</ListItemText>
                 </div>
             </MenuItem>
-            <div style={{fontSize: 14, borderTop: '1px solid black', width: '30rem', padding: '10px', wordSpacing:'2px',maxHeight:350, overflowY:'scroll',}}>
-                {
+            <div style={{fontSize: 14, borderTop: '1px solid black', minWidth:'20rem',maxWidth:'20rem', padding: '2px', wordSpacing:'2px',maxHeight:350, overflowY:'scroll',}}>
+                {                                          
                     devices.length >0? devices.map((dev)=>{
-                        if(dev.notifications){
-                            return dev.meta.notifications.messages.map((notification, i)=>{
+                        if(dev.notifications){  
+
+                            const notifications = [...dev.meta.notifications.messages].reverse() 
+
+                            return notifications.map((notification, i)=>{
+                                // const date = notification.time        
+                                const dateObj = new Date(notification.time);
+                                const currentDate = new Date();
+
+                                // Define an array of month names
+                                const monthNames = [
+                                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                                ];                                
+
+                                // Format the time as HH:mm
+                                const formattedTime = dateObj.toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                                });
+
+                                // Calculate the time difference in milliseconds
+                                const timeDifference = currentDate.getTime() - dateObj.getTime();
+
+                                // Function to check if the difference is greater than a month
+                                function isGreaterThanAMonth(timeDiff: any) {
+                                    const millisecondsPerMonth = 30 * 24 * 60 * 60 * 1000;
+                                    return timeDiff > millisecondsPerMonth;
+                                }
+
+                                // Function to check if the difference is greater than a year
+                                function isGreaterThanAYear(timeDiff: any) {
+                                    const millisecondsPerYear = 365 * 24 * 60 * 60 * 1000;
+                                    return timeDiff > millisecondsPerYear;
+                                }
+
+                                // Format the date with or without the year
+                                let formattedDate;
+                                if (isGreaterThanAYear(timeDifference)) {
+                                    formattedDate = `
+                                    ${monthNames[dateObj.getMonth()]}
+                                    ${dateObj.getFullYear()}
+                                `;
+                                } else if (isGreaterThanAMonth(timeDifference)) {
+                                    formattedDate = `
+                                    ${monthNames[dateObj.getMonth()]}
+                                `;
+                                } else {
+                                    formattedDate = `
+                                    ${dateObj.toLocaleString('en-US', { weekday: 'short' })}
+                                    ${monthNames[dateObj.getMonth()]}
+                                `;
+                                }
+
+                                // Combine the time and date
+                                const formattedDateTime = `${formattedTime}, ${formattedDate}`;
+
                                 return (
-                                    <Box sx={{display:'flex', alignItems:'center',overflow:'hidden'}}>
+                                    <Box key={i} sx={{display:'flex', alignItems:'center',minWidth:'100%',overflow:'hidden', borderBottom:'solid 1px'}}>
                                         <NotificationsNone sx={{color:'#E46B26'}} />
-                                        <Box key={i} sx={{display: 'flex', flexDirection:'column', padding: '9px', justifyContent: 'space-between', alignItems: 'centre', lineHeight:1.5, borderBottom:'solid 1px',marginBottom:'2px', }}>                                        
+                                        <Box key={i} sx={{display: 'flex', flexDirection:'column', width:'100%',padding: '9px', justifyContent: 'space-between', alignItems: 'centre', lineHeight:1.6,marginBottom:'2px', }}>                                        
                                             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:'5px'}}>
-                                                <strong>{notification.tank_name}</strong>
-                                                {/* {
-                                                    notification.priority === 'HIGH'?
-                                                    <article>Priority: <span style={{color:'red'}}>{notification.priority}</span></article>:
-                                                    <article>Priority: <span style={{color:'#E46B26'}}>{notification.priority}</span></article>                                                
-                                                } */}
-                                                <article>{notification.time}</article>
+                                                <strong>{notification.tank_name}</strong>                                                
+                                                <article>{formattedDateTime}</article>
                                             </div>
                                             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:'5px'}}>                                            
                                                 <article>{notification.message}</article>
-                                                {
+                                                {/* {
                                                     !notification.read_status?
                                                     <article style={{color:'#E46B26', cursor:'pointer', fontSize:12, width:'fit-content'}}>Mark as Read</article>:''
-                                                }
+                                                } */}
                                             </div>
                                         </Box>
                                     </Box>                                    

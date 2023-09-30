@@ -77,7 +77,7 @@ export const postNewNotificationMessage = async (deviceId: string, devices: X[],
                         message,
                         priority: notificationPriority,
                         tank_name: tank.name,
-                        timestamp: new Date().toLocaleTimeString(),
+                        time: new Date(),
                         read_status: false
                     }
                 ]
