@@ -133,10 +133,10 @@ function TankDetailComponent({id,capacity, receiveNotifications, waterTemp,water
             const pumpUpdate = !pumpStatus
             setPumpStatus(pumpUpdate);
             if (pumpUpdate===true){
-                postNewNotificationMessage(id, devices,`Pump turned ON! Tank, ${device?.name}`, "LOW")                                                                                  ;
+                postNewNotificationMessage(id, devices,`Pump turned ON! Tank`, "LOW")                                                                                  ;
                 alert(`Pump turned ON! Tank, ${device?.name}`);
             } else if (pumpUpdate===false) {
-                postNewNotificationMessage(id, devices,`Pump turned OFF! Tank, ${device?.name}`, "LOW")                                                                                  ;
+                postNewNotificationMessage(id, devices,`Pump turned OFF! Tank`, "LOW")                                                                                  ;
                 alert(`Pump turned OFF! Tank, ${device?.name}`);
             }
             
