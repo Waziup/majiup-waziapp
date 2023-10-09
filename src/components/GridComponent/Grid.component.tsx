@@ -14,6 +14,7 @@ import { DeviceThermostatSharp, MoreVert, WaterDrop } from "@mui/icons-material"
 import WatertankComponent from "../WaterTank/Watertank.component";
 import axios from "axios";
 import { getLiters, postNewNotificationMessage } from "../../utils/consumptionHelper";
+import Copilot from "../copilot/copilot.component";
 
 /** 
  * ToDo
@@ -325,6 +326,7 @@ function GridComponent() {
                     )
                 }
             </Grid>
+            <Copilot />        
         </Grid>
     );
 }

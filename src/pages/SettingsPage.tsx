@@ -343,7 +343,7 @@ function SettingsPage() {
             <Box sx={matches?{...SensorContainer}:{...SensorContainer,justifyContent:'center'}}>
                 {
                     devices.map((device,id)=>(
-                        <Stack key={id} p={1} sx={BoxStyle} alignItems={'center'} flexWrap='wrap'  direction='column' alignContent={'center'} spacing={2}>
+                        <Stack key={id} p={1} sx={BoxStyle} alignItems={'start'} flexWrap='wrap'  direction='column' alignContent={'center'} spacing={2}>
                             <Stack  width={'100%'} direction='row' justifyContent={'space-between'}>
                                 <h3 style={{fontSize: '20px',fontWeight:'bold', color:'black', lineHeight:1.5 }}>
                                     {device.name}
@@ -395,23 +395,22 @@ function SettingsPage() {
                                                 </article>
                                             </Box>    
                                             <Box sx={{display:'flex',justifyContent:'space-between', borderBottom:'solid 1px gray'}}>
-                                                <small>Max Alert: {sensor.meta.critical_max}</small>
-                                                <small>Min Alert: {sensor.meta.critical_min}</small> 
+                                                <small>Max Alert: {sensor.meta?.critical_max}</small>
+                                                <small>Min Alert: {sensor.meta?.critical_min}</small> 
                                                 {
-                                                    sensor.meta.kind === 'WaterLevel' && <small>Ltrs</small>
+                                                    sensor.meta?.kind === 'WaterLevel' && <small>Ltrs</small>
                                                 }
                                                 {
-                                                    sensor.meta.kind === 'WaterThermometer' && <small>Deg</small>
+                                                    sensor.meta?.kind === 'WaterThermometer' && <small>Deg</small>
                                                 }
                                                 {
-                                                    sensor.meta.kind === 'WaterPollutantSensor' && <small>PPM</small>
+                                                    sensor.meta?.kind === 'WaterPollutantSensor' && <small>PPM</small>
                                                 }
                                                 <span></span>
                                             </Box>  
                                         </Box>
                                     ))
-                                } 
-                                
+                                }                                 
                             </Box>
                             <Box sx={{width: '100%', display:'flex', flexDirection:'column', gap:1.5}}>
                                 <Box sx={{display:'flex', alignItems:'center', gap:1}}>
@@ -435,8 +434,7 @@ function SettingsPage() {
                                             </h3>                                            
                                         </Stack>
                                     ))
-                                } 
-                                
+                                }                                 
                             </Box>
                         </Stack>
                     ))
