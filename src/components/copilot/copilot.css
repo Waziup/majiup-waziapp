@@ -1,0 +1,47 @@
+.loading-styles-0 {
+    width:6px;
+    aspect-ratio:1;
+    background-color:gray;
+    border-radius:2rem;
+    animation: loading 0.5s infinite ease-in-out alternate
+}
+
+.loading-styles-1 {
+    width:6px;
+    aspect-ratio:1;
+    background-color:gray;
+    border-radius:2rem;
+    animation: loading 0.5s infinite 0.1s ease-in-out alternate
+}
+
+.loading-styles-2 {
+    width:6px;
+    aspect-ratio:1;
+    background-color:gray;
+    border-radius:2rem;
+    animation: loading 0.5s infinite 0.2s ease-in-out alternate
+}
+
+@keyframes loading {
+    0% {
+        width: 6px;
+        aspect-ratio:1;
+    } 
+    100% {
+        width: 7px;
+        aspect-ratio:1;
+    }
+}
+  
+.animation-box {
+    display: flex;
+    gap: 1px;
+}
+
+.show {
+    display: inherit;
+}
+
+.hide {
+    display: none;
+}
