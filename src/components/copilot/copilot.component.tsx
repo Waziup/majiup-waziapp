@@ -70,7 +70,7 @@ const Copilot = () => {
         setLoading(true);
 
         try {        
-            const response = await fetch('http://localhost:8081/api/v1/ask-majiup-copilot',{
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/ask-majiup-copilot`,{
                 method:'POST',
                 headers:{
                     // 'Accept': 'application/json',
