@@ -2,14 +2,14 @@ import { Stack, Box, styled, Switch, Typography } from "@mui/material";
 import {
   FireHydrantAlt,
   WaterDrop,
-  DeviceThermostatSharp,
-  AutoAwesome,
-  DeviceThermostat,
+  // DeviceThermostatSharp,
+  // AutoAwesome,
+  // DeviceThermostat,
   Opacity,
 } from "@mui/icons-material";
 import WatertankComponent from "../WaterTank/Watertank.component";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { CSSProperties, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MapComponent from "../MapComponent/Map.component";
 import FrameSVG from "../../assets/not-found.svg";
 import { Actuator, DevicesContext, X } from "../../context/devices.context";
@@ -86,11 +86,13 @@ const BoxStyle: React.CSSProperties = {
 };
 
 const TankDetails: React.CSSProperties = {
-  padding: "6px 20px",
+  padding: "20px",
   margin: "7px 0",
-  width: "45%",
+  width: "100%",
   borderRadius: "10px",
   boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
+  display: "flex",
+  justifyContent: "space-around",
 };
 
 function TankDetailComponent({
@@ -235,9 +237,9 @@ function TankDetailComponent({
     }
   }, [toggleHot]);
 
-  function handleToggleTeemp() {
-    setToggleHot(!toggleHot);
-  }
+  // function handleToggleTeemp() {
+  //   setToggleHot(!toggleHot);
+  // }
 
   const [sendingReq, setSendingReq] = useState(false);
 
@@ -444,17 +446,18 @@ function TankDetailComponent({
             <Box sx={TankDetails}>
               <p
                 style={{
-                  fontSize: "12px",
+                  fontSize: "16px",
                   display: "inline-flex",
                   alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                <WaterDrop style={{ fontSize: 10, color: "#4592F6" }} />
+                <WaterDrop style={{ fontSize: 28, color: "#4592F6" }} />
                 Current Amount
               </p>
               <p style={{ fontSize: "24px" }}>{liters} Ltr</p>
             </Box>
-            <Box sx={TankDetails}>
+            {/* <Box sx={T/ankDetails}>
               <p
                 style={{
                   fontSize: "12px",
@@ -472,8 +475,8 @@ function TankDetailComponent({
                 Temperature
               </p>
               <p style={{ fontSize: "24px" }}>{Math.round(waterTemp)}&#8451;</p>
-            </Box>
-            <Box sx={TankDetails}>
+            </Box> */}
+            {/* <Box sx={TankDetails}>
               <p
                 style={{
                   fontSize: "12px",
@@ -520,7 +523,7 @@ function TankDetailComponent({
                 Water Leakage
               </p>
               <p style={{ fontSize: "24px" }}>No</p>
-            </Box>
+            </Box> */}
           </Stack>
           <Box
             style={{
@@ -529,7 +532,7 @@ function TankDetailComponent({
               display: "flex",
               alignItems: "center",
               gap: "2rem",
-              // justifyContent: "space-between",
+              justifyContent: "space-around",
             }}
           >
             {refill?.status === "In Progress" ? (
@@ -657,7 +660,7 @@ function TankDetailComponent({
                 WATER {toggleHot ? "TEMPERATURE" : "CONSUMPTION"}
               </p>
               <Box
-                onClick={handleToggleTeemp}
+                // onClick={handleToggleTeemp}
                 pt={0.3}
                 bgcolor={"#E8E8E8"}
                 sx={{ borderRadius: "20px", width: "20%", textAlign: "center" }}
@@ -678,7 +681,7 @@ function TankDetailComponent({
                         }
                   }
                 />
-                <DeviceThermostat
+                {/* <DeviceThermostat
                   style={
                     toggleHot
                       ? {
@@ -689,7 +692,7 @@ function TankDetailComponent({
                         }
                       : { color: "#888992", cursor: "pointer" }
                   }
-                />
+                /> */}
               </Box>
             </Box>
             {/* <CanvasJSChart style={{innerHeighteight:'200px'}}  options = {options}/> */}
@@ -710,6 +713,7 @@ function TankDetailComponent({
                 },
                 xaxis: {
                   categories: temperatureConsumption?.map((item) => item.x),
+                  tickAmount: 5,
                 },
                 fill: {
                   type: "gradient",

@@ -110,7 +110,7 @@ function BillingsPage() {
                         },
                         colors:['#4592F6','#00e396'],
                         dataLabels: {
-                            enabled: false
+                            enabled: false,                        
                         },
                         
                         stroke: {
@@ -118,11 +118,12 @@ function BillingsPage() {
                             width: 2,
                         },
                         title: {
-                            // text: 'Water Consumption',
+                            text: 'Water Consumption',
                             align: 'left',
                         },
                         xaxis: {
                             categories: devices[0]?.consumption? devices[0]?.consumption.map((d)=>d.x):[],
+                            tickAmount: 10,
                         },
                     },
                 })
