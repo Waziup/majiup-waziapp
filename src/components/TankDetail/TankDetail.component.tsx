@@ -147,6 +147,7 @@ function TankDetailComponent({
       },
       xaxis: {
         categories: temperatureConsumption?.map((item) => item.x),
+        tickAmount: 10,
       },
       fill: {
         type: "gradient",
