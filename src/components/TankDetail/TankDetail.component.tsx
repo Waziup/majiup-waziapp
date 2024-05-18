@@ -121,7 +121,7 @@ function TankDetailComponent({
   const apexChartOptions = {
     series: [
       {
-        name: "Consumption",
+        name: "Water Consumption",
         data: temperatureConsumption?.map((item) => item.y),
         type: "area",
       },
