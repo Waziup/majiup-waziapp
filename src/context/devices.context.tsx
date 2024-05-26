@@ -44,8 +44,8 @@ export type Notification = {
 };
 
 export type SensorAlert = {
-  critical_min: string;
-  critical_max: string;
+  critical_min: number;
+  critical_max: number;
   kind: string;
 };
 

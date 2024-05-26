@@ -2,17 +2,24 @@ import { Delete, SaveAlt } from "@mui/icons-material";
 import { Box, Modal, Stack, SxProps, Theme } from "@mui/material";
 import FrameSVG from "../assets/frame.svg";
 import React, { useContext, useState } from "react";
-import { DevicesContext, MetaInformation } from "../context/devices.context";
+import {
+  DevicesContext,
+  MetaInformation,
+  Sensor,
+} from "../context/devices.context";
 import { Android12Switch } from "../components/TankDetail/TankDetail.component";
 import { useOutletContext } from "react-router-dom";
 import { X as Device } from "../context/devices.context";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { TbAlertHexagon } from "react-icons/tb";
 import { MdModeEdit, MdSensors } from "react-icons/md";
 import { IoPersonOutline } from "react-icons/io5";
 import { ImSwitch } from "react-icons/im";
 import { Profile } from "../context/devices.context";
 import { SensorAlert } from "../context/devices.context";
+import { CiPhone } from "react-icons/ci";
+import { GoPerson } from "react-icons/go";
+
 // import { useNavigate, } from 'react-router-dom';
 /*
 josee Musya10:30AM
@@ -47,6 +54,8 @@ const ModalContainer: SxProps<Theme> = {
 const InputLabel = {
   fontSize: "16px",
   margin: "10px 0",
+  display: "flex",
+  gap: "0.5rem",
 };
 const SensorContainer: SxProps<Theme> = {
   display: "flex",
@@ -106,12 +115,34 @@ const cancelButtonStyle = {
   outline: "none",
   cursor: "pointer",
 };
+
+const fRow: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "start",
+  gap: "0.5rem",
+};
+const fColumn: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "start",
+  gap: "0.5rem",
+};
+
 function SettingsPage() {
   const { devices, setTanks } = useContext(DevicesContext);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [selectedDevice, setSelectedDevice] = useState<Device>();
   const [matches] = useOutletContext<[matches: boolean]>();
+  const [deviceUpdated, setDeviceUpdated] = useState<boolean>(false);
+
   // const navigate = useNavigate();
+  const DefaultAlerts: SensorAlert = {
+    critical_min: 0,
+    critical_max: 0,
+    kind: "",
+  };
+
   const Alt = {
     location: { latitude: 0, longitude: 0 },
     notifications: selectedDevice?.notifications
@@ -131,13 +162,14 @@ function SettingsPage() {
   };
   const [changedMetaInfo, setChangedMetaInfo] = useState<{
     name: string;
-    waterlevelSensorAlert: SensorAlert | undefined;
+    waterlevelSensorAlert: SensorAlert;
     metaData: MetaInformation;
   }>({
     name: selectedDevice?.name ?? "",
-    waterlevelSensorAlert: selectedDevice?.sensors.find(
-      (sensor) => sensor.meta.kind === "WaterLevel"
-    )?.meta,
+    waterlevelSensorAlert:
+      selectedDevice?.sensors.find(
+        (sensor) => sensor.meta.kind === "WaterLevel"
+      )?.meta ?? DefaultAlerts,
     metaData: selectedDevice?.meta ?? Alt,
   });
 
@@ -151,9 +183,9 @@ function SettingsPage() {
     setChangedMetaInfo({
       name: device.name,
       metaData: device.meta,
-      waterlevelSensorAlert: device.sensors.find(
-        (sensor) => sensor.meta.kind === "WaterLevel"
-      )?.meta,
+      waterlevelSensorAlert:
+        device.sensors.find((sensor) => sensor.meta.kind === "WaterLevel")
+          ?.meta ?? DefaultAlerts,
     });
     setIsOpenModal(true);
   };
@@ -169,12 +201,25 @@ function SettingsPage() {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/tanks/${id}`);
       setTanks(devices.filter((device: Device) => device.id !== id));
       setIsOpenModal(false);
+      setDeviceUpdated(false);
       setSelectedDevice(undefined);
       // navigate('/dashboard');
       //refresh the page
     }
   };
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (
+      changedMetaInfo.metaData !== selectedDevice?.meta ||
+      changedMetaInfo.name !== selectedDevice.name ||
+      changedMetaInfo.waterlevelSensorAlert !==
+        selectedDevice.sensors.find((sensor) => sensor.kind === "WaterLevel")
+          ?.meta
+    ) {
+      setDeviceUpdated(true);
+    } else {
+      setDeviceUpdated(false);
+    }
+
     if (e.target.name === "name") {
       setChangedMetaInfo({
         ...changedMetaInfo,
@@ -182,54 +227,50 @@ function SettingsPage() {
       });
       return;
     } else if (e.target.name === "max_alert") {
-      console.log(changedMetaInfo.waterlevelSensorAlert?.critical_max);
-      setChangedMetaInfo((prev) => ({
-        ...prev,
-        waterlevelSensorAlert: {
-          ...pre,
-        } as SensorAlert,
-      }));
-      // setChangedMetaInfo({
-      //   ...changedMetaInfo,
-      //   waterlevelSensorAlert: {
-      //     ...(changedMetaInfo.waterlevelSensorAlert as SensorAlert),
-      //     critical_max: "99",
-      //   },
-      // });
+      e.target.value &&
+        setChangedMetaInfo({
+          ...changedMetaInfo,
+          waterlevelSensorAlert: {
+            ...changedMetaInfo.waterlevelSensorAlert,
+            critical_max: parseInt(e.target.value),
+          },
+        });
     } else if (e.target.name === "min_alert") {
+      e.target.value &&
+        setChangedMetaInfo({
+          ...changedMetaInfo,
+          waterlevelSensorAlert: {
+            ...changedMetaInfo.waterlevelSensorAlert,
+            critical_min: parseInt(e.target.value),
+          },
+        });
+    } else {
       setChangedMetaInfo({
         ...changedMetaInfo,
-        waterlevelSensorAlert: {
-          ...(changedMetaInfo.waterlevelSensorAlert as SensorAlert),
-          critical_min: e.target.value,
+        metaData: {
+          ...changedMetaInfo.metaData,
+          settings: {
+            ...changedMetaInfo.metaData.settings,
+            [e.target.name]: e.target.value,
+          },
+          profile: {
+            ...changedMetaInfo.metaData.profile,
+            [e.target.name]: e.target.value,
+          },
         },
       });
     }
-
-    setChangedMetaInfo({
-      ...changedMetaInfo,
-      metaData: {
-        ...changedMetaInfo.metaData,
-        settings: {
-          ...changedMetaInfo.metaData.settings,
-          [e.target.name]: e.target.value,
-        },
-        profile: {
-          ...changedMetaInfo.metaData.profile,
-          [e.target.name]: e.target.value,
-        },
-      },
-    });
   }
   async function handeleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const promises: any = [];
     // const rs = confirm(
     //   `Are you sure you want to save changes to ${changedMetaInfo.name}?`
     // );
 
     if (true) {
       if (selectedDevice?.name !== changedMetaInfo.name) {
-        await axios.post(
+        const nameUpdate = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/tanks/${
             selectedDevice?.id
           }/name`,
@@ -240,15 +281,22 @@ function SettingsPage() {
             },
           }
         );
+        promises.push(nameUpdate);
       }
 
       if (
         selectedDevice?.sensors.find(
           (sensor) => sensor.meta.kind === "WaterLevel"
-        )?.meta === changedMetaInfo.waterlevelSensorAlert
+        )?.meta !== changedMetaInfo.waterlevelSensorAlert &&
+        selectedDevice
       ) {
-        console.log("Update sensor: ");
-        console.log(changedMetaInfo.waterlevelSensorAlert);
+        const sensorUpdate = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/tanks/${
+            selectedDevice.id
+          }/tank-sensors/waterlevel/alerts`,
+          changedMetaInfo.waterlevelSensorAlert
+        );
+        promises.push(sensorUpdate);
       }
 
       const responseMetaData = await axios.post(
@@ -270,14 +318,25 @@ function SettingsPage() {
           profile: changedMetaInfo.metaData.profile,
         }
       );
-      Promise.all([responseMetaData])
+      promises.push(responseMetaData);
+
+      Promise.all(promises)
         .then(() => {
           const device = devices.find(
             (device) => device.id === selectedDevice?.id
           );
+          const waterlevelSensorPresent = device?.sensors.find(
+            (sensor) => sensor.meta.kind === "WaterLevel"
+          ) as Sensor;
+
           if (device) {
             device.meta = changedMetaInfo.metaData;
             device.name = changedMetaInfo.name;
+            if (waterlevelSensorPresent) {
+              waterlevelSensorPresent.meta =
+                changedMetaInfo.waterlevelSensorAlert;
+            }
+
             setTanks([...devices]);
             setSelectedDevice(undefined);
             setIsOpenModal(false);
@@ -289,7 +348,8 @@ function SettingsPage() {
         .catch(() => {
           setIsOpenModal(false);
           setSelectedDevice(undefined);
-        });
+        })
+        .finally(() => setDeviceUpdated(false));
     }
   }
   function handleToggle(e: React.ChangeEvent<HTMLInputElement>) {
@@ -399,31 +459,50 @@ function SettingsPage() {
                   placeholder={"Enter Height"}
                 />
               </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "1rem",
+              }}
+              mt={2}
+            >
               <Box>
-                <h4 style={InputLabel}>Max Alert</h4>
+                <h4 style={InputLabel}>
+                  Water filled alert <small>(%)</small>
+                </h4>
                 <input
                   onChange={handleChange}
                   name={"max_alert"}
                   // value={changedMetaInfo.waterlevelSensorAlert?.critical_max}
                   required
-                  defaultValue={0}
+                  defaultValue={
+                    changedMetaInfo.waterlevelSensorAlert.critical_max
+                  }
                   style={inputbox}
                   className="input_box"
                   type="number"
-                  max={changedMetaInfo.metaData.settings.capacity}
-                  placeholder={"Enter MaxAlert"}
+                  max={100}
+                  // placeholder={"Enter MaxAlert"}
                 />
               </Box>
               <Box>
-                <h4 style={InputLabel}>Min Alert</h4>
+                <h4 style={InputLabel}>
+                  Water low alert <small>(%)</small>
+                </h4>
                 <input
                   onChange={handleChange}
                   name={"min_alert"}
-                  min={0}
+                  // min={0}
+                  max={100}
                   // value={changedMetaInfo.waterlevelSensorAlert?.critical_min}
                   required
                   style={inputbox}
-                  defaultValue={0}
+                  defaultValue={
+                    changedMetaInfo.waterlevelSensorAlert.critical_min
+                  }
                   className="input_box"
                   type="number"
                   placeholder={"Enter Minimum Alert"}
@@ -442,7 +521,6 @@ function SettingsPage() {
                 checked={changedMetaInfo.metaData.receivenotifications}
               />
             </Box>
-
             <Box>
               <strong>Tank User Profile</strong>
               <Box
@@ -516,16 +594,20 @@ function SettingsPage() {
                 justifyContent: "space-between",
               }}
             >
-              <button type="submit" style={ButtonStyle} className="button">
-                <SaveAlt sx={{ cursor: "pointer" }} />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={() => setIsOpenModal(!isOpenModal)}
-                style={cancelButtonStyle}
-              >
-                Cancel
-              </button>
+              {deviceUpdated && (
+                <>
+                  <button type="submit" style={ButtonStyle} className="button">
+                    <SaveAlt sx={{ cursor: "pointer" }} />
+                    <span>Save</span>
+                  </button>
+                  <button
+                    onClick={() => setIsOpenModal(!isOpenModal)}
+                    style={cancelButtonStyle}
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
             </Box>
             <Box
               sx={{
@@ -624,7 +706,11 @@ function SettingsPage() {
             </Stack>
             <Box
               p={1}
-              sx={{ border: "1px solid #ccc", borderRadius: 1, width: "100%" }}
+              sx={{
+                borderRadius: 1,
+                width: "100%",
+                backgroundColor: "#fafafa",
+              }}
             >
               <Box
                 sx={{
@@ -640,8 +726,8 @@ function SettingsPage() {
                 </Box>
                 <Box>
                   <article>
-                    {device.capacity}
-                    <span> Ltrs</span>
+                    {device.meta.settings.capacity}
+                    <span> Liters</span>
                   </article>
                   <p>
                     {device.height}
@@ -650,28 +736,58 @@ function SettingsPage() {
                 </Box>
               </Box>
             </Box>
-            <Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IoPersonOutline size={20} />
-                <strong style={{ color: "#E46B26" }}>Profile</strong>
+            {device.meta.profile.first_name &&
+            device.meta.profile.last_name &&
+            device.meta.profile.phone ? (
+              <Box sx={{ width: "100%" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <IoPersonOutline size={20} />
+                  <strong style={{ color: "#E46B26" }}>Profile</strong>
+                </Box>
+                <Box
+                  sx={{
+                    mt: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: "0.5rem",
+                    borderRadius: "4px",
+                    width: "100%",
+                    position: "inherit",
+                    gap: 1,
+                    backgroundColor: "#fafafa",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {device.meta.profile.username && (
+                    <Box>
+                      <small>@{device.meta.profile.username}</small>
+                    </Box>
+                  )}
+                  <Box sx={fRow}>
+                    <GoPerson />
+                    <small>
+                      {device.meta.profile.first_name +
+                        " " +
+                        device.meta.profile.last_name}
+                    </small>
+                  </Box>
+                  <Box sx={fRow}>
+                    <CiPhone />
+                    <small>{device.meta.profile.phone}</small>
+                  </Box>
+                </Box>
               </Box>
-              <Box
-                sx={{
-                  mt: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 1,
-                }}
-              >
-                <article>@{device.meta.profile.username}</article>
-                <article>
-                  {device.meta.profile.first_name +
-                    " " +
-                    device.meta.profile.last_name}
-                </article>
-                <article>{device.meta.profile.phone}</article>
-              </Box>
-            </Box>
+            ) : (
+              <small style={{ color: "orange" }}>
+                User profile not configured!
+              </small>
+            )}
             <Box
               sx={{
                 width: "100%",
@@ -689,7 +805,9 @@ function SettingsPage() {
               ) : (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <TbAlertHexagon size={23} />
-                  <small>No sensors connected</small>
+                  <small style={{ color: "orange" }}>
+                    No sensors connected
+                  </small>
                 </Box>
               )}
 
@@ -698,19 +816,26 @@ function SettingsPage() {
                 ?.map((sensor, idx) => (
                   <Box key={idx} width={"100%"} lineHeight={1.8}>
                     <Box>
-                      <article>{sensor.name}</article>
+                      <small>{sensor.name}</small>
+                      {sensor.meta.critical_max === 0 &&
+                        sensor.meta.critical_min === 0 && (
+                          <small style={{ color: "orange" }}>
+                            {sensor.name} alerts not configured properly
+                          </small>
+                        )}
                     </Box>
                     <Box
                       sx={{
                         display: "flex",
                         justifyContent: "space-between",
+                        backgroundColor: "#fafafa",
+                        padding: "0.5rem",
+                        borderRadius: "4px",
                       }}
                     >
-                      <small>Max Alert: {sensor.meta?.critical_max}</small>
-                      <small>Min Alert: {sensor.meta?.critical_min}</small>
-                      {sensor.meta?.kind === "WaterLevel" && (
-                        <small>Ltrs</small>
-                      )}
+                      <small>Max Alert: {sensor.meta?.critical_max}% </small>
+                      <small>Min Alert: {sensor.meta?.critical_min}%</small>
+                      {sensor.meta?.kind === "WaterLevel" && <small></small>}
                       {sensor.meta?.kind === "WaterThermometer" && (
                         <small>Deg</small>
                       )}
@@ -738,7 +863,7 @@ function SettingsPage() {
               ) : (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <TbAlertHexagon size={23} />
-                  <small>No pumps connected</small>
+                  <small style={{ color: "orange" }}>No pumps connected</small>
                 </Box>
               )}
               {device.actuators?.map((actuator, idx) => (
