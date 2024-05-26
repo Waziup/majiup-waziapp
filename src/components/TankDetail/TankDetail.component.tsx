@@ -387,6 +387,7 @@ function TankDetailComponent({
       alignContent={"center"}
       spacing={2}
     >
+      <strong style={{ padding: "1rem" }}>{device?.name}</strong>
       {consumption?.length || (waterQuality && waterTemp) ? (
         <>
           {/* <h3 style={{display: 'inline-block'}}>{owner}</h3> */}
@@ -400,7 +401,7 @@ function TankDetailComponent({
             //     </Box>
             // ):(null)
           }
-          {(actuator?.length as number) > 0 ? (
+          {(actuator?.length as number) > 0 && (
             <Box
               sx={{
                 display: "flex",
@@ -430,8 +431,6 @@ function TankDetailComponent({
                 sx={{ color: "#FF5C00" }}
               />
             </Box>
-          ) : (
-            <Typography>No actuator device.</Typography>
           )}
           <WatertankComponent
             waterQuality={waterQuality}

@@ -34,9 +34,6 @@ const BoxStyle: SxProps<Theme> = {
   bgcolor: "#fff",
   borderRadius: "10px",
   mt: 1,
-  width: "38%",
-  minWidth: "35%",
-  minHeight: "30rem",
   overflowY: "auto",
   boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
 };
@@ -58,10 +55,9 @@ const InputLabel = {
   gap: "0.5rem",
 };
 const SensorContainer: SxProps<Theme> = {
-  display: "flex",
-  justifyContent: "space-evenly",
-  alignItems: "center",
-  flexWrap: "wrap",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(18rem, 1fr))",
+  gap: "1.5rem",
 };
 const boldText: React.CSSProperties = {
   fontSize: "16px",
@@ -522,7 +518,9 @@ function SettingsPage() {
               />
             </Box>
             <Box>
-              <strong>Tank User Profile</strong>
+              <Box sx={{ display: "flex", gap: "1rem" }}>
+                <strong>Tank User Profile</strong>
+              </Box>
               <Box
                 sx={{
                   display: "flex",
@@ -552,6 +550,16 @@ function SettingsPage() {
                   placeholder="Last name"
                 />
                 <input
+                  name={"username"}
+                  style={inputbox}
+                  type="text"
+                  onChange={handleChange}
+                  // value={changedMetaInfo.metaData.profile.last_name}
+                  defaultValue={changedMetaInfo.metaData.profile.username}
+                  placeholder="Username"
+                  required
+                />
+                <input
                   name={"phone"}
                   style={inputbox}
                   type="text"
@@ -559,6 +567,7 @@ function SettingsPage() {
                   // value={changedMetaInfo.metaData.profile.phone}
                   defaultValue={changedMetaInfo.metaData.profile.phone}
                   placeholder="Phone"
+                  required
                 />
               </Box>
             </Box>
@@ -652,13 +661,7 @@ function SettingsPage() {
           </Box>
         </Box>
       )}
-      <Box
-        sx={
-          matches
-            ? { ...SensorContainer }
-            : { ...SensorContainer, justifyContent: "center" }
-        }
-      >
+      <Box sx={matches ? { ...SensorContainer } : { ...SensorContainer }}>
         {devices.map((device, id) => (
           <Stack
             key={id}
@@ -669,6 +672,7 @@ function SettingsPage() {
             direction="column"
             alignContent={"center"}
             spacing={2}
+            maxWidth="22rem"
           >
             <Stack
               width={"100%"}
@@ -750,6 +754,11 @@ function SettingsPage() {
                   <IoPersonOutline size={20} />
                   <strong style={{ color: "#E46B26" }}>Profile</strong>
                 </Box>
+                {!device.meta.profile.username && (
+                  <small style={{ color: "orange" }}>
+                    Please add username to your tank
+                  </small>
+                )}
                 <Box
                   sx={{
                     mt: 2,
@@ -820,6 +829,7 @@ function SettingsPage() {
                       {sensor.meta.critical_max === 0 &&
                         sensor.meta.critical_min === 0 && (
                           <small style={{ color: "orange" }}>
+                            {" - "}
                             {sensor.name} alerts not configured properly
                           </small>
                         )}
@@ -846,7 +856,7 @@ function SettingsPage() {
                   </Box>
                 ))}
             </Box>
-            <Box
+            {/* <Box
               sx={{
                 width: "100%",
                 display: "flex",
@@ -854,10 +864,6 @@ function SettingsPage() {
                 gap: 1.5,
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <ImSwitch size={23} />
-                <strong style={{ color: "#E46B26" }}>Pumps</strong>
-              </Box>
               {device.actuators?.length > 0 ? (
                 ""
               ) : (
@@ -879,7 +885,7 @@ function SettingsPage() {
                   </h3>
                 </Stack>
               ))}
-            </Box>
+            </Box> */}
           </Stack>
         ))}
       </Box>

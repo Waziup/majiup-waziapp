@@ -99,7 +99,7 @@ function NavigationIndex({ matches }: Props) {
           >
             <Box sx={{ position: "relative" }}>
               <NotificationsNone
-                sx={{ fontWeight: "light", fontSize: "20px", color: "#000" }}
+                sx={{ fontWeight: "light", fontSize: "28px", color: "#000" }}
               />
               <Box
                 sx={{
@@ -136,9 +136,7 @@ function NavigationIndex({ matches }: Props) {
                 name={user.name}
                 src='"https://mui.com/static/images/avatar/1.jpg"'
               />
-              <p style={{ fontSize: "15px", fontWeight: "normal" }}>
-                Admin Wazigate
-              </p>
+              <p style={{ fontSize: "15px", fontWeight: "normal" }}>Wazigate</p>
               <Box component="img" src={ArrowDropDownSVG} />
             </Box>
           </Box>
