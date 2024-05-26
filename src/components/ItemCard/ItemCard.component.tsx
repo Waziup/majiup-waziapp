@@ -99,6 +99,7 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
             <Box>
               <h3 style={{ fontSize: "20px", fontWeight: "normal" }}>{name}</h3>
               <p style={COMMON_P}>Quantity</p>
+              <p style={COMMON_P}>Days to refill</p>
               {/* <p style={COMMON_P} >Temperature:</p> */}
             </Box>
           }
@@ -134,18 +135,34 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
             )}
           </h3>
           {lastSeen && (
-            <>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignSelf: "flex-end",
+              }}
+            >
               <p
                 style={{
                   float: "inline-end",
                   paddingTop: "16px",
                   fontSize: "18px",
+                  alignSelf: "flex-end",
                 }}
               >
-                {amount} Ltrs
+                {amount} Litres
               </p>
-              {/* <p style={COMMON_P}>{temp}&#8451;</p> */}
-            </>
+              <p
+                style={{
+                  float: "inline-end",
+                  paddingTop: "16px",
+                  fontSize: "18px",
+                  alignSelf: "flex-end",
+                }}
+              >
+                8 Days
+              </p>
+            </Box>
           )}
           {/* <p style={{fontSize: '14px', color: '#E46B26'}}>{amount}</p> */}
           {/* <p style={{fontSize: '14px', color: '#E46B26'}}>{temp}&#8451;</p> */}
