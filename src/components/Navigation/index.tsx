@@ -1,13 +1,12 @@
 import * as React from "react";
 import { Box } from "@mui/material";
 import SearchComponent from "./Search.component";
-import { WaterDrop, NotificationsNone, Search } from "@mui/icons-material";
+import { NotificationsNone, Search } from "@mui/icons-material";
 import ArrowDropDownSVG from "../../assets/arrow_drop_down.svg";
 import { useContext } from "react";
 import { DevicesContext } from "../../context/devices.context";
 import IconMenuComponent from "../IconMenu/IconMenu.component";
 import { redirect } from "react-router-dom";
-import AvatarComponent from "../AvatarComponent/Avatar.component";
 import logo from "../../assets/imgs/logo.png";
 
 type Props = {
@@ -132,10 +131,6 @@ function NavigationIndex({ matches }: Props) {
                 height: "100%",
               }}
             >
-              <AvatarComponent
-                name={user.name}
-                src='"https://mui.com/static/images/avatar/1.jpg"'
-              />
               <p style={{ fontSize: "15px", fontWeight: "normal" }}>Wazigate</p>
               <Box component="img" src={ArrowDropDownSVG} />
             </Box>
