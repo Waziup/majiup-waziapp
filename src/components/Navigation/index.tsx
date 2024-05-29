@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Box } from "@mui/material";
 import SearchComponent from "./Search.component";
-import { NotificationsNone, Search } from "@mui/icons-material";
+import { NotificationsNone, Search, Wifi } from "@mui/icons-material";
 import ArrowDropDownSVG from "../../assets/arrow_drop_down.svg";
 import { useContext } from "react";
 import { DevicesContext } from "../../context/devices.context";
@@ -13,7 +13,7 @@ type Props = {
   matches: boolean;
 };
 function NavigationIndex({ matches }: Props) {
-  const { user, devices, toggleModal } = useContext(DevicesContext);
+  const { user, devices, connected, toggleModal } = useContext(DevicesContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const isOpen = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -60,12 +60,12 @@ function NavigationIndex({ matches }: Props) {
           />
         </Box>
         {/* <WaterDrop style={{ fontSize: "calc(20px + 1vw)", color: "#4592F6" }} /> */}
-        <h1 style={{ fontSize: "calc(20px + 1vw)", fontWeight: "normal" }}>
+        <h1 style={{ fontSize: "calc(20px + 1vw)", fontWeight: "bold" }}>
           Majiup
         </h1>
       </Box>
       {matches && (
-        <Box sx={matches ? { width: "60%" } : { width: "60%" }}>
+        <Box sx={matches ? { width: "50%" } : { width: "60%" }}>
           <SearchComponent />
         </Box>
       )}
@@ -82,6 +82,27 @@ function NavigationIndex({ matches }: Props) {
           </h3>
         </Box>
       )}
+
+      {
+        <Box
+          sx={{ display: "flex", alignItems: "center", position: "relative" }}
+          title={`${connected ? "Connected" : "No access to internet"}`}
+        >
+          {!connected && (
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: "-10%",
+                right: "0%",
+                color: "red",
+              }}
+            >
+              <small>x</small>
+            </Box>
+          )}
+          <Wifi color={connected ? "success" : "action"} />
+        </Box>
+      }
       {matches && (
         <>
           <Box

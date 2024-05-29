@@ -35,7 +35,7 @@ export default function ProfilePage() {
     width: "40rem",
     // maxWidth: "40rem",
     borderRadius: "4px",
-    boxShadow: "0 0 4px gray",
+    boxShadow: "0 0 10px #a7a7a7",
     position: "relative",
     overflow: "hidden",
   };
@@ -255,7 +255,7 @@ export default function ProfilePage() {
           <Box
             sx={{
               position: "absolute",
-              right: "2%",
+              right: "0%",
               top: "2%",
               cursor: "pointer",
             }}
@@ -269,7 +269,8 @@ export default function ProfilePage() {
             sx={{
               ...fRow,
               alignItems: "center",
-              backgroundColor: "gray",
+              backgroundColor: "#EDEDED",
+              borderBottom: "solid 1px #EBF3FB",
               width: "100%",
               padding: "1rem",
             }}

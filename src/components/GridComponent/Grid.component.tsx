@@ -72,6 +72,7 @@ function GridComponent() {
     if (topicArr.includes("sensors") && devices.length > 0) {
       // const arr = topic.split('/');
       // console.log(filteredDevices);
+      const val: { value: string } = JSON.parse(message.toString());
       const device = devices.find(
         (device: Device) => device.id === topicArr[1]
       );
@@ -84,7 +85,7 @@ function GridComponent() {
           sensorV.meta.kind.toLowerCase().includes("WaterLevel".toLowerCase())
         ) {
           const liters = getLiters(
-            parseInt(message.toString()),
+            val.value,
             device.meta.settings.height,
             device.meta.settings.capacity
           );
@@ -102,34 +103,34 @@ function GridComponent() {
 
           const maxSensor = sensorV.meta.critical_max;
           const minSensor = sensorV.meta.critical_min;
-          const pumpStatus = device.actuators[0].value;
+          // const pumpStatus = device.actuators[0].value;
 
           // Generate notifiction for extreme water levels
           if (liters >= maxSensor) {
             // If pump is on
-            const pumpStatus = device.actuators[0].value;
-            if (pumpStatus === true) {
-              postNewNotificationMessage(
-                device.id,
-                devices,
-                `Tank almost full, turning pump OFF`,
-                "HIGH"
-              );
-              toogleActuatorHandler(device.id);
-              return;
-            }
+            // const pumpStatus = device.actuators[0].value;
+            // if (pumpStatus === true) {
+            //   postNewNotificationMessage(
+            //     device.id,
+            //     devices,
+            //     `Tank almost full, turning pump OFF`,
+            //     "HIGH"
+            //   );
+            //   toogleActuatorHandler(device.id);
+            //   return;
+            // }
           } else if (liters <= minSensor) {
             // If pump is off
-            if (pumpStatus === false) {
-              postNewNotificationMessage(
-                device.id,
-                devices,
-                `Tank almost empty, turning pump ON`,
-                "HIGH"
-              );
-              toogleActuatorHandler(device.id);
-              return;
-            }
+            // if (pumpStatus === false) {
+            //   postNewNotificationMessage(
+            //     device.id,
+            //     devices,
+            //     `Tank almost empty, turning pump ON`,
+            //     "HIGH"
+            //   );
+            //   toogleActuatorHandler(device.id);
+            //   return;
+            // }
           }
         } else if (
           sensorV &&

@@ -167,8 +167,8 @@ function SettingsPage() {
   }>({
     name: selectedDevice?.name ?? "",
     waterlevelSensorAlert:
-      selectedDevice?.sensors.find(
-        (sensor) => sensor.meta.kind === "WaterLevel"
+      selectedDevice?.sensors?.find(
+        (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
       )?.meta ?? DefaultAlerts,
     metaData: selectedDevice?.meta ?? Alt,
   });
@@ -184,8 +184,9 @@ function SettingsPage() {
       name: device.name,
       metaData: device.meta,
       waterlevelSensorAlert:
-        device.sensors.find((sensor) => sensor.meta.kind === "WaterLevel")
-          ?.meta ?? DefaultAlerts,
+        device.sensors?.find(
+          (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+        )?.meta ?? DefaultAlerts,
     });
     setIsOpenModal(true);
   };
@@ -212,8 +213,9 @@ function SettingsPage() {
       changedMetaInfo.metaData !== selectedDevice?.meta ||
       changedMetaInfo.name !== selectedDevice.name ||
       changedMetaInfo.waterlevelSensorAlert !==
-        selectedDevice.sensors.find((sensor) => sensor.kind === "WaterLevel")
-          ?.meta
+        selectedDevice.sensors?.find(
+          (sensor: Sensor) => sensor.kind === "WaterLevel"
+        )?.meta
     ) {
       setDeviceUpdated(true);
     } else {
@@ -293,10 +295,13 @@ function SettingsPage() {
       }
 
       if (
-        selectedDevice?.sensors.find(
+        selectedDevice?.sensors?.find(
           (sensor) => sensor.meta.kind === "WaterLevel"
         )?.meta !== changedMetaInfo.waterlevelSensorAlert &&
-        selectedDevice
+        selectedDevice &&
+        selectedDevice?.sensors?.some?.(
+          (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+        )
       ) {
         const sensorUpdate = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/tanks/${
@@ -340,7 +345,7 @@ function SettingsPage() {
           const device = devices.find(
             (device) => device.id === selectedDevice?.id
           );
-          const waterlevelSensorPresent = device?.sensors.find(
+          const waterlevelSensorPresent = device?.sensors?.find(
             (sensor) => sensor.meta.kind === "WaterLevel"
           ) as Sensor;
 
@@ -522,6 +527,16 @@ function SettingsPage() {
                   className="input_box"
                   type="number"
                   max={100}
+                  disabled={
+                    !selectedDevice?.sensors?.some?.(
+                      (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+                    )
+                  }
+                  title={
+                    `${selectedDevice?.sensors?.some?.(
+                      (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+                    )}` && "No water level sensor!"
+                  }
                   // placeholder={"Enter MaxAlert"}
                 />
               </Box>
@@ -546,6 +561,16 @@ function SettingsPage() {
                   className="input_box"
                   type="number"
                   placeholder={"Enter Minimum Alert"}
+                  disabled={
+                    !selectedDevice?.sensors?.some?.(
+                      (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+                    )
+                  }
+                  title={
+                    `${selectedDevice?.sensors?.some?.(
+                      (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+                    )}` && "No water level sensor!"
+                  }
                 />
               </Box>
             </Box>
@@ -573,9 +598,9 @@ function SettingsPage() {
                 style={inputbox}
                 type="text"
                 onChange={handleChange}
-                required
                 defaultValue={changedMetaInfo.metaData.location.address}
                 placeholder="Address"
+                required
               />
             </Box>
             <Box>
@@ -684,7 +709,7 @@ function SettingsPage() {
                 justifyContent: "space-evenly",
               }}
             >
-              <h4 style={InputLabel}>Delete this device?</h4>
+              <h4 style={InputLabel}>Remove tank?</h4>
               <button
                 onClick={(e) =>
                   deleteAlert(e, selectedDevice?.id ? selectedDevice.id : "")
@@ -789,7 +814,7 @@ function SettingsPage() {
                 </Box>
                 <Box>
                   <article>
-                    {device.meta.settings.capacity}
+                    {device.meta?.settings.capacity}
                     <span> Liters</span>
                   </article>
                   <p>
@@ -824,8 +849,8 @@ function SettingsPage() {
                   flexWrap: "wrap",
                 }}
               >
-                {device.meta.location.address ? (
-                  <small>{device.meta.location.address}</small>
+                {device.meta?.location.address ? (
+                  <small>{device.meta?.location.address}</small>
                 ) : (
                   <small style={{ color: "orange" }}>
                     Add location for this tank!
@@ -857,19 +882,19 @@ function SettingsPage() {
                 <MdSensors size={23} />
                 <strong style={{ color: "#E46B26" }}>Sensors</strong>
               </Box>
-              {device.sensors?.length > 0 ? (
-                ""
-              ) : (
+              {!device?.sensors?.some?.(
+                (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+              ) ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <TbAlertHexagon size={23} />
                   <small style={{ color: "orange" }}>
-                    No sensors connected
+                    No majiup sensors detected
                   </small>
                 </Box>
-              )}
+              ) : null}
 
-              {device.sensors
-                .filter((sensor) => sensor.meta.kind === "WaterLevel")
+              {device?.sensors
+                ?.filter((sensor: Sensor) => sensor.meta.kind === "WaterLevel")
                 ?.map((sensor, idx) => (
                   <Box key={idx} width={"100%"} lineHeight={1.8}>
                     <Box>

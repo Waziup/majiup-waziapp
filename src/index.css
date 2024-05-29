@@ -16,12 +16,12 @@ a:hover {
   margin: 0;
   box-sizing: border-box;
   @font-face {
-    font-family: 'Poppins';
-    src: url('./assets/fonts/Poppins-Regular.ttf') format('truetype');
-  };
+    font-family: "arial";
+    src: url("./assets/fonts/Poppins-Regular.ttf") format("truetype");
+  }
 }
-body{
-  font-family: 'Poppins', sans-serif;
+body {
+  font-family: "Poppins", sans-serif;
 }
 
 ::-webkit-scrollbar {

@@ -1,6 +1,4 @@
-import InputComponent from '../Input/Input.component';
+import InputComponent from "../Input/Input.component";
 export default function SearchComponent() {
-  return (
-	<InputComponent type='text' placeholder='Search facility...' />
-  );
+  return <InputComponent type="text" placeholder="Search tanks..." />;
 }

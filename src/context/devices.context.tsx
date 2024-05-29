@@ -1,9 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import mqtt from "precompiled-mqtt";
-import { User } from "@supabase/supabase-js";
-const brokerUrl = `mqtt://wazigate.local`;
-//const brokerUrl = `mqtt://localhost`;
+// import { User } from "@supabase/supabase-js";
+// const brokerUrl = `mqtt://wazigate.local`;
+const brokerUrl = `mqtt://localhost`;
 
 type Props = {
   children: ReactNode;
@@ -88,15 +88,16 @@ interface Device {
   created: Date;
   height: number;
   id: string;
-  length: number;
+  length?: number;
   meta: MetaInformation;
   modified: string;
   name: string;
   notifications: { messages: Notification[] };
   radius: number;
   sensors: Sensor[];
-  width: number;
+  width?: number;
 }
+
 export interface X extends Device {
   consumption: Consumption[];
   isSelect: boolean;
@@ -124,6 +125,7 @@ interface ContextValues {
   fetchInMinutes: () => void;
   profile?: Profile;
   loadingProfile?: boolean;
+  connected?: boolean;
 }
 export const DevicesContext = createContext<ContextValues>({
   devices: [],
@@ -143,6 +145,7 @@ export const DevicesContext = createContext<ContextValues>({
   searchDevices: () => {},
   profile: {} as Profile,
   loadingProfile: true,
+  connected: false,
 });
 
 //return an array of device data including level, temperature, quality, etc.
@@ -173,6 +176,7 @@ export const DevicesProvider = ({ children }: Props) => {
   const [filteredDevices, setFilteredDevices] = useState<X[]>(devices);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTank, setSelectedTank] = useState<X>();
+  const [connected, setConnected] = useState<boolean>();
   const [user, setLoggedUser] = useState<{ name: string; token: string }>({
     name: "",
     token: "",
@@ -181,6 +185,30 @@ export const DevicesProvider = ({ children }: Props) => {
   const toggleModal = () => setIsOpenNav(!isOpenNav);
   const setTanks = (devices: X[]) => setDevices(devices);
   const [reportRef, setReportRefFunch] = useState<HTMLDivElement | null>(null);
+
+  const getWifiStatus = async () => {
+    console.log("Status: ");
+    try {
+      const getStatus = await axios.get(
+        "http://wazigate.local/apps/waziup.wazigate-system/internet",
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (getStatus.status === 200) {
+        const wifiStatus: boolean = await getStatus.data;
+        setConnected(wifiStatus);
+      } else {
+        setConnected(false);
+      }
+    } catch (err) {
+    } finally {
+    }
+  };
+
   const setReportRef = (ref: HTMLDivElement) => {
     if (ref !== null) {
       setReportRefFunch(ref);
@@ -204,6 +232,7 @@ export const DevicesProvider = ({ children }: Props) => {
       if (requestProfile.status === 200) {
         const userProfile: UserProfile = await requestProfile.data;
         setProfile(userProfile.profile);
+        return userProfile;
       } else {
         throw new Error("Failed to fetch user profile");
       }
@@ -367,6 +396,7 @@ export const DevicesProvider = ({ children }: Props) => {
     fetchInMinutes();
     setFilteredDevices(devices);
     getUserProfile();
+    getWifiStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   function searchDevices(name: string) {
@@ -406,6 +436,7 @@ export const DevicesProvider = ({ children }: Props) => {
     searchDevices,
     profile,
     loadingProfile,
+    connected,
   };
   return (
     <DevicesContext.Provider value={value}>{children}</DevicesContext.Provider>
