@@ -1,10 +1,10 @@
-import { Box, Button, Modal } from "@mui/material";
+import { Box, Modal } from "@mui/material";
 import { DevicesContext, Profile } from "../context/devices.context";
 import React, { useContext, useEffect, useState } from "react";
 import logo from "../assets/imgs/logo.png";
-import { IoPersonOutline } from "react-icons/io5";
+// import { IoPersonOutline } from "react-icons/io5";
 
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
 import {
   ButtonStyle,
@@ -18,9 +18,10 @@ import { BiDotsVerticalRounded } from "react-icons/bi";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaPhoneAlt } from "react-icons/fa";
 import { MdMarkEmailRead } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 export default function ProfilePage() {
-  const { profile, loadingProfile } = useContext(DevicesContext);
+  const { profile, loadingProfile, devices } = useContext(DevicesContext);
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -30,13 +31,13 @@ export default function ProfilePage() {
     display: "flex",
     alignItems: "start",
     flexDirection: "column",
-    minHeight: "50dvh",
+    minHeight: "40dvh",
     width: "40rem",
-    maxWidth: "40rem",
+    // maxWidth: "40rem",
     borderRadius: "4px",
     boxShadow: "0 0 4px gray",
-    padding: "1rem",
     position: "relative",
+    overflow: "hidden",
   };
 
   const ProfileBox: React.CSSProperties = {
@@ -251,13 +252,28 @@ export default function ProfilePage() {
         <p>Loading...</p>
       ) : (
         <Box sx={BoxStyle}>
-          <Box sx={{ position: "absolute", right: "2%", cursor: "pointer" }}>
+          <Box
+            sx={{
+              position: "absolute",
+              right: "2%",
+              top: "2%",
+              cursor: "pointer",
+            }}
+          >
             <BiDotsVerticalRounded
               size={25}
               onClick={() => setModalOpen(true)}
             />
           </Box>
-          <Box sx={{ ...fRow, alignItems: "center" }}>
+          <Box
+            sx={{
+              ...fRow,
+              alignItems: "center",
+              backgroundColor: "gray",
+              width: "100%",
+              padding: "1rem",
+            }}
+          >
             <Box sx={ProfileBox}>
               <img
                 style={{ width: "5rem", aspectRatio: 1, padding: "0.5rem" }}
@@ -272,29 +288,78 @@ export default function ProfilePage() {
                 gap: "4px",
               }}
             >
-              <Box sx={{ ...fRow }}>
-                <Box sx={fRow}>
-                  <p>{profile?.first_name}</p>
-                  <p>{profile?.last_name}</p>
-                </Box>
-              </Box>
-              <Box>
-                <p>@{profile?.username}</p>
-              </Box>
+              {profile?.first_name &&
+              profile?.last_name &&
+              profile?.username ? (
+                <>
+                  <Box sx={{ ...fRow }}>
+                    <Box sx={fRow}>
+                      <p>{profile?.first_name}</p>
+                      <p>{profile?.last_name}</p>
+                    </Box>
+                  </Box>
+                  <Box>
+                    <p>@{profile?.username}</p>
+                  </Box>
+                </>
+              ) : (
+                <p style={{ color: "orange" }}>Please complete profile setup</p>
+              )}
             </Box>
           </Box>
-          <Box sx={{ ...fColumn, marginTop: "2rem", gap: "1rem" }}>
-            <Box sx={{ ...fRow, alignItems: "center" }}>
-              <FaLocationDot size={iconSize} color="#29ABE2" />
-              <p>{profile?.address}</p>
-            </Box>
-            <Box sx={{ ...fRow, alignItems: "center" }}>
-              <MdMarkEmailRead size={iconSize} color="#29ABE2" />
-              <p>{profile?.email}</p>
-            </Box>
-            <Box sx={{ ...fRow, alignItems: "center" }}>
-              <FaPhoneAlt size={iconSize} color="#29ABE2" />
-              <p>{profile?.phone}</p>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(18rem, 1fr))",
+              gap: "1rem",
+              width: "100%",
+              padding: "1rem",
+            }}
+          >
+            {profile?.address && profile?.email && profile?.phone ? (
+              <Box sx={{ ...fColumn, gap: "1rem" }}>
+                <Box sx={{ ...fRow, alignItems: "center" }}>
+                  <FaLocationDot size={iconSize} color="#29ABE2" />
+                  <p>{profile?.address}</p>
+                </Box>
+                <Box sx={{ ...fRow, alignItems: "center" }}>
+                  <MdMarkEmailRead size={iconSize} color="#29ABE2" />
+                  <p>{profile?.email}</p>
+                </Box>
+                <Box sx={{ ...fRow, alignItems: "center" }}>
+                  <FaPhoneAlt size={iconSize} color="#29ABE2" />
+                  <p>{profile?.phone}</p>
+                </Box>
+              </Box>
+            ) : (
+              <p style={{ color: "orange" }}>Profile not set!</p>
+            )}
+            <Box
+              sx={{
+                ...fRow,
+                gap: "2rem",
+                justifyContent: "space-between",
+                alignItems: "center",
+                height: "fit-content",
+              }}
+            >
+              <p>Total Tanks connected</p>
+              <Link to="/dashboard">
+                <p
+                  style={{
+                    width: "2rem",
+                    height: "2rem",
+                    backgroundColor: "#29ABE2",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "50%",
+                  }}
+                >
+                  {devices.length}
+                </p>
+              </Link>
             </Box>
           </Box>
         </Box>

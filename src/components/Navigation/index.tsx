@@ -94,6 +94,7 @@ function NavigationIndex({ matches }: Props) {
               ":hover": { bgcolor: "#f5f5f5" },
               alignItems: "center",
               justifyContent: "space-around",
+              borderRadius: "2rem",
             }}
           >
             <Box sx={{ position: "relative" }}>
@@ -120,6 +121,7 @@ function NavigationIndex({ matches }: Props) {
                 {totalNotifications}
               </Box>
             </Box>
+
             <Box
               mr={2}
               sx={{

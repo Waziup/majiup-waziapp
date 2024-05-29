@@ -7,7 +7,6 @@ import ListItemText from "@mui/material/ListItemText";
 import {
   Settings,
   Person,
-  Language,
   InsertChart,
   Dashboard,
   NotificationsNone,
@@ -19,7 +18,7 @@ import IconMenuComponent from "../IconMenu/IconMenu.component";
 import ArrowDropDownSVG from "../../assets/arrow_drop_down.svg";
 import React from "react";
 import { redirect } from "react-router-dom";
-import AvatarComponent from "../AvatarComponent/Avatar.component";
+// import AvatarComponent from "../AvatarComponent/Avatar.component";
 const LinkStyle = {
   textDecoration: "none",
   width: "100%",
@@ -132,7 +131,7 @@ export default function SideNavigation({ matches }: Props) {
               </ListItemButton>
             </NavLink>
           </ListItem>
-          <ListItem onClick={toggleModal}>
+          {/* <ListItem onClick={toggleModal}>
             <NavLink
               style={stylingFunc}
               replace
@@ -146,7 +145,7 @@ export default function SideNavigation({ matches }: Props) {
                 <ListItemText primary="Community" />
               </ListItemButton>
             </NavLink>
-          </ListItem>
+          </ListItem> */}
           {!matches && (
             <>
               <ListItem>
@@ -195,23 +194,21 @@ export default function SideNavigation({ matches }: Props) {
                       width: "100%",
                       cursor: "pointer",
                       alignItems: "center",
-                      justifyContent: "space-evenly",
+                      // justifyContent: "space-evenly",
+                      gap: "1rem",
                       height: "100%",
                     }}
                   >
-                    <AvatarComponent
-                      name={user.name}
-                      src='"https://mui.com/static/images/avatar/1.jpg"'
-                    />
+                    {/* <s */}
 
-                    <h3
+                    {/* <h3
                       style={{
                         fontSize: "calc(12px + .2vw)",
                         fontWeight: "normal",
                       }}
                     >
                       {user.name}
-                    </h3>
+                    </h3> */}
                     <Box component="img" src={ArrowDropDownSVG} />
                   </Box>
                 </Box>

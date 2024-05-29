@@ -10,15 +10,15 @@ import {
 import { Android12Switch } from "../components/TankDetail/TankDetail.component";
 import { useOutletContext } from "react-router-dom";
 import { X as Device } from "../context/devices.context";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { TbAlertHexagon } from "react-icons/tb";
 import { MdModeEdit, MdSensors } from "react-icons/md";
-import { IoPersonOutline } from "react-icons/io5";
-import { ImSwitch } from "react-icons/im";
+// import { IoPersonOutline } from "react-icons/io5";
+// import { ImSwitch } from "react-icons/im";
 import { Profile } from "../context/devices.context";
 import { SensorAlert } from "../context/devices.context";
-import { CiPhone } from "react-icons/ci";
-import { GoPerson } from "react-icons/go";
+// import { CiPhone } from "react-icons/ci";
+// import { GoPerson } from "react-icons/go";
 import { FaLocationDot } from "react-icons/fa6";
 
 // import { useNavigate, } from 'react-router-dom';
@@ -74,16 +74,16 @@ export const inputbox: React.CSSProperties = {
   borderRadius: "20px",
 };
 
-const inputbox1: React.CSSProperties = {
-  height: "100%",
-  padding: "5px 3px",
-  outline: "none",
-  fontSize: "13px",
-  borderBottom: "1px solid #888",
-  // background: '#F6F6F6',
-  // width: '50%',
-  margin: "0 10px",
-};
+// const inputbox1: React.CSSProperties = {
+//   height: "100%",
+//   padding: "5px 3px",
+//   outline: "none",
+//   fontSize: "13px",
+//   borderBottom: "1px solid #888",
+//   // background: '#F6F6F6',
+//   // width: '50%',
+//   margin: "0 10px",
+// };
 export const ButtonStyle: React.CSSProperties = {
   borderRadius: "20px",
   padding: "8px 0px",
