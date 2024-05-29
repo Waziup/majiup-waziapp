@@ -19,6 +19,7 @@ import { Profile } from "../context/devices.context";
 import { SensorAlert } from "../context/devices.context";
 import { CiPhone } from "react-icons/ci";
 import { GoPerson } from "react-icons/go";
+import { FaLocationDot } from "react-icons/fa6";
 
 // import { useNavigate, } from 'react-router-dom';
 /*
@@ -37,7 +38,7 @@ const BoxStyle: SxProps<Theme> = {
   overflowY: "auto",
   boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
 };
-const ModalContainer: SxProps<Theme> = {
+export const ModalContainer: SxProps<Theme> = {
   bgcolor: "#fff",
   padding: 2,
   position: "absolute",
@@ -63,7 +64,7 @@ const boldText: React.CSSProperties = {
   fontSize: "16px",
   margin: "10px 0",
 };
-const inputbox: React.CSSProperties = {
+export const inputbox: React.CSSProperties = {
   height: "100%",
   padding: "5px 15px",
   outline: "none",
@@ -83,7 +84,7 @@ const inputbox1: React.CSSProperties = {
   // width: '50%',
   margin: "0 10px",
 };
-const ButtonStyle: React.CSSProperties = {
+export const ButtonStyle: React.CSSProperties = {
   borderRadius: "20px",
   padding: "8px 0px",
   fontSize: "16px",
@@ -99,7 +100,7 @@ const ButtonStyle: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
 };
-const cancelButtonStyle = {
+export const cancelButtonStyle = {
   borderRadius: "20px",
   padding: "10px 20px",
   fontSize: "16px",
@@ -112,13 +113,13 @@ const cancelButtonStyle = {
   cursor: "pointer",
 };
 
-const fRow: React.CSSProperties = {
+export const fRow: React.CSSProperties = {
   display: "flex",
   flexDirection: "row",
   justifyContent: "start",
   gap: "0.5rem",
 };
-const fColumn: React.CSSProperties = {
+export const fColumn: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   justifyContent: "start",
@@ -140,7 +141,10 @@ function SettingsPage() {
   };
 
   const Alt = {
-    location: { latitude: 0, longitude: 0 },
+    location: {
+      cordinates: { latitude: 0, longitude: 0 },
+      address: "",
+    },
     notifications: selectedDevice?.notifications
       ? selectedDevice?.notifications
       : { messages: [] },
@@ -245,6 +249,14 @@ function SettingsPage() {
         ...changedMetaInfo,
         metaData: {
           ...changedMetaInfo.metaData,
+          location: {
+            ...changedMetaInfo.metaData.location,
+            cordinates: {
+              ...changedMetaInfo.metaData.location.cordinates,
+              [e.target.name]: e.target.value,
+            },
+            [e.target.name]: e.target.value,
+          },
           settings: {
             ...changedMetaInfo.metaData.settings,
             [e.target.name]: e.target.value,
@@ -301,6 +313,13 @@ function SettingsPage() {
         }/profile`,
         {
           ...changedMetaInfo.metaData,
+          location: {
+            cordinates: {
+              latitude: changedMetaInfo.metaData.location.cordinates.latitude,
+              longitude: changedMetaInfo.metaData.location.cordinates.longitude,
+            },
+            address: changedMetaInfo.metaData.location.address,
+          },
           settings: {
             capacity: parseFloat(
               changedMetaInfo.metaData.settings.capacity.toString()
@@ -391,7 +410,12 @@ function SettingsPage() {
               }}
             >
               <Box mb={2}>
-                <h4 style={InputLabel}>Tank Name*</h4>
+                <h4 style={InputLabel}>
+                  Tank Name{" "}
+                  {!changedMetaInfo.name && (
+                    <span style={{ color: "red" }}>*</span>
+                  )}
+                </h4>
                 <input
                   name={"name"}
                   onChange={handleChange}
@@ -404,7 +428,12 @@ function SettingsPage() {
                 />
               </Box>
               <Box mb={2}>
-                <h4 style={InputLabel}>Tank ID</h4>
+                <h4 style={InputLabel}>
+                  Tank ID{" "}
+                  {!selectedDevice?.id && (
+                    <span style={{ color: "red" }}>*</span>
+                  )}
+                </h4>
                 <input
                   name={"id"}
                   readOnly={true}
@@ -427,7 +456,13 @@ function SettingsPage() {
             >
               <Box>
                 <h4 style={InputLabel}>
-                  Tank Capacity <small>(Liters)</small>
+                  Tank Capacity{" "}
+                  <small>
+                    (Liters){" "}
+                    {!changedMetaInfo.metaData.settings.capacity && (
+                      <span style={{ color: "red" }}>*</span>
+                    )}
+                  </small>
                 </h4>
                 <input
                   name={"capacity"}
@@ -443,6 +478,9 @@ function SettingsPage() {
               <Box>
                 <h4 style={InputLabel}>
                   Tank Height <small>(mm)</small>
+                  {!changedMetaInfo.metaData.settings.height && (
+                    <span style={{ color: "red" }}>*</span>
+                  )}
                 </h4>
                 <input
                   name={"height"}
@@ -468,6 +506,9 @@ function SettingsPage() {
               <Box>
                 <h4 style={InputLabel}>
                   Water filled alert <small>(%)</small>
+                  {!changedMetaInfo.waterlevelSensorAlert.critical_max && (
+                    <span style={{ color: "red" }}>*</span>
+                  )}
                 </h4>
                 <input
                   onChange={handleChange}
@@ -487,6 +528,9 @@ function SettingsPage() {
               <Box>
                 <h4 style={InputLabel}>
                   Water low alert <small>(%)</small>
+                  {!changedMetaInfo.waterlevelSensorAlert.critical_min && (
+                    <span style={{ color: "red" }}>*</span>
+                  )}
                 </h4>
                 <input
                   onChange={handleChange}
@@ -515,6 +559,23 @@ function SettingsPage() {
                 onChange={handleToggle}
                 name={"receivenotifications"}
                 checked={changedMetaInfo.metaData.receivenotifications}
+              />
+            </Box>
+            <Box mb={2}>
+              <h4 style={InputLabel}>
+                Address{" "}
+                {changedMetaInfo.metaData.location.address && (
+                  <span style={{ color: "red" }}>*</span>
+                )}
+              </h4>
+              <input
+                name={"address"}
+                style={inputbox}
+                type="text"
+                onChange={handleChange}
+                required
+                defaultValue={changedMetaInfo.metaData.location.address}
+                placeholder="Address"
               />
             </Box>
             <Box>
@@ -557,7 +618,6 @@ function SettingsPage() {
                   // value={changedMetaInfo.metaData.profile.last_name}
                   defaultValue={changedMetaInfo.metaData.profile.username}
                   placeholder="Username"
-                  required
                 />
                 <input
                   name={"phone"}
@@ -567,7 +627,6 @@ function SettingsPage() {
                   // value={changedMetaInfo.metaData.profile.phone}
                   defaultValue={changedMetaInfo.metaData.profile.phone}
                   placeholder="Phone"
-                  required
                 />
               </Box>
             </Box>
@@ -740,45 +799,39 @@ function SettingsPage() {
                 </Box>
               </Box>
             </Box>
-            {device.meta.profile.first_name &&
-            device.meta.profile.last_name &&
-            device.meta.profile.phone ? (
-              <Box sx={{ width: "100%" }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                  }}
-                >
-                  <IoPersonOutline size={20} />
-                  <strong style={{ color: "#E46B26" }}>Profile</strong>
-                </Box>
-                {!device.meta.profile.username && (
+            <Box sx={{ width: "100%" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <FaLocationDot size={20} />
+                <strong style={{ color: "#E46B26" }}>Location</strong>
+              </Box>
+              <Box
+                sx={{
+                  mt: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  padding: "0.5rem",
+                  borderRadius: "4px",
+                  width: "100%",
+                  position: "inherit",
+                  gap: 1,
+                  backgroundColor: "#fafafa",
+                  flexWrap: "wrap",
+                }}
+              >
+                {device.meta.location.address ? (
+                  <small>{device.meta.location.address}</small>
+                ) : (
                   <small style={{ color: "orange" }}>
-                    Please add username to your tank
+                    Add location for this tank!
                   </small>
                 )}
-                <Box
-                  sx={{
-                    mt: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    padding: "0.5rem",
-                    borderRadius: "4px",
-                    width: "100%",
-                    position: "inherit",
-                    gap: 1,
-                    backgroundColor: "#fafafa",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {device.meta.profile.username && (
-                    <Box>
-                      <small>@{device.meta.profile.username}</small>
-                    </Box>
-                  )}
-                  <Box sx={fRow}>
+                {/* <Box sx={fRow}>
                     <GoPerson />
                     <small>
                       {device.meta.profile.first_name +
@@ -789,14 +842,9 @@ function SettingsPage() {
                   <Box sx={fRow}>
                     <CiPhone />
                     <small>{device.meta.profile.phone}</small>
-                  </Box>
-                </Box>
+                  </Box> */}
               </Box>
-            ) : (
-              <small style={{ color: "orange" }}>
-                User profile not configured!
-              </small>
-            )}
+            </Box>
             <Box
               sx={{
                 width: "100%",

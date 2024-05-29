@@ -1,6 +1,7 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import mqtt from "precompiled-mqtt";
+import { User } from "@supabase/supabase-js";
 const brokerUrl = `mqtt://wazigate.local`;
 //const brokerUrl = `mqtt://localhost`;
 
@@ -55,6 +56,7 @@ export type Profile = {
   username: string;
   phone: string;
   email: string;
+  address: string;
 };
 
 export type MetaInformation = {
@@ -63,13 +65,20 @@ export type MetaInformation = {
     messages: Notification[];
   };
   location: {
-    longitude: number;
-    latitude: number;
+    cordinates: {
+      longitude: number;
+      latitude: number;
+    };
+    address: string;
   };
   settings: {
     height: number;
     capacity: number;
   };
+  profile: Profile;
+};
+
+export type UserProfile = {
   profile: Profile;
 };
 
@@ -113,39 +122,27 @@ interface ContextValues {
   // fetchinHours: ()=>void,
   searchDevices: (name: string) => void;
   fetchInMinutes: () => void;
+  profile?: Profile;
+  loadingProfile?: boolean;
 }
 export const DevicesContext = createContext<ContextValues>({
   devices: [],
   user: { token: "", name: "" },
-  setUser: (user, token) => {
-    console.log(user, token);
-  },
-  toggleModal: () => {
-    console.log("");
-  },
+  setUser: () => {},
+  toggleModal: () => {},
   isOpenNav: false,
-  setTanks: (devices) => {
-    console.log(devices);
-  },
+  setTanks: () => {},
   selectedDevice: undefined,
-  setSelectedDevice(device) {
-    console.log(device);
-  },
+  setSelectedDevice() {},
   reportRef: null,
-  setReportRef: (ref: HTMLDivElement) => {
-    console.log(ref);
-  },
+  setReportRef: () => {},
   loading: false,
-  setLoadingFunc: (loading) => {
-    console.log(loading);
-  },
+  setLoadingFunc: () => {},
   // fetchinHours: ()=>{console.log('');},
-  fetchInMinutes: () => {
-    console.log("");
-  },
-  searchDevices: (name) => {
-    console.log(name);
-  },
+  fetchInMinutes: () => {},
+  searchDevices: () => {},
+  profile: {} as Profile,
+  loadingProfile: true,
 });
 
 //return an array of device data including level, temperature, quality, etc.
@@ -168,8 +165,11 @@ function subscriberFn(client: mqtt.MqttClient, topic: string) {
 }
 
 export const client = mqtt.connect(brokerUrl);
+
 export const DevicesProvider = ({ children }: Props) => {
+  const [loadingProfile, setLoadingProfile] = useState<boolean>(true);
   const [devices, setDevices] = useState<X[]>([]);
+  const [profile, setProfile] = useState<Profile>();
   const [filteredDevices, setFilteredDevices] = useState<X[]>(devices);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTank, setSelectedTank] = useState<X>();
@@ -188,6 +188,28 @@ export const DevicesProvider = ({ children }: Props) => {
   };
   const setLoadingFunc = (loading: boolean) => {
     setLoading(!loading);
+  };
+
+  const getUserProfile = async () => {
+    try {
+      const requestProfile: AxiosResponse = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/gateway-profile`,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (requestProfile.status === 200) {
+        const userProfile: UserProfile = await requestProfile.data;
+        setProfile(userProfile.profile);
+      } else {
+        throw new Error("Failed to fetch user profile");
+      }
+    } finally {
+      setLoadingProfile(false);
+    }
   };
 
   function fetchInMinutes() {
@@ -344,6 +366,7 @@ export const DevicesProvider = ({ children }: Props) => {
     setLoading(true);
     fetchInMinutes();
     setFilteredDevices(devices);
+    getUserProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   function searchDevices(name: string) {
@@ -381,6 +404,8 @@ export const DevicesProvider = ({ children }: Props) => {
     // fetchinHours,
     fetchInMinutes,
     searchDevices,
+    profile,
+    loadingProfile,
   };
   return (
     <DevicesContext.Provider value={value}>{children}</DevicesContext.Provider>

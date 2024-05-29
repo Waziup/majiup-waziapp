@@ -6,6 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import {
   Settings,
+  Person,
   Language,
   InsertChart,
   Dashboard,
@@ -125,7 +126,7 @@ export default function SideNavigation({ matches }: Props) {
             <NavLink style={stylingFunc} replace to="/profile">
               <ListItemButton color="initial">
                 <ListItemIcon color="initial">
-                  <Settings sx={{ color: "inherit" }} />
+                  <Person sx={{ color: "inherit" }} />
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
               </ListItemButton>

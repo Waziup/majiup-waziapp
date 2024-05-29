@@ -10,6 +10,7 @@ import LayoutComponent from "./components/Layout/Layout.component";
 
 import SignUpPage from "./pages/SignupPage";
 import DevicesPage from "./pages/DevicesPage";
+import ProfilePage from "./pages/ProfilePage";
 // import { ConfirmationNumberTwoTone } from "@mui/icons-material";
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
         <Route element={<LayoutComponent />}>
           <Route path="/analytics" element={<BillingsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="profile" element={<SettingsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route
             path="/devices/:id"
