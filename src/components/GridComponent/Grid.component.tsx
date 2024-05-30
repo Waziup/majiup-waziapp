@@ -19,18 +19,11 @@ import WatertankComponent from "../WaterTank/Watertank.component";
 import axios from "axios";
 import {
   getLiters,
-  postNewNotificationMessage,
+  // postNewNotificationMessage,
 } from "../../utils/consumptionHelper";
 import Copilot from "../copilot/copilot.component";
+import { formatTime } from "../../utils/timeFormatter";
 
-/**
- * ToDo
- * Data pulling
- * 1. array testing on multiple changes and graph
- * reusable setState function
- * request for all information after successfull Changing of data information
- * Document generation
- */
 const BoxStyle = {
   bgcolor: "#fff",
   borderRadius: "10px",
@@ -91,11 +84,10 @@ function GridComponent() {
           );
           device.liters = liters;
           device.on = true;
-          const date = new Date();
+          const date = formatTime(new Date());
+
           device.consumption.push({
-            x: parseFloat(
-              (date.getHours() + date.getMinutes() / 60).toFixed(2)
-            ),
+            x: date,
             y: liters,
           });
 
@@ -132,61 +124,62 @@ function GridComponent() {
             //   return;
             // }
           }
-        } else if (
-          sensorV &&
-          sensorV.meta.kind
-            .toLowerCase()
-            .includes("WaterPollutantSensor".toLowerCase())
-        ) {
+        }
+        //  else if (
+        //   sensorV &&
+        //   sensorV.meta.kind
+        //     .toLowerCase()
+        //     .includes("WaterPollutantSensor".toLowerCase())
+        // ) {
+        //   device.on = true;
+        //   setTanks([...devices]);
+        //   const maxSensor = sensorV.meta.critical_max;
+
+        //   if (parseInt(message.toString()) >= maxSensor) {
+        //     postNewNotificationMessage(
+        //       device.id,
+        //       devices,
+        //       `Poor water quality detected`,
+        //       "HIGH"
+        //     );
+        //     return;
+        //   }
+        // } else if (
+        //   sensorV &&
+        //   sensorV.meta.kind
+        //     .toLowerCase()
+        //     .includes("WaterThermometer".toLowerCase())
+        // ) {
+        //   // console.log('Water thermometer');
+        //   device.temp = parseInt(message.toString());
+        //   // device.modified = new Date().toISOString();
+        //   device.on = true;
+
+        //   setTanks([...devices]);
+
+        //   const maxSensor = sensorV.meta.critical_max;
+        //   const minSensor = sensorV.meta.critical_min;
+
+        //   if (parseInt(message.toString()) >= maxSensor) {
+        //     postNewNotificationMessage(
+        //       device.id,
+        //       devices,
+        //       `Extreme hot temperatures`,
+        //       "HIGH"
+        //     );
+        //     return;
+        //   } else if (parseInt(message.toString()) <= minSensor) {
+        //     postNewNotificationMessage(
+        //       device.id,
+        //       devices,
+        //       `Extreme cold temperatures`,
+        //       "HIGH"
+        //     );
+        //     return;
+        //   }
+        // }
+        else {
           device.on = true;
-          setTanks([...devices]);
-          const maxSensor = sensorV.meta.critical_max;
-
-          if (parseInt(message.toString()) >= maxSensor) {
-            postNewNotificationMessage(
-              device.id,
-              devices,
-              `Poor water quality detected`,
-              "HIGH"
-            );
-            return;
-          }
-        } else if (
-          sensorV &&
-          sensorV.meta.kind
-            .toLowerCase()
-            .includes("WaterThermometer".toLowerCase())
-        ) {
-          // console.log('Water thermometer');
-          device.temp = parseInt(message.toString());
-          // device.modified = new Date().toISOString();
-          device.on = true;
-
-          setTanks([...devices]);
-
-          const maxSensor = sensorV.meta.critical_max;
-          const minSensor = sensorV.meta.critical_min;
-
-          if (parseInt(message.toString()) >= maxSensor) {
-            postNewNotificationMessage(
-              device.id,
-              devices,
-              `Extreme hot temperatures`,
-              "HIGH"
-            );
-            return;
-          } else if (parseInt(message.toString()) <= minSensor) {
-            postNewNotificationMessage(
-              device.id,
-              devices,
-              `Extreme cold temperatures`,
-              "HIGH"
-            );
-            return;
-          }
-        } else {
-          device.on = true;
-          // console.log(sensorV?.meta.kind);
           return;
         }
         return;

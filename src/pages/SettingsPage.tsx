@@ -20,6 +20,7 @@ import { SensorAlert } from "../context/devices.context";
 // import { CiPhone } from "react-icons/ci";
 // import { GoPerson } from "react-icons/go";
 import { FaLocationDot } from "react-icons/fa6";
+import toast from "react-hot-toast";
 
 // import { useNavigate, } from 'react-router-dom';
 /*
@@ -280,18 +281,27 @@ function SettingsPage() {
 
     if (true) {
       if (selectedDevice?.name !== changedMetaInfo.name) {
-        const nameUpdate = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/tanks/${
-            selectedDevice?.id
-          }/name`,
-          changedMetaInfo.name,
-          {
-            headers: {
-              "Content-Type": "text/plain",
-            },
+        try {
+          const nameUpdate = await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/tanks/${
+              selectedDevice?.id
+            }/name`,
+            changedMetaInfo.name,
+            {
+              headers: {
+                "Content-Type": "text/plain",
+              },
+            }
+          );
+
+          if (nameUpdate.status !== 200) {
+            toast.error("Failed to change tank name");
           }
-        );
-        promises.push(nameUpdate);
+          promises.push(nameUpdate);
+        } catch (err) {
+          console.error(err);
+          toast.error("Error occured changing tank name");
+        }
       }
 
       if (
@@ -303,42 +313,59 @@ function SettingsPage() {
           (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
         )
       ) {
-        const sensorUpdate = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/tanks/${
-            selectedDevice.id
-          }/tank-sensors/waterlevel/alerts`,
-          changedMetaInfo.waterlevelSensorAlert
-        );
-        promises.push(sensorUpdate);
+        try {
+          const sensorUpdate = await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/tanks/${
+              selectedDevice.id
+            }/tank-sensors/waterlevel/alerts`,
+            changedMetaInfo.waterlevelSensorAlert
+          );
+          promises.push(sensorUpdate);
+
+          if (sensorUpdate.status !== 200) {
+            toast.error("Error updating tank alerts");
+          }
+        } catch (err) {
+          toast.error("Error updating tank alerts");
+        }
       }
 
-      const responseMetaData = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/tanks/${
-          selectedDevice?.id
-        }/profile`,
-        {
-          ...changedMetaInfo.metaData,
-          location: {
-            cordinates: {
-              latitude: changedMetaInfo.metaData.location.cordinates.latitude,
-              longitude: changedMetaInfo.metaData.location.cordinates.longitude,
+      try {
+        const responseMetaData = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/tanks/${
+            selectedDevice?.id
+          }/profile`,
+          {
+            ...changedMetaInfo.metaData,
+            location: {
+              cordinates: {
+                latitude: changedMetaInfo.metaData.location.cordinates.latitude,
+                longitude:
+                  changedMetaInfo.metaData.location.cordinates.longitude,
+              },
+              address: changedMetaInfo.metaData.location.address,
             },
-            address: changedMetaInfo.metaData.location.address,
-          },
-          settings: {
-            capacity: parseFloat(
-              changedMetaInfo.metaData.settings.capacity.toString()
-            ),
-            height: parseFloat(
-              changedMetaInfo.metaData.settings.height.toString()
-            ),
-          },
-          receivenotifications: changedMetaInfo.metaData.receivenotifications,
-          notifications: { ...selectedDevice?.meta.notifications },
-          profile: changedMetaInfo.metaData.profile,
+            settings: {
+              capacity: parseFloat(
+                changedMetaInfo.metaData.settings.capacity.toString()
+              ),
+              height: parseFloat(
+                changedMetaInfo.metaData.settings.height.toString()
+              ),
+            },
+            receivenotifications: changedMetaInfo.metaData.receivenotifications,
+            notifications: { ...selectedDevice?.meta.notifications },
+            profile: changedMetaInfo.metaData.profile,
+          }
+        );
+
+        if (responseMetaData.status !== 200) {
+          toast.error("Failed to update tank details");
         }
-      );
-      promises.push(responseMetaData);
+        promises.push(responseMetaData);
+      } catch (err) {
+        toast.error("Error while updating tank");
+      }
 
       Promise.all(promises)
         .then(() => {
@@ -360,6 +387,7 @@ function SettingsPage() {
             setTanks([...devices]);
             setSelectedDevice(undefined);
             setIsOpenModal(false);
+            toast.success(`${device.name} has been updated`);
           } else {
             setIsOpenModal(false);
             setSelectedDevice(undefined);

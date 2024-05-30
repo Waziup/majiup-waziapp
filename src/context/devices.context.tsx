@@ -1,8 +1,10 @@
 import axios, { AxiosResponse } from "axios";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import mqtt from "precompiled-mqtt";
+// import toast from "react-hot-toast";
 // import { User } from "@supabase/supabase-js";
 // const brokerUrl = `mqtt://wazigate.local`;
+import { formatTime } from "../utils/timeFormatter";
 const brokerUrl = `mqtt://localhost`;
 
 type Props = {
@@ -10,7 +12,7 @@ type Props = {
 };
 
 type Consumption = {
-  x: number;
+  x: any;
   y: number;
 };
 
@@ -126,6 +128,7 @@ interface ContextValues {
   profile?: Profile;
   loadingProfile?: boolean;
   connected?: boolean;
+  updateProfile: (profileDetails: Profile) => void;
 }
 export const DevicesContext = createContext<ContextValues>({
   devices: [],
@@ -146,6 +149,7 @@ export const DevicesContext = createContext<ContextValues>({
   profile: {} as Profile,
   loadingProfile: true,
   connected: false,
+  updateProfile: () => {},
 });
 
 //return an array of device data including level, temperature, quality, etc.
@@ -186,8 +190,10 @@ export const DevicesProvider = ({ children }: Props) => {
   const setTanks = (devices: X[]) => setDevices(devices);
   const [reportRef, setReportRefFunch] = useState<HTMLDivElement | null>(null);
 
+  const updateProfile = (profileDetails: Profile) => {
+    setProfile(profileDetails);
+  };
   const getWifiStatus = async () => {
-    console.log("Status: ");
     try {
       const getStatus = await axios.get(
         "http://wazigate.local/apps/waziup.wazigate-system/internet",
@@ -265,24 +271,9 @@ export const DevicesProvider = ({ children }: Props) => {
 
             const plotVals = sensorResponse.data?.waterLevels?.map(
               (val: { timestamp: any; liters: any }) => {
-                const date = new Date(val.timestamp);
-                const daysOfWeek = [
-                  "Sun",
-                  "Mon",
-                  "Tue",
-                  "Wed",
-                  "Thur",
-                  "Fri",
-                  "Sat",
-                ];
-
-                const dayOfWeek = daysOfWeek[date.getUTCDay()];
-
-                const hours = String(date.getUTCHours()).padStart(2, "0");
-
-                const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+                const date: string = formatTime(new Date(val.timestamp));
                 return {
-                  x: `${dayOfWeek}, ${hours}:${minutes}`,
+                  x: date,
                   y: val.liters,
                 };
               }
@@ -391,6 +382,9 @@ export const DevicesProvider = ({ children }: Props) => {
   client.on("connect", () => {
     console.log("MQTT Connected");
   });
+  // client.on("disconnect", () => {
+  //   client.reconnect();
+  // });
   useEffect(() => {
     setLoading(true);
     fetchInMinutes();
@@ -437,6 +431,7 @@ export const DevicesProvider = ({ children }: Props) => {
     profile,
     loadingProfile,
     connected,
+    updateProfile,
   };
   return (
     <DevicesContext.Provider value={value}>{children}</DevicesContext.Provider>

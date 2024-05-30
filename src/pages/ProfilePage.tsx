@@ -19,9 +19,11 @@ import { FaLocationDot } from "react-icons/fa6";
 import { FaPhoneAlt } from "react-icons/fa";
 import { MdMarkEmailRead } from "react-icons/md";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function ProfilePage() {
-  const { profile, loadingProfile, devices } = useContext(DevicesContext);
+  const { profile, loadingProfile, devices, updateProfile } =
+    useContext(DevicesContext);
 
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -73,7 +75,7 @@ export default function ProfilePage() {
       setProfileChanged(false);
     }
 
-    const newProfile = {
+    const newProfile: Profile = {
       ...updatedProfileInfo.profile,
       [e.target.name]: e.target.value,
     };
@@ -83,7 +85,7 @@ export default function ProfilePage() {
     });
   };
 
-  const updateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+  const updateUserProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const sendUpdateReq = await axios.post(
@@ -95,10 +97,15 @@ export default function ProfilePage() {
           },
         }
       );
-      if ((sendUpdateReq.status = 200)) {
+      if (sendUpdateReq.status === 200) {
         setModalOpen(false);
+        updateProfile(updatedProfileInfo.profile);
+        toast.success("Your profile has been updated");
+      } else {
+        toast.error("Failed to update your profile");
       }
     } catch (err) {
+      toast.error("Error updating user profile");
     } finally {
     }
   };
@@ -141,7 +148,7 @@ export default function ProfilePage() {
           >
             <h2>Edit Profile</h2>
             <Box mt={2}>
-              <form onSubmit={updateProfile}>
+              <form onSubmit={updateUserProfile}>
                 <Box
                   sx={{
                     display: "grid",

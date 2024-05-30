@@ -1,4 +1,4 @@
-import { Stack, Box, styled, Switch, Typography } from "@mui/material";
+import { Stack, Box, styled, Switch } from "@mui/material";
 import {
   FireHydrantAlt,
   WaterDrop,
@@ -10,10 +10,10 @@ import {
 import WatertankComponent from "../WaterTank/Watertank.component";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useContext, useEffect, useState } from "react";
-import MapComponent from "../MapComponent/Map.component";
+// import MapComponent from "../MapComponent/Map.component";
 import FrameSVG from "../../assets/not-found.svg";
 import { Actuator, DevicesContext, X } from "../../context/devices.context";
-import axios from "axios";
+// import axios from "axios";
 import { PiWarningOctagonLight } from "react-icons/pi";
 import { FaTruckDroplet } from "react-icons/fa6";
 
@@ -106,7 +106,7 @@ function TankDetailComponent({
   actuator,
   toggleActuator,
 }: Props) {
-  const [toggleHot, setToggleHot] = useState(false);
+  // const [toggleHot, setToggleHot] = useState(false);
   const [temperatureConsumption, setTemperatureConsumption] = useState<
     Consumption[]
   >([]);
@@ -193,50 +193,50 @@ function TankDetailComponent({
     setTemperatureConsumption(consumption);
   }, [consumption]);
 
-  async function runFetch() {
-    const temperatureConsumptionVal = await axios
-      .get(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/tanks/${id}/tank-sensors/water-temperature/values`,
-        {
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      )
-      .then((response) => {
-        console.log(response.data);
-        const plotVals = response.data.map((val: { time: any; value: any }) => {
-          const date = new Date(val.time);
-          const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
+  // async function runFetch() {
+  //   const temperatureConsumptionVal = await axios
+  //     .get(
+  //       `${
+  //         import.meta.env.VITE_BACKEND_URL
+  //       }/tanks/${id}/tank-sensors/water-temperature/values`,
+  //       {
+  //         headers: {
+  //           Accept: "application/json",
+  //         },
+  //       }
+  //     )
+  //     .then((response) => {
+  //       console.log(response.data);
+  //       const plotVals = response.data.map((val: { time: any; value: any }) => {
+  //         const date = new Date(val.time);
+  //         const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
 
-          const dayOfWeek = daysOfWeek[date.getUTCDay()];
+  //         const dayOfWeek = daysOfWeek[date.getUTCDay()];
 
-          const hours = String(date.getUTCHours()).padStart(2, "0");
+  //         const hours = String(date.getUTCHours()).padStart(2, "0");
 
-          const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-          return {
-            x: `${dayOfWeek}, ${hours}:${minutes}`,
-            y: val.value,
-          };
-        });
+  //         const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  //         return {
+  //           x: `${dayOfWeek}, ${hours}:${minutes}`,
+  //           y: val.value,
+  //         };
+  //       });
 
-        return plotVals;
-      })
-      .catch((err) => {
-        alert(err);
-      });
+  //       return plotVals;
+  //     })
+  //     .catch((err) => {
+  //       alert(err);
+  //     });
 
-    setTemperatureConsumption(temperatureConsumptionVal);
-  }
-  useEffect(() => {
-    if (toggleHot) {
-      runFetch();
-    } else {
-      setTemperatureConsumption(consumption);
-    }
-  }, [toggleHot]);
+  //   setTemperatureConsumption(temperatureConsumptionVal);
+  // }
+  // useEffect(() => {
+  //   if (toggleHot) {
+  //     runFetch();
+  //   } else {
+  //     setTemperatureConsumption(consumption);
+  //   }
+  // }, [toggleHot]);
 
   // function handleToggleTeemp() {
   //   setToggleHot(!toggleHot);
@@ -313,7 +313,6 @@ function TankDetailComponent({
         .eq("status", "In Progress");
       if (data) {
         setRefill(data[0]);
-        console.log(data);
       }
     } catch (err) {
       console.log(err);
@@ -657,7 +656,7 @@ function TankDetailComponent({
               <p
                 style={{ fontSize: 16, fontWeight: "600", textAlign: "center" }}
               >
-                WATER {toggleHot ? "TEMPERATURE" : "CONSUMPTION"}
+                WATER CONSUMPTION
               </p>
               <Box
                 // onClick={handleToggleTeemp}
@@ -666,20 +665,12 @@ function TankDetailComponent({
                 sx={{ borderRadius: "20px", width: "20%", textAlign: "center" }}
               >
                 <Opacity
-                  style={
-                    !toggleHot
-                      ? {
-                          cursor: "pointer",
-                          color: "#fff",
-                          borderRadius: "50%",
-                          backgroundColor: "#4592F6",
-                        }
-                      : {
-                          cursor: "pointer",
-                          color: "#888992",
-                          borderRadius: "50%",
-                        }
-                  }
+                  style={{
+                    cursor: "pointer",
+                    color: "#fff",
+                    borderRadius: "50%",
+                    backgroundColor: "#4592F6",
+                  }}
                 />
                 {/* <DeviceThermostat
                   style={
@@ -695,14 +686,13 @@ function TankDetailComponent({
                 /> */}
               </Box>
             </Box>
-            {/* <CanvasJSChart style={{innerHeighteight:'200px'}}  options = {options}/> */}
             <Chart
               options={{
                 chart: {
                   height: 350,
                   type: "rangeArea",
                 },
-                colors: [toggleHot ? "#FF0000" : "#4592F6"],
+                colors: ["#4592F6"],
 
                 dataLabels: {
                   enabled: false,
@@ -727,11 +717,10 @@ function TankDetailComponent({
               }}
               series={apexChartOptions.series}
               type="line"
-              height={350}
-              width={380}
+              height={300}
+              width={450}
             />
-            <Box id="#chart"></Box>
-            <MapComponent />
+            {/* <MapComponent /> */}
           </Box>
         </>
       ) : (
