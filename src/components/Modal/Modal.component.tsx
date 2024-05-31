@@ -13,10 +13,10 @@ type ModalComponentProps = {
 
 // import { } 'react-icon'
 
-import TankSVG from "../../assets/tank_sett.svg";
+// import TankSVG from "../../assets/tank_sett.svg";
 import RoundTankSVG from "../../assets/round_tank.svg";
-import FireHydrantSVG from "../../assets/fire_hydrant.svg";
-import FireHydrantSVG1 from "../../assets/fire_hydrant1.svg";
+// import FireHydrantSVG from "../../assets/fire_hydrant.svg";
+// import FireHydrantSVG1 from "../../assets/fire_hydrant1.svg";
 const ImageStyle = { height: 40, width: 40 };
 function ModalComponent({ open, handleClose, children }: ModalComponentProps) {
   const styles = {
