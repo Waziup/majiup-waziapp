@@ -189,7 +189,7 @@ function BillingsPage() {
               height: 350,
               type: "rangeArea",
             },
-            colors: ["#4592F6"],
+            // colors: ["#4592F6"],
             xaxis: {
               categories: deviceFound?.consumption
                 ? deviceFound?.consumption.map((d) => d.x)
@@ -275,7 +275,7 @@ function BillingsPage() {
             height: 350,
             type: "rangeArea",
           },
-          colors: ["#4592F6"],
+          //   colors: ["#4592F6"],
           xaxis: {
             categories: deviceFound?.consumption
               ? deviceFound?.consumption.map((d) => d.x)
