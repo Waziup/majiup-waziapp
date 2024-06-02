@@ -23,7 +23,7 @@ Instruction to run the Majiup application on gateway (production) can be found [
 
 ## Installing in local machine
 
-A step by step series of examples that tell you how to get a development environment running
+Follow these steps to get a development environment running
 
 1. Clone the repo
    ```
