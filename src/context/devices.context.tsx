@@ -3,9 +3,9 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 import mqtt from "precompiled-mqtt";
 // import toast from "react-hot-toast";
 // import { User } from "@supabase/supabase-js";
-// const brokerUrl = `mqtt://wazigate.local`;
+const brokerUrl = `mqtt://wazigate.local`;
 import { formatTime } from "../utils/timeFormatter";
-const brokerUrl = `mqtt://localhost`;
+// const brokerUrl = `mqtt://localhost`;
 
 type Props = {
   children: ReactNode;

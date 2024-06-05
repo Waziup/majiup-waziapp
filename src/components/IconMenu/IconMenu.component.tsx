@@ -6,7 +6,7 @@ import {
   ListItemIcon,
   Box,
 } from "@mui/material";
-import { Launch, Logout, AccountCircle } from "@mui/icons-material";
+import { Launch, Logout } from "@mui/icons-material";
 import { useContext } from "react";
 import { DevicesContext } from "../../context/devices.context";
 import { Link, useNavigate } from "react-router-dom";

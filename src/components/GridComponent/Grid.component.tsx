@@ -32,6 +32,7 @@ const BoxStyle = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
+  position: "inherit",
   width: "100%",
 };
 const TankDetails = {
@@ -353,13 +354,22 @@ function GridComponent() {
           </Grid>
         )}
         <Grid
-          ml={!matches ? 3 : 0}
+          style={{
+            position: "relative",
+            width: "20rem",
+          }}
+          // ml={!matches ? 3 : 0}
           mr={!matches ? 2 : 0}
           item
-          xs={matches ? 6 : 12}
+          // xs={matches ? 6 : 12}
         >
           {devices.length <= 0 ? (
-            <Box sx={{ position: "relative", width: "100%" }}>
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -501,7 +511,15 @@ function GridComponent() {
           )}
         </Grid>
         {matches && (
-          <Grid overflow={"auto"} height={"100vh"} item xs={3.4}>
+          <Grid
+            overflow={"auto"}
+            height={"100dvh"}
+            item
+            style={{
+              position: "relative",
+            }}
+            // xs={10.4}
+          >
             {selectedDevice && (
               <TankDetailComponent
                 id={selectedDevice.id}

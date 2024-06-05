@@ -13,7 +13,7 @@ function mapNumberToPercentage(number: number): number {
     (number / 100) * (destinationMax - destinationMin) + destinationMin;
   return mappedValue;
 }
-function WatertankComponent({ percentage, waterQuality }: Props) {
+function WatertankComponent({ percentage }: Props) {
   return (
     <div className="circle">
       <style>
