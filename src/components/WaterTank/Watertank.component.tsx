@@ -4,6 +4,7 @@ import "./Watertank.styles.css";
 type Props = {
   percentage: number;
   waterQuality: string;
+  consumption: any;
 };
 
 function mapNumberToPercentage(number: number): number {
@@ -13,7 +14,7 @@ function mapNumberToPercentage(number: number): number {
     (number / 100) * (destinationMax - destinationMin) + destinationMin;
   return mappedValue;
 }
-function WatertankComponent({ percentage }: Props) {
+function WatertankComponent({ percentage, consumption }: Props) {
   return (
     <div className="circle">
       <style>
@@ -24,25 +25,34 @@ function WatertankComponent({ percentage }: Props) {
                         position: absolute;
                         width: 200%;
                         height: 200%;
-                        top: ${mapNumberToPercentage(percentage)}%;
+                        top:  ${`${mapNumberToPercentage(
+                          percentage
+                        )}%`};                        
                         left: 50%;
                         transform: translate(-50%, -75%);
                     }
                     
                 `}
       </style>
-      <h1>{percentage}%</h1>
-      <div style={{}} className="wave">
-        {/* {
-                    waterQuality==='Poor' &&(
-                        <>
-                            <img src={BacteriaSVG} alt="bacteria" className="bacteria"/>
-                            <img src={DirtSVG} alt="dirt" className="dirt"/>
-                            <img src={DirtSVG} alt="dirt" className="dirt1"/>
-                        </>
-                    )
-                } */}
-      </div>
+
+      {/* 
+      
+      top: ${
+                          percentage
+                            ? `${mapNumberToPercentage(percentage)}%`
+                            : 0
+                        };
+      */}
+
+      {percentage ? (
+        <h1>{percentage}%</h1>
+      ) : (
+        <h1 style={{ color: "red", fontSize: 22, textAlign: "center" }}>
+          Setup incomplete!
+        </h1>
+      )}
+
+      <div style={{}} className="wave"></div>
     </div>
   );
 }

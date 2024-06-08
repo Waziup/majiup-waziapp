@@ -154,6 +154,7 @@ function SettingsPage() {
       capacity: 0,
       radius: 0,
       height: 0,
+      offset: 0,
       length: 0,
       width: 0,
       maxalert: 0,
@@ -352,6 +353,9 @@ function SettingsPage() {
               height: parseFloat(
                 changedMetaInfo.metaData.settings.height.toString()
               ),
+              offset: parseFloat(
+                changedMetaInfo.metaData.settings.offset.toString()
+              ),
             },
             receivenotifications: changedMetaInfo.metaData.receivenotifications,
             notifications: { ...selectedDevice?.meta.notifications },
@@ -524,6 +528,24 @@ function SettingsPage() {
                   className="input_box"
                   type={"text"}
                   placeholder={"Enter Height"}
+                />
+              </Box>
+              <Box>
+                <h4 style={InputLabel}>
+                  Tank Offset <small>(mm)</small>
+                  {!changedMetaInfo.metaData.settings.offset && (
+                    <span style={{ color: "red" }}>*</span>
+                  )}
+                </h4>
+                <input
+                  name={"offset"}
+                  onChange={handleChange}
+                  value={changedMetaInfo.metaData.settings.offset}
+                  required
+                  style={inputbox}
+                  className="input_box"
+                  type={"text"}
+                  placeholder={"Enter offset"}
                 />
               </Box>
             </Box>

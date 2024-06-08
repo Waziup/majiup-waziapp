@@ -98,8 +98,14 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
           {
             <Box>
               <h3 style={{ fontSize: "20px", fontWeight: "normal" }}>{name}</h3>
-              <p style={COMMON_P}>Quantity</p>
-              <p style={COMMON_P}>Days to refill</p>
+              {amount ? (
+                <p style={COMMON_P}>Quantity</p>
+              ) : (
+                <p style={{ ...COMMON_P, color: "orange", fontSize: "90%" }}>
+                  Click to set up
+                </p>
+              )}
+              {/* <p style={COMMON_P}>Days to refill</p> */}
               {/* <p style={COMMON_P} >Temperature:</p> */}
             </Box>
           }
@@ -119,7 +125,10 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
                 `Last Active, ${lastSeen}`
               )
             ) : (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                onClick={handleNavigate}
+              >
                 <TbAlertHexagon size={23} color="#E46B26" />
                 <h3
                   style={{
@@ -127,7 +136,6 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
                     color: "#E46B26",
                     cursor: "pointer",
                   }}
-                  onClick={handleNavigate}
                 >
                   Finish Setup
                 </h3>
@@ -152,7 +160,7 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
               >
                 {amount} Litres
               </p>
-              <p
+              {/* <p
                 style={{
                   float: "inline-end",
                   paddingTop: "16px",
@@ -161,7 +169,7 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
                 }}
               >
                 8 Days
-              </p>
+              </p> */}
             </Box>
           )}
           {/* <p style={{fontSize: '14px', color: '#E46B26'}}>{amount}</p> */}

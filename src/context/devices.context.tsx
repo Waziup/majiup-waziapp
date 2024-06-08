@@ -75,6 +75,7 @@ export type MetaInformation = {
   };
   settings: {
     height: number;
+    offset: number;
     capacity: number;
   };
   profile: Profile;
@@ -89,6 +90,7 @@ interface Device {
   capacity: number;
   created: Date;
   height: number;
+  offset: number;
   id: string;
   length?: number;
   meta: MetaInformation;
@@ -305,6 +307,7 @@ export const DevicesProvider = ({ children }: Props) => {
               ...device,
               capacity: device.meta?.settings.capacity,
               height: Math.round(device.meta?.settings.height),
+              offset: device.meta?.settings.offset,
               consumption: consumption[index],
               liters: device.sensors?.find((sensor: Sensor) =>
                 sensor.meta.kind.toLowerCase().includes("waterlevel")

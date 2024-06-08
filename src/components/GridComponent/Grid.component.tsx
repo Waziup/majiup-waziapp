@@ -1,6 +1,6 @@
 import { Box, Grid, Stack } from "@mui/material";
 import SideNavigation from "../SideNavigation";
-import NavigationIndex from "../Navigation";
+// import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
 import { useContext, useState } from "react";
 import TankDetailComponent from "../TankDetail/TankDetail.component";
@@ -23,6 +23,7 @@ import {
 } from "../../utils/consumptionHelper";
 import Copilot from "../copilot/copilot.component";
 import { formatTime } from "../../utils/timeFormatter";
+import { TbAlertHexagon } from "react-icons/tb";
 
 const BoxStyle = {
   bgcolor: "#fff",
@@ -38,12 +39,13 @@ const BoxStyle = {
 const TankDetails = {
   padding: "14px 24px",
   margin: "7px 0px",
-  width: "fit-content",
+  width: "inherit",
   borderRadius: "10px",
-  boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
+  // boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
   display: "flex",
   gap: "2rem",
-  justifyContent: "center",
+  justifyContent: "space-between",
+  flexWrap: "wrap",
 };
 
 function GridComponent() {
@@ -263,9 +265,6 @@ function GridComponent() {
   if (loading) {
     return (
       <Grid container style={{ background: "#F6F6F6" }} spacing={2}>
-        <Grid item xs={12}>
-          <NavigationIndex matches={matches} />
-        </Grid>
         <Grid container spacing={2}>
           {isOpenNav && !matches && (
             <Box
@@ -312,56 +311,26 @@ function GridComponent() {
   }
   return (
     <Grid
-      overflow={"hidden"}
-      height={"100vh"}
+      // overflow={"hidden"}
+      height={"100dvh"}
       container
       style={{ background: "#F6F6F6" }}
       spacing={2}
     >
-      <Grid item xs={12}>
-        <NavigationIndex matches={matches} />
-      </Grid>
       <Grid container spacing={2}>
-        {isOpenNav && !matches && (
-          <Box
-            sx={{
-              position: "absolute",
-              height: "100vh",
-              width: "110vw",
-              bgcolor: "rgba(0,0,0,.25)",
-            }}
-          ></Box>
-        )}
-        {(matches || isOpenNav) && (
-          <Grid
-            sx={
-              !matches
-                ? {
-                    zIndex: 6,
-                    position: "absolute",
-                    bgcolor: "#fff",
-                    transition: 0.5,
-                    width: "500px",
-                    height: "95vh",
-                    mt: 2,
-                  }
-                : {}
-            }
-            item
-            xs={matches ? 2.5 : 9}
-          >
-            <SideNavigation matches={matches} />
-          </Grid>
-        )}
         <Grid
           style={{
             position: "relative",
-            width: "20rem",
+            display: "flex",
+            marginLeft: `${matches ? "0" : "2rem"}`,
+            gap: `${matches ? "0" : "1rem"}`,
+            marginTop: "1rem",
+            alignItems: "center",
+            flexDirection: "column",
           }}
-          // ml={!matches ? 3 : 0}
-          mr={!matches ? 2 : 0}
           item
-          // xs={matches ? 6 : 12}
+          xs={12}
+          md={3}
         >
           {devices.length <= 0 ? (
             <Box
@@ -385,7 +354,7 @@ function GridComponent() {
                     margin: "10px 0",
                   }}
                 >
-                  Hi there, No devices found!
+                  Hi there, No tanks found!
                 </h3>
                 <Box component="img" src={FrameSVG} />
                 <p
@@ -396,7 +365,7 @@ function GridComponent() {
                     fontSize: 16,
                   }}
                 >
-                  No devices found, create one.
+                  No tanks found, create one.
                 </p>
               </Box>
             </Box>
@@ -437,8 +406,12 @@ function GridComponent() {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    bgcolor: tank.isSelect ? "#FFE6D9" : "#fff",
+                    // bgcolor: tank.isSelect ? "#FFE6D9" : "#fff",
+                    boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
                     cursor: "pointer",
+                    position: "relative",
+                    width: "95%",
+                    paddingBottom: `${!tank.consumption && "1rem"}`,
                   }}
                 >
                   <Box
@@ -475,14 +448,9 @@ function GridComponent() {
                   <WatertankComponent
                     percentage={Math.round((tank.liters / tank.capacity) * 100)}
                     waterQuality={tank.tds}
+                    consumption={selectedDevice?.consumption}
                   />
-                  <Stack
-                    // direction={"row"}
-                    flexWrap={"wrap"}
-                    alignItems={"center"}
-                    justifyContent={"space-between"}
-                    sx={{ marginTop: "10px", width: "90%" }}
-                  >
+                  {tank.consumption && (
                     <Box sx={TankDetails}>
                       <p
                         style={{
@@ -495,16 +463,9 @@ function GridComponent() {
                         <WaterDrop style={{ fontSize: 18, color: "#4592F6" }} />
                         Water Amount
                       </p>
-                      <p style={{ fontSize: "24px" }}>{tank.liters} Ltr</p>
+                      <p style={{ fontSize: "24px" }}>{tank.liters} Liters</p>
                     </Box>
-                    {/* <Box sx={TankDetails}>
-                                        <p style={{fontSize: '12px',display: 'inline-flex', alignItems:'center'}}>
-                                            <DeviceThermostatSharp style={{fontSize: 12, display: 'inline-block', color: '#1C1B1F'}}/>
-                                            Temperature
-                                        </p>
-                                        <p style={{fontSize: '24px',}}>{tank.temp}&#8451;</p>
-                                    </Box> */}
-                  </Stack>
+                  )}
                 </Box>
               )
             )
@@ -512,13 +473,13 @@ function GridComponent() {
         </Grid>
         {matches && (
           <Grid
-            overflow={"auto"}
-            height={"100dvh"}
+            // overflow={"auto"}
+            // height={"100dvh"}
             item
             style={{
               position: "relative",
             }}
-            // xs={10.4}
+            xs={9}
           >
             {selectedDevice && (
               <TankDetailComponent
@@ -539,7 +500,7 @@ function GridComponent() {
           </Grid>
         )}
       </Grid>
-      <Copilot />
+      {/* <Copilot /> */}
     </Grid>
   );
 }

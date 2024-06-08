@@ -14,8 +14,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
       <Route element={<LayoutComponent />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/analytics" element={<BillingsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="profile" element={<ProfilePage />} />

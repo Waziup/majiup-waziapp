@@ -25,6 +25,7 @@ import Chart from "react-apexcharts";
 import { postNewNotificationMessage } from "../../utils/consumptionHelper";
 
 import supabase from "../../config/supabaseClient";
+import { formatTime } from "../../utils/timeFormatter";
 
 type Props = {
   owner: string;
@@ -92,7 +93,7 @@ const TankDetails: React.CSSProperties = {
   borderRadius: "10px",
   boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
   display: "flex",
-  justifyContent: "space-around",
+  justifyContent: "space-between",
 };
 
 function TankDetailComponent({
@@ -377,165 +378,171 @@ function TankDetailComponent({
   return (
     <Box
       sx={
-        consumption?.length || (waterQuality && waterTemp)
-          ? { ...BoxStyle, bgcolor: "#fff" }
-          : { ...BoxStyle, bgcolor: "inherit" }
+        consumption?.length
+          ? {
+              ...BoxStyle,
+              bgcolor: "#fff",
+              display: "flex",
+              flexDirection: "column",
+            }
+          : {
+              ...BoxStyle,
+              bgcolor: "inherit",
+            }
       }
-      alignItems={"center"}
-      display={"flex"}
-      gap={5}
-      alignContent={"center"}
       padding={2}
     >
-      <Box sx={{}}>
-        <strong style={{ padding: "1rem" }}>{device?.name}</strong>
-        <WatertankComponent
-          waterQuality={waterQuality}
-          percentage={Math.round((liters / capacity) * 100)}
-        />
-        <Box sx={TankDetails}>
-          <p
-            style={{
-              fontSize: "16px",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
+      {consumption?.length ? (
+        <>
+          <Box
+            sx={{
+              display: "flex",
+              gap: "2rem",
             }}
           >
-            <WaterDrop style={{ fontSize: 28, color: "#4592F6" }} />
-            Current Amount
-          </p>
-          <p style={{ fontSize: "24px" }}>{liters} Ltr</p>
-        </Box>
-        <Box
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            gap: "2rem",
-            justifyContent: "space-between",
-          }}
-        >
-          {refill?.status === "In Progress" ? (
-            <>
-              <button
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1rem",
-                  backgroundColor: "#FF5C00 ",
-                  border: "none",
-                  color: " #fff",
-                  padding: "0.5rem 0.8rem",
-                  fontWeight: "bold",
-                  borderRadius: "2rem",
-                  fontSize: 16,
-                  // cursor: "pointer",
-                }}
-              >
-                {/* <span> */}
-                <Box>
-                  <FaTruckDroplet size={30} />
-                </Box>
-                {/* </span> */}
-                Request in Progress
-              </button>
-              <button
-                onClick={() => cancelRefill(refill.id)}
-                style={{
-                  backgroundColor: "gray",
-                  border: "none",
-                  color: " #fff",
-                  padding: "0.8rem",
-                  fontWeight: "bold",
-                  borderRadius: "2rem",
-                  fontSize: 16,
-                  cursor: "pointer",
-                  width: "6rem",
-                }}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              {sendingReq ? (
-                <p style={{ color: "orangegb" }}>Sending order...</p>
-              ) : (
-                <button
-                  onClick={() => createRefill(device)}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <strong style={{ padding: "1rem" }}>{device?.name}</strong>
+              <WatertankComponent
+                waterQuality={waterQuality}
+                percentage={Math.round((liters / capacity) * 100)}
+                consumption={device?.consumption}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignContent: "center",
+                justifyContent: "center",
+                width: "fit-content",
+                minWidth: "40%",
+              }}
+              gap={2}
+            >
+              <Box sx={TankDetails}>
+                <p
                   style={{
-                    backgroundColor: "#1976D2",
-                    border: "none",
-                    color: " #fff",
-                    padding: "0.8rem",
-                    fontWeight: "bold",
-                    borderRadius: "2rem",
-                    fontSize: 16,
-                    cursor: "pointer",
+                    fontSize: "16px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  Request Refill
-                </button>
-              )}
+                  <WaterDrop style={{ fontSize: 28, color: "#4592F6" }} />
+                  Current Amount
+                </p>
+                <p style={{ fontSize: "24px" }}>{liters} Ltr</p>
+              </Box>
+              <Box
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "2rem",
+                  justifyContent: "space-between",
+                }}
+              >
+                {refill?.status === "In Progress" ? (
+                  <>
+                    <button
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "1rem",
+                        backgroundColor: "#FF5C00 ",
+                        border: "none",
+                        color: " #fff",
+                        padding: "0.5rem 0.8rem",
+                        fontWeight: "bold",
+                        borderRadius: "2rem",
+                        fontSize: 16,
+                        // cursor: "pointer",
+                      }}
+                    >
+                      {/* <span> */}
+                      <Box>
+                        <FaTruckDroplet size={30} />
+                      </Box>
+                      {/* </span> */}
+                      Request in Progress
+                    </button>
+                    <button
+                      onClick={() => cancelRefill(refill.id)}
+                      style={{
+                        backgroundColor: "gray",
+                        border: "none",
+                        color: " #fff",
+                        padding: "0.8rem",
+                        fontWeight: "bold",
+                        borderRadius: "2rem",
+                        fontSize: 16,
+                        cursor: "pointer",
+                        width: "6rem",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {sendingReq ? (
+                      <p style={{ color: "orangegb" }}>Sending order...</p>
+                    ) : (
+                      <button
+                        onClick={() => createRefill(device)}
+                        style={{
+                          backgroundColor: "#1976D2",
+                          border: "none",
+                          color: " #fff",
+                          padding: "0.8rem",
+                          fontWeight: "bold",
+                          borderRadius: "2rem",
+                          fontSize: 16,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Request Refill
+                      </button>
+                    )}
+
+                    <Box
+                      style={{
+                        border: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: ".5rem",
+                      }}
+                    >
+                      <Box>
+                        <PiWarningOctagonLight color="orange" size={26} />
+                      </Box>
+                      <p>Refill in 8 days</p>
+                    </Box>
+                  </>
+                )}
+              </Box>
 
               <Box
                 style={{
-                  border: "none",
                   display: "flex",
-                  alignItems: "center",
-                  gap: ".5rem",
+                  justifyContent: "space-between",
                 }}
               >
-                <Box>
-                  <PiWarningOctagonLight color="orange" size={26} />
-                </Box>
-                <p>Refill in 8 days</p>
+                <p>Tank Status</p>
+                {device?.on ? (
+                  <p style={{ color: "green" }}>Active</p>
+                ) : (
+                  <p style={{ color: "red" }}>Offline</p>
+                )}
               </Box>
-            </>
-          )}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            marginTop: "10px",
-            justifyContent: "space-between",
-            alignItems: "center",
-            cursor: "pointer",
-            transition: ".5s",
-            borderRadius: "5px",
-            width: "100%",
-            boxShadow: "1px 2px 1px rgba(0, 0, 0, 0.15)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "14px",
-              display: "inline-flex",
-              alignItems: "center",
-            }}
-          >
-            <NotificationsIcon style={{ fontSize: 14 }} />
-            Notification
-          </p>
-          <Android12Switch checked={receiveNotifications} />
-        </Box>
-      </Box>
-      <Box>
-        {consumption?.length || (waterQuality && waterTemp) ? (
-          <>
-            {/* <h3 style={{display: 'inline-block'}}>{owner}</h3> */}
-            {
-              // isalert?(
-              //     <Box sx={{display: 'flex',marginTop:'10px', justifyContent: 'space-between',alignItems: 'center', padding:'8px 3px', cursor: 'pointer', transition: '.5s', borderRadius: '5px', bgcolor:'#E7D66C', width: '90%',boxShadow: '3px 1px 2px rgba(0, 0, 0, 0.15)',}}>
-              //         <p style={{display: 'inline-flex',paddingLeft: '5px', color:'#B69E09', alignItems: 'center'}}>
-              //             ""
-              //         </p>
-              //         <p style={{color:'#B69E09'}} >&#10006;</p>
-              //     </Box>
-              // ):(null)
-            }
-            {(actuator?.length as number) > 0 && (
+
               <Box
                 sx={{
                   display: "flex",
@@ -545,220 +552,132 @@ function TankDetailComponent({
                   cursor: "pointer",
                   transition: ".5s",
                   borderRadius: "5px",
-                  width: "90%",
-                  boxShadow: "3px 1px 2px rgba(0, 0, 0, 0.15)",
+                  width: "100%",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                  padding: 2,
                 }}
               >
                 <p
                   style={{
+                    fontSize: "14px",
                     display: "inline-flex",
-                    padding: 2,
                     alignItems: "center",
+                    gap: "8px",
                   }}
                 >
-                  <FireHydrantAlt sx={{ fontSize: 25, color: "#4592F6" }} />
-                  {actuator ? actuator[0].name : "Water Pump Control"}
+                  <Box>
+                    <NotificationsIcon />
+                  </Box>
+                  Notifications
                 </p>
-                <Android12Switch
-                  onClick={switchActuator}
-                  checked={pumpStatus}
-                  sx={{ color: "#FF5C00" }}
-                />
+                <Android12Switch checked={receiveNotifications} />
               </Box>
-            )}
-
-            <Stack
-              direction={"row"}
-              flexWrap={"wrap"}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-              sx={{ marginTop: "10px", width: "80%" }}
-            >
-              {/* <Box sx={T/ankDetails}>
-              <p
-                style={{
-                  fontSize: "12px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
-                <DeviceThermostatSharp
-                  style={{
-                    fontSize: 12,
-                    display: "inline-block",
-                    color: "#1C1B1F",
-                  }}
-                />
-                Temperature
-              </p>
-              <p style={{ fontSize: "24px" }}>{Math.round(waterTemp)}&#8451;</p>
-            </Box> */}
-              {/* <Box sx={TankDetails}>
-              <p
-                style={{
-                  fontSize: "12px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
-                <AutoAwesome
-                  style={{ fontSize: 12, display: "inline-block" }}
-                />
-                Water Quality
-              </p>
-              {waterQuality?.toLowerCase().includes("excellent") && (
-                <p style={{ fontSize: "24px", color: "#85ea2d" }}>
-                  {waterQuality}
-                </p>
-              )}
-              {waterQuality?.includes("Poor") && (
-                <p style={{ fontSize: "24px", color: "#c5221f" }}>
-                  {waterQuality}
-                </p>
-              )}
-              {waterQuality?.includes("Good") && (
-                <p style={{ fontSize: "24px", color: "#f35e19" }}>
-                  {waterQuality}
-                </p>
-              )}
             </Box>
-            <Box sx={TankDetails}>
-              <p
-                style={{
-                  fontSize: "12px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
-                <WaterDrop
-                  style={{
-                    fontSize: 12,
-                    display: "inline-block",
-                    color: "#2C2D38",
+          </Box>
+          <Box>
+            <>
+              {(actuator?.length as number) > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    marginTop: "10px",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    transition: ".5s",
+                    borderRadius: "5px",
+                    width: "90%",
+                    boxShadow: "3px 1px 2px rgba(0, 0, 0, 0.15)",
                   }}
-                />
-                Water Leakage
-              </p>
-              <p style={{ fontSize: "24px" }}>No</p>
-            </Box> */}
-            </Stack>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                transition: ".5s",
-              }}
-            >
+                >
+                  <p
+                    style={{
+                      display: "inline-flex",
+                      padding: 2,
+                      alignItems: "center",
+                    }}
+                  >
+                    <FireHydrantAlt sx={{ fontSize: 25, color: "#4592F6" }} />
+                    {actuator ? actuator[0].name : "Water Pump Control"}
+                  </p>
+                  <Android12Switch
+                    onClick={switchActuator}
+                    checked={pumpStatus}
+                    sx={{ color: "#FF5C00" }}
+                  />
+                </Box>
+              )}
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  flexDirection: "column",
                   transition: ".5s",
-                  width: "75%",
                 }}
               >
-                <p
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "600",
-                    textAlign: "center",
-                  }}
-                >
-                  WATER CONSUMPTION
-                </p>
-                <Box
-                  // onClick={handleToggleTeemp}
-                  pt={0.3}
-                  bgcolor={"#E8E8E8"}
-                  sx={{
-                    borderRadius: "20px",
-                    width: "20%",
-                    textAlign: "center",
-                  }}
-                >
-                  <Opacity
-                    style={{
-                      cursor: "pointer",
-                      color: "#fff",
-                      borderRadius: "50%",
-                      backgroundColor: "#4592F6",
-                    }}
-                  />
-                  {/* <DeviceThermostat
-                  style={
-                    toggleHot
-                      ? {
-                          color: "#fff",
-                          cursor: "pointer",
-                          borderRadius: "50%",
-                          backgroundColor: "#FF5C00",
-                        }
-                      : { color: "#888992", cursor: "pointer" }
-                  }
-                /> */}
-                </Box>
-              </Box>
-              <Chart
-                options={{
-                  chart: {
-                    height: 350,
-                    type: "rangeArea",
-                  },
-                  colors: ["#4592F6"],
-
-                  dataLabels: {
-                    enabled: false,
-                  },
-                  stroke: {
-                    curve: "smooth",
-                    width: 2,
-                  },
-                  xaxis: {
-                    categories: temperatureConsumption?.map((item) => item.x),
-                    tickAmount: 5,
-                  },
-                  fill: {
-                    type: "gradient",
-                    gradient: {
-                      shadeIntensity: 1,
-                      opacityFrom: 0.5,
-                      opacityTo: 0.5,
-                      stops: [0, 90, 100],
+                <Chart
+                  options={{
+                    chart: {
+                      type: "rangeArea",
                     },
-                  },
-                }}
-                series={apexChartOptions.series}
-                type="line"
-                height={300}
-                width={450}
-              />
-              {/* <MapComponent /> */}
-            </Box>
-          </>
-        ) : (
-          <Box sx={{ position: "relative" }}>
-            <Box sx={{ marginTop: "10px" }}>
-              {/* <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
+                    colors: ["#4592F6"],
+
+                    dataLabels: {
+                      enabled: false,
+                    },
+                    stroke: {
+                      curve: "smooth",
+                      width: 2,
+                    },
+                    xaxis: {
+                      categories: temperatureConsumption?.map((item) => item.x),
+                      tickAmount: 5,
+                    },
+                    fill: {
+                      type: "gradient",
+                      gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.5,
+                        opacityTo: 0.5,
+                        stops: [0, 90, 100],
+                      },
+                    },
+                  }}
+                  series={apexChartOptions.series}
+                  type="line"
+                  height={500}
+                />
+                {/* <MapComponent /> */}
+              </Box>
+            </>
+          </Box>
+        </>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+          }}
+        >
+          <Box sx={{}}>
+            {/* <h3 style={{fontSize: '15px', textAlign: 'center', margin:'10px 0'}}>
                                 {owner}
                             </h3> */}
-              <Box sx={{ width: "100%" }} component="img" src={FrameSVG} />
-              <p
-                style={{
-                  color: "red",
-                  fontWeight: "600",
-                  textAlign: "center",
-                  fontSize: 16,
-                }}
-              >
-                No readings detected for this tank!
-              </p>
-            </Box>
+            <Box sx={{ width: "100%" }} component="img" src={FrameSVG} />
+            <p
+              style={{
+                color: "red",
+                fontWeight: "600",
+                textAlign: "center",
+                fontSize: 16,
+              }}
+            >
+              No readings detected for this tank!
+            </p>
           </Box>
-        )}
-      </Box>
+        </Box>
+      )}
     </Box>
   );
 }
