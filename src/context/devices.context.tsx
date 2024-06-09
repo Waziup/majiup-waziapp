@@ -143,7 +143,7 @@ export const DevicesContext = createContext<ContextValues>({
   setSelectedDevice() {},
   reportRef: null,
   setReportRef: () => {},
-  loading: false,
+  loading: true,
   setLoadingFunc: () => {},
   // fetchinHours: ()=>{console.log('');},
   fetchInMinutes: () => {},
@@ -180,7 +180,7 @@ export const DevicesProvider = ({ children }: Props) => {
   const [devices, setDevices] = useState<X[]>([]);
   const [profile, setProfile] = useState<Profile>();
   const [filteredDevices, setFilteredDevices] = useState<X[]>(devices);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [selectedTank, setSelectedTank] = useState<X>();
   const [connected, setConnected] = useState<boolean>();
   const [user, setLoggedUser] = useState<{ name: string; token: string }>({
@@ -223,7 +223,7 @@ export const DevicesProvider = ({ children }: Props) => {
     }
   };
   const setLoadingFunc = (loading: boolean) => {
-    setLoading(!loading);
+    // setLoading(!loading);
   };
 
   const getUserProfile = async () => {
@@ -328,6 +328,7 @@ export const DevicesProvider = ({ children }: Props) => {
       })
       .catch((err) => {
         console.log(err);
+        setLoading(false);
       });
   }
   // function fetchinHours(){
@@ -389,7 +390,6 @@ export const DevicesProvider = ({ children }: Props) => {
   //   client.reconnect();
   // });
   useEffect(() => {
-    setLoading(true);
     fetchInMinutes();
     setFilteredDevices(devices);
     getUserProfile();
@@ -409,7 +409,6 @@ export const DevicesProvider = ({ children }: Props) => {
   useEffect(() => {
     if (devices !== undefined && selectedTank === undefined) {
       setSelectedTank(devices[0]);
-      setLoading(false);
     }
   }, [devices, selectedTank]);
   const setSelectedDevice = (device: X) => setSelectedTank(device);

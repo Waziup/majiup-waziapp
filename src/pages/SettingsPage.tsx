@@ -48,6 +48,7 @@ export const ModalContainer: SxProps<Theme> = {
   transform: "translate(-50%, -50%)",
   width: "40%",
   alignContent: "center",
+  borderRadius: "4px",
   //
 };
 const InputLabel = {
@@ -414,7 +415,7 @@ function SettingsPage() {
     });
   }
   return (
-    <Box pl={2} pr={2}>
+    <Box pl={3} pr={1}>
       <Modal
         open={isOpenModal}
         onClose={() => setIsOpenModal(!isOpenModal)}
@@ -427,9 +428,9 @@ function SettingsPage() {
               ? { ...ModalContainer }
               : {
                   ...ModalContainer,
-                  maxHeight: "80vh",
+                  maxHeight: "60vh",
                   overflowY: "scroll",
-                  minWidth: "80vw",
+                  minWidth: "95vw",
                 }
           }
         >

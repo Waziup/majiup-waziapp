@@ -304,7 +304,7 @@ function BillingsPage() {
     return <article>Loading</article>;
   }
   return (
-    <Box pl={2} pr={2}>
+    <Box pl={3} pr={1}>
       <Box
         onClick={() => setIsOpenModal(!isOpenModal)}
         sx={{

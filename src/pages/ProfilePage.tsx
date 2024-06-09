@@ -116,6 +116,12 @@ export default function ProfilePage() {
     }
   }, [profile]);
 
+  const InputElementStyle: React.CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+  };
+
   return (
     <Box
       sx={{
@@ -125,6 +131,8 @@ export default function ProfilePage() {
         justifyContent: "center",
         minHeight: "50dvh",
         marginTop: "5%",
+        marginRight: 1,
+        marginLeft: 3,
       }}
     >
       <Modal
@@ -157,7 +165,7 @@ export default function ProfilePage() {
                     gap: "1rem",
                   }}
                 >
-                  <Box mb={2}>
+                  <Box mb={0} sx={InputElementStyle}>
                     <label htmlFor="">First Name</label>
                     <input
                       name="first_name"
@@ -168,7 +176,7 @@ export default function ProfilePage() {
                       onChange={handleChange}
                     />
                   </Box>
-                  <Box mb={2}>
+                  <Box mb={0} sx={InputElementStyle}>
                     <label htmlFor="">Last Name</label>
                     <input
                       name="last_name"
@@ -179,7 +187,7 @@ export default function ProfilePage() {
                       onChange={handleChange}
                     />
                   </Box>
-                  <Box mb={2}>
+                  <Box mb={0} sx={InputElementStyle}>
                     <label htmlFor="">Username</label>
                     <input
                       name="username"
@@ -190,7 +198,7 @@ export default function ProfilePage() {
                       onChange={handleChange}
                     />
                   </Box>
-                  <Box mb={2}>
+                  <Box mb={0} sx={InputElementStyle}>
                     <label htmlFor="">Phone</label>
                     <input
                       name="phone"
@@ -201,7 +209,7 @@ export default function ProfilePage() {
                       onChange={handleChange}
                     />
                   </Box>
-                  <Box mb={2}>
+                  <Box mb={0} sx={InputElementStyle}>
                     <label htmlFor="">Email</label>
                     <input
                       name="email"
@@ -212,7 +220,7 @@ export default function ProfilePage() {
                       onChange={handleChange}
                     />
                   </Box>
-                  <Box mb={2}>
+                  <Box mb={0} sx={InputElementStyle}>
                     <label htmlFor="">Address</label>
                     <input
                       name="address"
@@ -224,7 +232,7 @@ export default function ProfilePage() {
                     />
                   </Box>
                 </Box>
-                <Box mt={4} sx={{ ...fRow }}>
+                <Box mt={1} sx={{ ...fRow }}>
                   <button
                     style={{
                       ...cancelButtonStyle,
