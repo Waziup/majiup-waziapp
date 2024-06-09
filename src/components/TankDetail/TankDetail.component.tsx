@@ -1,11 +1,11 @@
-import { Stack, Box, styled, Switch } from "@mui/material";
+import { Box, styled, Switch, useMediaQuery, useTheme } from "@mui/material";
 import {
   FireHydrantAlt,
   WaterDrop,
   // DeviceThermostatSharp,
   // AutoAwesome,
   // DeviceThermostat,
-  Opacity,
+  // Opacity,
 } from "@mui/icons-material";
 import WatertankComponent from "../WaterTank/Watertank.component";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -16,16 +16,19 @@ import { Actuator, DevicesContext, X } from "../../context/devices.context";
 // import axios from "axios";
 import { PiWarningOctagonLight } from "react-icons/pi";
 import { FaTruckDroplet } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
-type Consumption = {
-  x: number;
-  y: number;
-};
 import Chart from "react-apexcharts";
 import { postNewNotificationMessage } from "../../utils/consumptionHelper";
 
 import supabase from "../../config/supabaseClient";
 import { formatTime } from "../../utils/timeFormatter";
+import toast from "react-hot-toast";
+
+type Consumption = {
+  x: number;
+  y: number;
+};
 
 type Props = {
   owner: string;
@@ -100,7 +103,6 @@ function TankDetailComponent({
   id,
   capacity,
   receiveNotifications,
-  waterTemp,
   waterQuality,
   liters,
   consumption,
@@ -114,6 +116,8 @@ function TankDetailComponent({
   const [pumpStatus, setPumpStatus] = useState(false);
   const { devices } = useContext(DevicesContext);
   const device = devices.find((device: X) => device.id === id);
+
+  const navigate = useNavigate();
 
   // console.log("Supabase: ", supabase);
 
@@ -338,6 +342,7 @@ function TankDetailComponent({
             status: data.status,
           };
         });
+        toast.success("Order cancelled!");
       }
     } catch (error) {
       console.log("Error");
@@ -375,6 +380,9 @@ function TankDetailComponent({
     listenToUpdateRefills();
   }, [device]);
 
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("md"));
+
   return (
     <Box
       sx={
@@ -398,6 +406,9 @@ function TankDetailComponent({
             sx={{
               display: "flex",
               gap: "2rem",
+              flexWrap: "wrap",
+              justifyContent: !matches && "center",
+              alignItems: "center",
             }}
           >
             <Box
@@ -421,8 +432,9 @@ function TankDetailComponent({
                 flexDirection: "column",
                 alignContent: "center",
                 justifyContent: "center",
-                width: "fit-content",
+                width: matches ? "fit-content" : "100%",
                 minWidth: "40%",
+                // flexWrap: "wrap",
               }}
               gap={2}
             >
@@ -459,10 +471,10 @@ function TankDetailComponent({
                         backgroundColor: "#FF5C00 ",
                         border: "none",
                         color: " #fff",
-                        padding: "0.5rem 0.8rem",
+                        padding: "0.4rem 0.7rem",
                         fontWeight: "bold",
                         borderRadius: "2rem",
-                        fontSize: 16,
+                        fontSize: matches ? 16 : 14,
                         // cursor: "pointer",
                       }}
                     >
@@ -504,7 +516,7 @@ function TankDetailComponent({
                           padding: "0.8rem",
                           fontWeight: "bold",
                           borderRadius: "2rem",
-                          fontSize: 16,
+                          fontSize: matches ? 16 : 14,
                           cursor: "pointer",
                         }}
                       >
@@ -528,7 +540,6 @@ function TankDetailComponent({
                   </>
                 )}
               </Box>
-
               <Box
                 style={{
                   display: "flex",
@@ -542,11 +553,9 @@ function TankDetailComponent({
                   <p style={{ color: "red" }}>Offline</p>
                 )}
               </Box>
-
               <Box
                 sx={{
                   display: "flex",
-                  marginTop: "10px",
                   justifyContent: "space-between",
                   alignItems: "center",
                   cursor: "pointer",
@@ -607,47 +616,48 @@ function TankDetailComponent({
                   />
                 </Box>
               )}
-              <Box
+              {/* <Box
                 sx={{
                   display: "flex",
                   flexDirection: "column",
                   transition: ".5s",
                 }}
-              >
-                <Chart
-                  options={{
-                    chart: {
-                      type: "rangeArea",
-                    },
-                    colors: ["#4592F6"],
+              > */}
+              <Chart
+                onClick={() => navigate("/analytics")}
+                options={{
+                  chart: {
+                    type: "rangeArea",
+                  },
+                  colors: ["#4592F6"],
 
-                    dataLabels: {
-                      enabled: false,
+                  dataLabels: {
+                    enabled: false,
+                  },
+                  stroke: {
+                    curve: "smooth",
+                    width: 2,
+                  },
+                  xaxis: {
+                    categories: temperatureConsumption?.map((item) => item.x),
+                    tickAmount: 5,
+                  },
+                  fill: {
+                    type: "gradient",
+                    gradient: {
+                      shadeIntensity: 1,
+                      opacityFrom: 0.5,
+                      opacityTo: 0.5,
+                      stops: [0, 90, 100],
                     },
-                    stroke: {
-                      curve: "smooth",
-                      width: 2,
-                    },
-                    xaxis: {
-                      categories: temperatureConsumption?.map((item) => item.x),
-                      tickAmount: 5,
-                    },
-                    fill: {
-                      type: "gradient",
-                      gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.5,
-                        opacityTo: 0.5,
-                        stops: [0, 90, 100],
-                      },
-                    },
-                  }}
-                  series={apexChartOptions.series}
-                  type="line"
-                  height={500}
-                />
-                {/* <MapComponent /> */}
-              </Box>
+                  },
+                }}
+                series={apexChartOptions.series}
+                type="line"
+                height={matches ? 500 : 250}
+              />
+              {/* <MapComponent /> */}
+              {/* </Box> */}
             </>
           </Box>
         </>
@@ -673,7 +683,7 @@ function TankDetailComponent({
                 fontSize: 16,
               }}
             >
-              No readings detected for this tank!
+              No readings detected for {device?.name}
             </p>
           </Box>
         </Box>

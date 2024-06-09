@@ -1,5 +1,5 @@
-import { Box, Grid, Stack } from "@mui/material";
-import SideNavigation from "../SideNavigation";
+import { Box, Grid } from "@mui/material";
+// import SideNavigation from "../SideNavigation";
 // import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
 import { useContext, useState } from "react";
@@ -21,9 +21,9 @@ import {
   getLiters,
   // postNewNotificationMessage,
 } from "../../utils/consumptionHelper";
-import Copilot from "../copilot/copilot.component";
+// import Copilot from "../copilot/copilot.component";
 import { formatTime } from "../../utils/timeFormatter";
-import { TbAlertHexagon } from "react-icons/tb";
+// import { TbAlertHexagon } from "react-icons/tb";
 
 const BoxStyle = {
   bgcolor: "#fff",
@@ -43,9 +43,7 @@ const TankDetails = {
   borderRadius: "10px",
   // boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
   display: "flex",
-  gap: "2rem",
   justifyContent: "space-between",
-  flexWrap: "wrap",
 };
 
 function GridComponent() {
@@ -262,54 +260,14 @@ function GridComponent() {
     }
     return false;
   }
-  if (loading) {
-    return (
-      <Grid container style={{ background: "#F6F6F6" }} spacing={2}>
-        <Grid container spacing={2}>
-          {isOpenNav && !matches && (
-            <Box
-              sx={{
-                position: "absolute",
-                height: "100vh",
-                width: "110vw",
-                bgcolor: "rgba(0,0,0,.25)",
-              }}
-            ></Box>
-          )}
-          {(matches || isOpenNav) && (
-            <Grid
-              sx={
-                !matches
-                  ? {
-                      zIndex: 6,
-                      position: "absolute",
-                      bgcolor: "#fff",
-                      transition: 0.5,
-                      width: "500px",
-                      height: "95vh",
-                      mt: 2,
-                    }
-                  : {}
-              }
-              item
-              xs={matches ? 2.5 : 9}
-            >
-              <SideNavigation matches={matches} />
-            </Grid>
-          )}
-          <Grid
-            ml={!matches ? 3 : 0}
-            mr={!matches ? 2 : 0}
-            item
-            xs={matches ? 6 : 12}
-          >
-            <article>Loading...</article>
-          </Grid>
-        </Grid>
-      </Grid>
-    );
-  }
-  return (
+
+  console.log(loading);
+
+  return loading ? (
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <p>Loading...</p>
+    </Box>
+  ) : (
     <Grid
       // overflow={"hidden"}
       height={"100dvh"}
@@ -332,7 +290,7 @@ function GridComponent() {
           xs={12}
           md={3}
         >
-          {devices.length <= 0 ? (
+          {devices.length <= 0 && loading ? (
             <Box
               sx={{
                 position: "relative",
@@ -412,6 +370,7 @@ function GridComponent() {
                     position: "relative",
                     width: "95%",
                     paddingBottom: `${!tank.consumption && "1rem"}`,
+                    borderRadius: "4px",
                   }}
                 >
                   <Box
@@ -421,7 +380,7 @@ function GridComponent() {
                       justifyContent: "space-between",
                       alignItems: "center",
                       cursor: "pointer",
-                      width: "90%",
+                      width: "100%",
                       transition: ".5s",
                     }}
                   >
@@ -451,7 +410,7 @@ function GridComponent() {
                     consumption={selectedDevice?.consumption}
                   />
                   {tank.consumption && (
-                    <Box sx={TankDetails}>
+                    <Box sx={{ ...TankDetails }}>
                       <p
                         style={{
                           fontSize: "16px",

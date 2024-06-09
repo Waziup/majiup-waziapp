@@ -74,7 +74,7 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
         transition: ".5s",
         borderRadius: "5px",
         width: "100%",
-        boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        // boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
       }}
     >
       <Box
