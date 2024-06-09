@@ -1,4 +1,6 @@
+import { useTheme } from "@emotion/react";
 import "./Watertank.styles.css";
+import { useMediaQuery } from "@mui/material";
 // import BacteriaSVG from "../../assets/bacteria.svg";
 // import DirtSVG from "../../assets/dirt.svg";
 type Props = {
@@ -14,9 +16,12 @@ function mapNumberToPercentage(number: number): number {
     (number / 100) * (destinationMax - destinationMin) + destinationMin;
   return mappedValue;
 }
+
 function WatertankComponent({ percentage }: Props) {
+  // const theme = useTheme();
+  // const matches = useMediaQuery(theme.breakpoints.up("md"));
   return (
-    <div className="circle">
+    <div className="circle" style={{ width: "175px", height: "175px" }}>
       <style>
         {`
                     .wave:before,

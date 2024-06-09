@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import TankDetailComponent from "../components/TankDetail/TankDetail.component";
-import { NavigateBefore } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import { DevicesContext } from "../context/devices.context";
 import { useContext } from "react";
@@ -40,14 +39,7 @@ function DevicesPage() {
   }
   return (
     <Box pl={3} pr={1}>
-      <NavigateBefore
-        sx={{
-          cursor: "pointer",
-          border: "1px solid #000",
-          borderRadius: "50%",
-        }}
-        onClick={() => navigate(-1)}
-      />
+      {/*   */}
       <TankDetailComponent
         liters={data.state.liters}
         on={data.state.on}

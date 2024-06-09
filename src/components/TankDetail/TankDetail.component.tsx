@@ -24,6 +24,8 @@ import { postNewNotificationMessage } from "../../utils/consumptionHelper";
 import supabase from "../../config/supabaseClient";
 import { formatTime } from "../../utils/timeFormatter";
 import toast from "react-hot-toast";
+import { ImArrowUp } from "react-icons/im";
+import { ImArrowDown } from "react-icons/im";
 
 type Consumption = {
   x: number;
@@ -94,7 +96,7 @@ const TankDetails: React.CSSProperties = {
   margin: "7px 0",
   width: "100%",
   borderRadius: "10px",
-  boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
+  // boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
   display: "flex",
   justifyContent: "space-between",
 };
@@ -405,7 +407,7 @@ function TankDetailComponent({
           <Box
             sx={{
               display: "flex",
-              gap: "2rem",
+              gap: "0.5rem",
               flexWrap: "wrap",
               justifyContent: !matches && "center",
               alignItems: "center",
@@ -419,7 +421,7 @@ function TankDetailComponent({
                 gap: 1,
               }}
             >
-              <strong style={{ padding: "1rem" }}>{device?.name}</strong>
+              <strong style={{ padding: "0.5rem" }}>{device?.name}</strong>
               <WatertankComponent
                 waterQuality={waterQuality}
                 percentage={Math.round((liters / capacity) * 100)}
@@ -434,31 +436,101 @@ function TankDetailComponent({
                 justifyContent: "center",
                 width: matches ? "fit-content" : "100%",
                 minWidth: "40%",
+                overflow: "hidden",
                 // flexWrap: "wrap",
+                borderRadius: "4px",
+                boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
               }}
-              gap={2}
             >
-              <Box sx={TankDetails}>
-                <p
-                  style={{
-                    fontSize: "16px",
-                    display: "inline-flex",
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignContent: "center",
+                  justifyContent: "center",
+                  padding: 2,
+                }}
+                gap={2}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <WaterDrop style={{ fontSize: 28, color: "#4592F6" }} />
-                  Current Amount
-                </p>
-                <p style={{ fontSize: "24px" }}>{liters} Ltr</p>
+                  <p>Current Quantity</p>
+                  <p style={{ fontSize: "24px" }}>{liters} Ltrs</p>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <p>Average consumption</p>
+                  <p style={{ fontSize: "24px" }}>{liters * 0.004} Ltrs</p>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    transition: ".5s",
+                    borderRadius: "8px",
+                    width: "100%",
+                  }}
+                >
+                  <p>Trend</p>
+                  {/* <input type="datetime-local" /> */}
+
+                  <select
+                    name=""
+                    id=""
+                    style={{
+                      padding: "8px",
+                      borderRadius: "4px",
+                      backgroundColor: "#4592F6",
+                      border: "none",
+                      color: "#fff",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="">5 min</option>
+                    <option value="">30 min</option>
+                    <option value="">1 hrs</option>
+                    <option value="">4 hour</option>
+                    <option value="">12 hour</option>
+                    <option value="">1 day</option>
+                  </select>
+                  <Box>
+                    <ImArrowUp color="green" />
+                  </Box>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <p>Tank Status</p>
+                  {device?.on ? (
+                    <p style={{ color: "green" }}>Active</p>
+                  ) : (
+                    <p style={{ color: "red" }}>Offline</p>
+                  )}
+                </Box>
               </Box>
               <Box
-                style={{
+                sx={{
                   width: "100%",
                   display: "flex",
                   alignItems: "center",
-                  gap: "2rem",
                   justifyContent: "space-between",
+                  backgroundColor: "#F6F6F6",
+                  padding: 1.5,
                 }}
               >
                 {refill?.status === "In Progress" ? (
@@ -515,6 +587,7 @@ function TankDetailComponent({
                           color: " #fff",
                           padding: "0.8rem",
                           fontWeight: "bold",
+
                           borderRadius: "2rem",
                           fontSize: matches ? 16 : 14,
                           cursor: "pointer",
@@ -539,47 +612,6 @@ function TankDetailComponent({
                     </Box>
                   </>
                 )}
-              </Box>
-              <Box
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <p>Tank Status</p>
-                {device?.on ? (
-                  <p style={{ color: "green" }}>Active</p>
-                ) : (
-                  <p style={{ color: "red" }}>Offline</p>
-                )}
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  transition: ".5s",
-                  borderRadius: "5px",
-                  width: "100%",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-                  padding: 2,
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: "14px",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <Box>
-                    <NotificationsIcon />
-                  </Box>
-                  Notifications
-                </p>
-                <Android12Switch checked={receiveNotifications} />
               </Box>
             </Box>
           </Box>

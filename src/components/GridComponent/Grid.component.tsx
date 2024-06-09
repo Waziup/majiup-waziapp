@@ -22,7 +22,7 @@ import {
   // postNewNotificationMessage,
 } from "../../utils/consumptionHelper";
 // import Copilot from "../copilot/copilot.component";
-import { formatTime } from "../../utils/timeFormatter";
+import { formatTime, getLastSeen } from "../../utils/timeFormatter";
 // import { TbAlertHexagon } from "react-icons/tb";
 
 const BoxStyle = {
@@ -369,19 +369,23 @@ function GridComponent() {
                     cursor: "pointer",
                     position: "relative",
                     width: "95%",
+                    // padding: 1,
                     paddingBottom: `${!tank.consumption && "1rem"}`,
                     borderRadius: "4px",
+                    gap: "4px",
+                    overflow: "hidden",
                   }}
                 >
                   <Box
                     sx={{
                       display: "flex",
-                      padding: "10px",
                       justifyContent: "space-between",
                       alignItems: "center",
                       cursor: "pointer",
                       width: "100%",
                       transition: ".5s",
+                      padding: 1,
+                      backgroundColor: "#dadada",
                     }}
                   >
                     <p
@@ -389,11 +393,12 @@ function GridComponent() {
                         display: "inline-flex",
                         padding: 2,
                         alignItems: "center",
+                        fontWeight: "bold",
                       }}
                     >
                       {tank.name ?? "Tank"}
                     </p>
-                    <h3
+                    {/* <h3
                       style={
                         tank.on
                           ? { fontSize: "16px", color: "#85ea2d" }
@@ -401,30 +406,84 @@ function GridComponent() {
                       }
                     >
                       {tank.on ? "Active" : "Inactive"}
-                    </h3>
-                    <MoreVert sx={{ fontSize: 25, color: "#4592F6" }} />
+                    </h3> */}
+                    {!tank.on && tank.consumption && (
+                      <small>
+                        Last seen{" "}
+                        {getLastSeen(
+                          tank?.sensors?.find(
+                            (sensor) => sensor.meta.kind === "WaterLevel"
+                          )?.modified
+                        )}
+                      </small>
+                    )}
+                    <div
+                      style={{
+                        width: "8px",
+                        aspectRatio: 1,
+                        backgroundColor: tank.on ? "#85ea2d" : "#85ea2d",
+                        zIndex: 1,
+                        borderRadius: "50%",
+                      }}
+                    ></div>
                   </Box>
-                  <WatertankComponent
-                    percentage={Math.round((tank.liters / tank.capacity) * 100)}
-                    waterQuality={tank.tds}
-                    consumption={selectedDevice?.consumption}
-                  />
-                  {tank.consumption && (
-                    <Box sx={{ ...TankDetails }}>
-                      <p
-                        style={{
-                          fontSize: "16px",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "1rem",
-                        }}
-                      >
-                        <WaterDrop style={{ fontSize: 18, color: "#4592F6" }} />
-                        Water Amount
-                      </p>
-                      <p style={{ fontSize: "24px" }}>{tank.liters} Liters</p>
+                  {tank.consumption ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        float: "",
+                        padding: 1,
+                        paddingTop: 0,
+                        // paddingRight: 2,
+                        // paddingLeft: 2,
+                      }}
+                    >
+                      <Box>
+                        <h1 style={{ fontWeight: 400 }}>
+                          {Math.round((tank.liters / tank.capacity) * 100)}%
+                        </h1>
+                        <small>{tank.liters} Liters</small>
+                      </Box>
+                      <Box>
+                        <h1 style={{ fontWeight: 400 }}>
+                          {Math.round(tank.liters * 0.004)}
+                          Ltrs
+                        </h1>
+                        <small>Average daily usage</small>
+                      </Box>
+                      <Box>
+                        <h1 style={{ fontWeight: 400 }}>8</h1>
+                        <small>Days left</small>
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        width: "100%",
+                        flexDirection: "column",
+                        gap: "8px",
+                        padding: 1,
+                      }}
+                    >
+                      <article style={{ color: "orangered" }}>
+                        Tank setup incomplete
+                      </article>
                     </Box>
                   )}
+                  {/* {matches ? (
+                    <WatertankComponent
+                      percentage={Math.round(
+                        (tank.liters / tank.capacity) * 100
+                      )}
+                      waterQuality={tank.tds}
+                      consumption={selectedDevice?.consumption}
+                    />
+                  ) : (
+                    <Box></Box>
+                  )} */}
                 </Box>
               )
             )
