@@ -22,12 +22,10 @@ function App() {
         <Route path="/community" element={<CommunityPage />} />
         <Route
           path="/devices/:id"
-          loader={async ({ params }) => {
-            console.log("Parameters passed to", params.id);
+          loader={async ({}) => {
             return [{ id: 2 }];
           }}
-          action={(data) => {
-            console.log("Data received in action", data);
+          action={() => {
             return 1;
           }}
           element={<DevicesPage />}
