@@ -369,7 +369,6 @@ function GridComponent() {
                     cursor: "pointer",
                     position: "relative",
                     width: "95%",
-                    // padding: 1,
                     paddingBottom: `${!tank.consumption && "1rem"}`,
                     borderRadius: "4px",
                     gap: "4px",
@@ -436,8 +435,6 @@ function GridComponent() {
                         float: "",
                         padding: 1,
                         paddingTop: 0,
-                        // paddingRight: 2,
-                        // paddingLeft: 2,
                       }}
                     >
                       <Box>
