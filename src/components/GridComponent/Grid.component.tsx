@@ -10,12 +10,11 @@ import { X as Device, client, Sensor } from "../../context/devices.context";
 import "./Grid.styles.css";
 import { DevicesContext } from "../../context/devices.context";
 import FrameSVG from "../../assets/frame.svg";
-import {
-  //   DeviceThermostatSharp,
-  MoreVert,
-  WaterDrop,
-} from "@mui/icons-material";
-import WatertankComponent from "../WaterTank/Watertank.component";
+import //   DeviceThermostatSharp,
+// MoreVert,
+// WaterDrop,
+"@mui/icons-material";
+// import WatertankComponent from "../WaterTank/Watertank.component";
 import axios from "axios";
 import {
   getLiters,
@@ -36,22 +35,22 @@ const BoxStyle = {
   position: "inherit",
   width: "100%",
 };
-const TankDetails = {
-  padding: "14px 24px",
-  margin: "7px 0px",
-  width: "inherit",
-  borderRadius: "10px",
-  // boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
-  display: "flex",
-  justifyContent: "space-between",
-};
+// const TankDetails = {
+//   padding: "14px 24px",
+//   margin: "7px 0px",
+//   width: "inherit",
+//   borderRadius: "10px",
+//   // boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
+//   display: "flex",
+//   justifyContent: "space-between",
+// };
 
 function GridComponent() {
   const [open, setOpen] = useState<boolean>(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const {
-    isOpenNav,
+    // isOpenNav,
     loading,
     devices,
     setTanks,
