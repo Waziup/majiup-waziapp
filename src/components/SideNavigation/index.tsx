@@ -200,7 +200,6 @@ export default function SideNavigation({ matches }: Props) {
                     }}
                   >
                     {/* <s */}
-
                     {/* <h3
                       style={{
                         fontSize: "calc(12px + .2vw)",
@@ -209,7 +208,7 @@ export default function SideNavigation({ matches }: Props) {
                     >
                       {user.name}
                     </h3> */}
-                    <Box component="img" src={ArrowDropDownSVG} />
+                    <Box component="img" src={ArrowDropDownSVG} />u
                   </Box>
                 </Box>
               </ListItem>

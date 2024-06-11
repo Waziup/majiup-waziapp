@@ -5,6 +5,7 @@ import mqtt from "precompiled-mqtt";
 // import { User } from "@supabase/supabase-js";
 const brokerUrl = `mqtt://wazigate.local`;
 import { formatTime } from "../utils/timeFormatter";
+import { Analytics } from "@mui/icons-material";
 // const brokerUrl = `mqtt://localhost`;
 
 type Props = {
@@ -100,7 +101,26 @@ interface Device {
   radius: number;
   sensors: Sensor[];
   width?: number;
+  analytics: Analytics;
 }
+
+interface Average {
+  hourly: number;
+  daily: number;
+}
+
+interface Trend {
+  value: number;
+  amountUsed: number;
+  days: number;
+  indicator: string;
+}
+
+export type Analytics = {
+  average: Average;
+  trend: Trend;
+  durationLeft: number;
+};
 
 export interface X extends Device {
   consumption: Consumption[];
@@ -110,6 +130,11 @@ export interface X extends Device {
   tds: string;
   on: boolean;
 }
+
+type TankData = {
+  consumption: [];
+  analytics: Analytics;
+};
 
 interface ContextValues {
   devices: X[];
@@ -249,6 +274,29 @@ export const DevicesProvider = ({ children }: Props) => {
     }
   };
 
+  const getAnalytics = async (
+    tankID: string
+  ): Promise<Analytics | undefined> => {
+    try {
+      const req: AxiosResponse = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/tanks/${tankID}/analytics`,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (req.status === 200) {
+        const analytics: Analytics = req.data;
+        return analytics;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   function fetchInMinutes() {
     axios
       .get(`${import.meta.env.VITE_BACKEND_URL}/tanks`, {
@@ -258,7 +306,7 @@ export const DevicesProvider = ({ children }: Props) => {
         },
       })
       .then(async (response) => {
-        const devicePromises = response.data.map(async (device: Device) => {
+        const tankValues: any = response.data.map(async (device: Device) => {
           if (device.sensors) {
             const sensorResponse = await axios.get(
               `${import.meta.env.VITE_BACKEND_URL}/tanks/${
@@ -271,7 +319,7 @@ export const DevicesProvider = ({ children }: Props) => {
               }
             );
 
-            const plotVals = sensorResponse.data?.waterLevels?.map(
+            const plotVals: any = sensorResponse.data?.waterLevels?.map(
               (val: { timestamp: any; liters: any }) => {
                 const date: string = formatTime(new Date(val.timestamp));
                 return {
@@ -281,17 +329,23 @@ export const DevicesProvider = ({ children }: Props) => {
               }
             );
 
-            return plotVals;
+            const analytics: Analytics | undefined = await getAnalytics(
+              device.id
+            );
+
+            return { plotVals, analytics };
           }
         });
-        const consumption = await Promise.all(devicePromises);
+
+        const tankData = await Promise.all(tankValues);
 
         return {
-          consumption: consumption as Consumption[],
+          tankData: tankData,
           res: response.data,
         };
       })
-      .then(({ res, consumption }) => {
+      .then(({ res, tankData }) => {
+        console.log(tankData);
         setDevices(
           res.map(function (device: X, index: number) {
             subscriberFn(client, `devices/${device.id}/meta/#`);
@@ -303,12 +357,22 @@ export const DevicesProvider = ({ children }: Props) => {
             );
             const modified = sensor?.time;
 
+            // getAnalytics(device.id).then((analytics) => {
+            //   console.table(analytics);
+            //   setDevices((prev) => {
+            //     return {
+            //       ...prev,
+            //       analytics: analytics,
+            //     };
+            //   });
+            // });
+
             return {
               ...device,
               capacity: device.meta?.settings.capacity,
               height: Math.round(device.meta?.settings.height),
               offset: device.meta?.settings.offset,
-              consumption: consumption[index],
+              consumption: tankData[index]?.plotVals,
               liters: device.sensors?.find((sensor: Sensor) =>
                 sensor.meta.kind.toLowerCase().includes("waterlevel")
               )?.value,
@@ -321,6 +385,7 @@ export const DevicesProvider = ({ children }: Props) => {
               isSelect: false,
               on: isActiveDevice(modified),
               notifications: device.meta?.notifications.messages,
+              analytics: tankData[index]?.analytics,
             };
           })
         );

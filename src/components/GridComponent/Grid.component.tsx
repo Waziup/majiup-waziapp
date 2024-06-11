@@ -261,8 +261,6 @@ function GridComponent() {
     return false;
   }
 
-  console.log(loading);
-
   return loading ? (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <p>Loading...</p>
@@ -384,7 +382,7 @@ function GridComponent() {
                       width: "100%",
                       transition: ".5s",
                       padding: 1,
-                      backgroundColor: "#dadada",
+                      backgroundColor: "#fff",
                     }}
                   >
                     <p
@@ -420,7 +418,7 @@ function GridComponent() {
                       style={{
                         width: "8px",
                         aspectRatio: 1,
-                        backgroundColor: tank.on ? "#85ea2d" : "#85ea2d",
+                        backgroundColor: tank.on ? "#85ea2d" : "orangered",
                         zIndex: 1,
                         borderRadius: "50%",
                       }}
@@ -438,21 +436,53 @@ function GridComponent() {
                       }}
                     >
                       <Box>
-                        <h1 style={{ fontWeight: 400 }}>
+                        <h1
+                          style={{
+                            fontWeight: 400,
+                            color: `${
+                              tank.sensors &&
+                              Math.round((tank.liters / tank.capacity) * 100) <=
+                                tank?.sensors?.find(
+                                  (sensor) => sensor.meta.kind === "WaterLevel"
+                                )?.meta.critical_min
+                                ? "orange"
+                                : ""
+                            }`,
+                          }}
+                        >
                           {Math.round((tank.liters / tank.capacity) * 100)}%
                         </h1>
                         <small>{tank.liters} Liters</small>
                       </Box>
                       <Box>
                         <h1 style={{ fontWeight: 400 }}>
-                          {Math.round(tank.liters * 0.004)}
-                          Ltrs
+                          {(tank.analytics?.average?.daily).toFixed(0)} Ltrs
                         </h1>
                         <small>Average daily usage</small>
                       </Box>
-                      <Box>
-                        <h1 style={{ fontWeight: 400 }}>8</h1>
-                        <small>Days left</small>
+                      <Box
+                        sx={{
+                          color: `${
+                            tank?.analytics?.durationLeft &&
+                            tank?.analytics?.durationLeft < 3
+                              ? "orange"
+                              : ""
+                          }`,
+                        }}
+                      >
+                        <h1
+                          style={{
+                            fontWeight: 400,
+                          }}
+                        >
+                          {tank?.analytics.durationLeft.toFixed(0)}{" "}
+                        </h1>
+                        <small>
+                          {tank?.analytics?.durationLeft &&
+                          tank?.analytics?.durationLeft > 1
+                            ? "Days left"
+                            : "Day left"}
+                        </small>
                       </Box>
                     </Box>
                   ) : (

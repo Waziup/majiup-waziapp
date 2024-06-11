@@ -7,7 +7,6 @@ import { DevicesContext } from "../../context/devices.context";
 function LayoutComponent() {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
-  console.log(matches);
   const { isOpenNav } = useContext(DevicesContext);
   return (
     <Grid

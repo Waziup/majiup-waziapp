@@ -26,6 +26,7 @@ import { formatTime } from "../../utils/timeFormatter";
 import toast from "react-hot-toast";
 import { ImArrowUp } from "react-icons/im";
 import { ImArrowDown } from "react-icons/im";
+import { Visibility } from "@mui/icons-material";
 
 type Consumption = {
   x: number;
@@ -118,6 +119,7 @@ function TankDetailComponent({
   const [pumpStatus, setPumpStatus] = useState(false);
   const { devices } = useContext(DevicesContext);
   const device = devices.find((device: X) => device.id === id);
+  const [usage, setUsage] = useState<string>("d");
 
   const navigate = useNavigate();
 
@@ -460,7 +462,7 @@ function TankDetailComponent({
                   }}
                 >
                   <p>Current Quantity</p>
-                  <p style={{ fontSize: "24px" }}>{liters} Ltrs</p>
+                  <p style={{ fontSize: "1rem" }}>{liters} Ltrs</p>
                 </Box>
                 <Box
                   sx={{
@@ -469,8 +471,31 @@ function TankDetailComponent({
                     justifyContent: "space-between",
                   }}
                 >
-                  <p>Average consumption</p>
-                  <p style={{ fontSize: "24px" }}>{liters * 0.004} Ltrs</p>
+                  <p>Average use</p>
+                  <select
+                    name=""
+                    id=""
+                    style={{
+                      padding: "8px",
+                      borderRadius: "4px",
+                      backgroundColor: "#4592F6",
+                      border: "none",
+                      color: "#fff",
+                      outline: "none",
+                    }}
+                    onChange={(e) => setUsage(e.target.value)}
+                  >
+                    <option value="d">Daily</option>
+                    <option value="h">Hourly</option>
+                  </select>
+                  <p style={{ fontSize: "1rem" }}>
+                    {" "}
+                    {usage === "d" &&
+                      device?.analytics.average.daily.toFixed(0)}{" "}
+                    {usage === "h" &&
+                      device?.analytics.average.hourly.toFixed(0)}{" "}
+                    Ltrs
+                  </p>
                 </Box>
                 <Box
                   sx={{
@@ -486,27 +511,13 @@ function TankDetailComponent({
                   <p>Trend</p>
                   {/* <input type="datetime-local" /> */}
 
-                  <select
-                    name=""
-                    id=""
-                    style={{
-                      padding: "8px",
-                      borderRadius: "4px",
-                      backgroundColor: "#4592F6",
-                      border: "none",
-                      color: "#fff",
-                      outline: "none",
-                    }}
-                  >
-                    <option value="">5 min</option>
-                    <option value="">30 min</option>
-                    <option value="">1 hrs</option>
-                    <option value="">4 hour</option>
-                    <option value="">12 hour</option>
-                    <option value="">1 day</option>
-                  </select>
                   <Box>
-                    <ImArrowUp color="green" />
+                    {device?.analytics.trend.value &&
+                      (device?.analytics.trend.value > 0 ? (
+                        <ImArrowUp color="green" />
+                      ) : (
+                        <ImArrowDown color="red" />
+                      ))}
                   </Box>
                 </Box>
                 <Box
@@ -582,7 +593,7 @@ function TankDetailComponent({
                       <button
                         onClick={() => createRefill(device)}
                         style={{
-                          backgroundColor: "#1976D2",
+                          backgroundColor: "#4592F6",
                           border: "none",
                           color: " #fff",
                           padding: "0.8rem",
@@ -605,10 +616,19 @@ function TankDetailComponent({
                         gap: ".5rem",
                       }}
                     >
-                      <Box>
-                        <PiWarningOctagonLight color="orange" size={26} />
-                      </Box>
-                      <p>Refill in 8 days</p>
+                      {device?.analytics.durationLeft &&
+                        device?.analytics?.durationLeft < 3 && (
+                          <Box>
+                            <PiWarningOctagonLight color="orange" size={26} />
+                          </Box>
+                        )}
+                      <p>
+                        Refill in {device?.analytics.durationLeft.toFixed(0)}{" "}
+                        {device?.analytics?.durationLeft &&
+                        device?.analytics?.durationLeft > 1
+                          ? "days"
+                          : "day"}
+                      </p>
                     </Box>
                   </>
                 )}
@@ -655,39 +675,67 @@ function TankDetailComponent({
                   transition: ".5s",
                 }}
               > */}
-              <Chart
-                onClick={() => navigate("/analytics")}
-                options={{
-                  chart: {
-                    type: "rangeArea",
-                  },
-                  colors: ["#4592F6"],
-
-                  dataLabels: {
-                    enabled: false,
-                  },
-                  stroke: {
-                    curve: "smooth",
-                    width: 2,
-                  },
-                  xaxis: {
-                    categories: temperatureConsumption?.map((item) => item.x),
-                    tickAmount: 5,
-                  },
-                  fill: {
-                    type: "gradient",
-                    gradient: {
-                      shadeIntensity: 1,
-                      opacityFrom: 0.5,
-                      opacityTo: 0.5,
-                      stops: [0, 90, 100],
+              {matches ? (
+                <Chart
+                  onClick={() => navigate("/analytics")}
+                  options={{
+                    chart: {
+                      type: "rangeArea",
                     },
-                  },
-                }}
-                series={apexChartOptions.series}
-                type="line"
-                height={matches ? 500 : 250}
-              />
+                    colors: ["#4592F6"],
+
+                    dataLabels: {
+                      enabled: false,
+                    },
+                    stroke: {
+                      curve: "smooth",
+                      width: 2,
+                    },
+                    xaxis: {
+                      categories: temperatureConsumption?.map((item) => item.x),
+                      tickAmount: matches ? 5 : 3,
+                    },
+                    fill: {
+                      type: "gradient",
+                      gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.5,
+                        opacityTo: 0.5,
+                        stops: [0, 90, 100],
+                      },
+                    },
+                  }}
+                  series={apexChartOptions.series}
+                  type="line"
+                  height={matches ? 500 : 250}
+                />
+              ) : (
+                <Box
+                  onClick={() => navigate("/analytics")}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: "2rem",
+                  }}
+                >
+                  <p
+                    style={{
+                      color: "#fff",
+                      fontSize: "12px",
+                      cursor: "pointer",
+                      borderRadius: "20px",
+                      padding: "0.8rem",
+                      display: "flex",
+                      alignItems: "center",
+                      backgroundColor: "#4592F6",
+                    }}
+                  >
+                    <Visibility sx={{ fontSize: 12, margin: "0 4px" }} />
+                    View Analytics
+                  </p>
+                </Box>
+              )}
               {/* <MapComponent /> */}
               {/* </Box> */}
             </>

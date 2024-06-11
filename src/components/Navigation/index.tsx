@@ -83,7 +83,7 @@ function NavigationIndex({ matches }: Props) {
         </Box>
       )}
 
-      {
+      {matches && (
         <Box
           sx={{ display: "flex", alignItems: "center", position: "relative" }}
           title={`${connected ? "Connected" : "No access to internet"}`}
@@ -102,7 +102,7 @@ function NavigationIndex({ matches }: Props) {
           )}
           <Wifi color={connected ? "success" : "action"} />
         </Box>
-      }
+      )}
       {matches && (
         <>
           <Box
@@ -122,6 +122,7 @@ function NavigationIndex({ matches }: Props) {
               <NotificationsNone
                 sx={{ fontWeight: "light", fontSize: "28px", color: "#000" }}
               />
+
               <Box
                 sx={{
                   position: "absolute",

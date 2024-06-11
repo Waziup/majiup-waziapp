@@ -7,15 +7,14 @@ import React, {
   useLayoutEffect,
   useEffect,
 } from "react";
-import { Box } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 // import { ApexAxisChartSeries,ApexCharts, ApexNonAxisChartSeries } from 'apexcharts';
-import { Visibility } from "@mui/icons-material";
 // import AssessmentIcon from '@mui/icons-material/Assessment';
 // import StickyHeadTable from '../components/TableComponent/Table.component';
 // import DownloadSVG from '../assets/download.svg';
 import ModalComponent from "../components/Modal/Modal.component";
 // import jsPDF from 'jspdf';
-import { DevicesContext } from "../context/devices.context";
+import { Analytics, DevicesContext } from "../context/devices.context";
 // import CanvasJSReact from '@canvasjs/react-charts';
 import Chart from "react-apexcharts";
 // import { X as Device } from '../context/devices.context';
@@ -49,6 +48,7 @@ type SelectedTankInfo = {
   name: string;
   litres: number;
   id: string;
+  analytics?: Analytics;
   consumption: {
     x: number;
     y: number;
@@ -68,6 +68,19 @@ function BillingsPage() {
   const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({
     name: "",
     litres: 0,
+    analytics: {
+      average: {
+        daily: 0,
+        hourly: 0,
+      },
+      durationLeft: 0,
+      trend: {
+        amountUsed: 0,
+        days: 0,
+        indicator: "",
+        value: 0,
+      },
+    },
     id: "",
     consumption: [],
   });
@@ -81,6 +94,9 @@ function BillingsPage() {
   >({ options: {}, series: [] });
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const reportTemplateRef = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("md"));
+
   // const handleGeneratePdf = () => {
   //     setIsOpenModal(!isOpenModal)
   //     setIsOpenModal(!isOpenModal)
@@ -128,7 +144,12 @@ function BillingsPage() {
         setSelectedTank({
           ...selectedTank,
           consumption: devices[0].consumption ?? [],
-          litres: devices.reduce((acc, curr) => acc + curr.liters, 0),
+          litres: devices.reduce((acc, curr) => {
+            if (curr.analytics) {
+              return acc + (curr.analytics.trend.amountUsed || 0); // Ensure the value is a number
+            }
+            return acc;
+          }, 0),
         });
         setApexOptionsToRender({
           series: [
@@ -161,7 +182,7 @@ function BillingsPage() {
               categories: devices[0]?.consumption
                 ? devices[0]?.consumption.map((d) => d.x)
                 : [],
-              tickAmount: 10,
+              tickAmount: matches ? 10 : 4,
             },
           },
         });
@@ -174,6 +195,7 @@ function BillingsPage() {
           consumption: deviceFound.consumption,
           name: deviceFound.name,
           litres: deviceFound.liters,
+          analytics: deviceFound.analytics,
         });
         setApexOptionsToRender({
           series: [
@@ -211,7 +233,13 @@ function BillingsPage() {
         id: "All",
         name: "All",
         consumption: [],
-        litres: devices.reduce((acc, curr) => acc + curr.liters, 0),
+        // litres: devices.reduce((acc, curr) => acc + curr.liters, 0),
+        litres: devices.reduce((acc, curr) => {
+          if (curr.analytics) {
+            return acc + (curr.analytics.trend.amountUsed || 0); // Ensure the value is a number
+          }
+          return acc;
+        }, 0),
       });
       setApexOptionsToRender({
         series: [
@@ -226,6 +254,7 @@ function BillingsPage() {
           chart: {
             height: 350,
             type: "area",
+            width: "100%",
             // toolbar: {
             //     show: false
             // }
@@ -259,7 +288,8 @@ function BillingsPage() {
         id: deviceFound.id,
         consumption: deviceFound.consumption,
         name: deviceFound.name,
-        litres: deviceFound.liters,
+        litres: deviceFound.analytics?.trend.amountUsed,
+        analytics: deviceFound.analytics,
       });
       setApexOptionsToRender({
         series: [
@@ -273,6 +303,7 @@ function BillingsPage() {
         options: {
           chart: {
             height: 350,
+            width: "100%",
             type: "rangeArea",
           },
           //   colors: ["#4592F6"],
@@ -305,31 +336,6 @@ function BillingsPage() {
   }
   return (
     <Box pl={3} pr={1}>
-      <Box
-        onClick={() => setIsOpenModal(!isOpenModal)}
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h3 style={{ fontSize: "24px" }}>Water Consumption</h3>
-        <p
-          style={{
-            color: "#fff",
-            fontSize: "12px",
-            cursor: "pointer",
-            borderRadius: "20px",
-            padding: "8px",
-            display: "flex",
-            alignItems: "center",
-            backgroundColor: "#1C1B1F",
-          }}
-        >
-          <Visibility sx={{ fontSize: 12, margin: "0 4px" }} />
-          View Analytics
-        </p>
-      </Box>
       <ModalComponent
         handleClose={() => {
           setIsOpenModal(!isOpenModal);
@@ -388,23 +394,29 @@ function BillingsPage() {
             padding: "5px 0",
             minWidth: "200px",
             width: "20%",
-            borderRadius: "20px",
+            borderRadius: "2rem",
+            overflow: "hidden",
+            borderColor: "#4592F6",
+            position: "relative",
+            zIndex: 1,
           }}
         >
           <label
             style={{
-              background: "#E8E8E8",
-              fontSize: "18",
+              background: "#4592F6",
+              fontSize: "1rem",
               fontWeight: "500",
-              color: "#2C2D38",
-              padding: "5px 5px",
-              borderTopLeftRadius: "inherit",
-              borderBottomLeftRadius: "inherit",
-              height: "100%",
+              color: "#fff",
+              padding: "5px 7px",
+              position: "absolute",
+              top: 0,
+              // borderTopLeftRadius: "inherit",
+              // borderBottomLeftRadius: "inherit",
+              // height: "100%",
             }}
             htmlFor="devs"
           >
-            Device:
+            Tank:
           </label>
           <select
             onChange={(event) => {
@@ -415,6 +427,7 @@ function BillingsPage() {
               outline: "none",
               width: "65%",
               background: "none",
+              color: "#4592F6",
             }}
             name="tanks"
             id="tanks"
@@ -427,7 +440,7 @@ function BillingsPage() {
             ))}
           </select>
         </Box>
-        <Box
+        {/* <Box
           sx={{
             border: "1px solid #ccc",
             margin: "15px",
@@ -466,7 +479,7 @@ function BillingsPage() {
             <option value="minutes">Minutes</option>
             <option value="hours">Hours</option>
           </select>
-        </Box>
+        </Box> */}
       </Box>
       <Box p={2} sx={{ width: "100%", bgcolor: "#fff", borderRadius: "8px" }}>
         <Box
@@ -496,15 +509,26 @@ function BillingsPage() {
         </Box>
         <br />
         <strong>
-          {isNaN(selectedTank.litres) ? 0 : selectedTank.litres}{" "}
-          {selectedTank.id === "All" ? "litres used" : "Litres"}{" "}
+          {!isNaN(selectedTank.litres) && selectedTank?.litres.toFixed(0)}
+          {" Litres used "}
+          {selectedTank.id === "All" && " - All tanks"}
         </strong>
-        <Chart
-          options={apexOptionsToRender.options}
-          series={apexOptionsToRender.series}
-          type={"area"}
-          height={350}
-        />
+        {selectedTank.consumption ? (
+          <Chart
+            options={apexOptionsToRender.options}
+            series={apexOptionsToRender.series}
+            type={"area"}
+            height={350}
+          />
+        ) : (
+          <Box
+            sx={{
+              paddingTop: "2rem",
+            }}
+          >
+            <p style={{ color: "orange" }}>No information for this tank!</p>
+          </Box>
+        )}
       </Box>
       {/* <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <article>Report</article>

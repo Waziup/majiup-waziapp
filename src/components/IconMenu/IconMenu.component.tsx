@@ -6,7 +6,7 @@ import {
   ListItemIcon,
   Box,
 } from "@mui/material";
-import { Launch, Logout } from "@mui/icons-material";
+import { Launch, Logout, Wifi } from "@mui/icons-material";
 import { useContext } from "react";
 import { DevicesContext } from "../../context/devices.context";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ export default function IconMenuComponent({
   anchorEl,
   handleClose,
 }: Props) {
-  const { setUser, devices } = useContext(DevicesContext);
+  const { setUser, devices, connected } = useContext(DevicesContext);
   const navigate = useNavigate();
   const handleLogout = () => {
     setUser("", "");
@@ -70,6 +70,36 @@ export default function IconMenuComponent({
             <Message fontSize="small" />
           </ListItemIcon>
           <ListItemText>Notifications</ListItemText>
+        </div>
+      </MenuItem>
+      <MenuItem onClick={handleClose}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <ListItemIcon>
+            <Wifi color={connected ? "success" : "action"} />
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                position: "relative",
+              }}
+              title={`${connected ? "Connected" : "No access to internet"}`}
+            >
+              {!connected && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: "-10%",
+                    right: "0%",
+                    color: "red",
+                  }}
+                >
+                  <small>x</small>
+                </Box>
+              )}
+            </Box>
+          </ListItemIcon>
+          <ListItemText>WiFi</ListItemText>
         </div>
       </MenuItem>
       <div
