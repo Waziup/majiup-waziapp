@@ -6,13 +6,14 @@ import ArrowDropDownSVG from "../../assets/arrow_drop_down.svg";
 import { useContext } from "react";
 import { DevicesContext } from "../../context/devices.context";
 import IconMenuComponent from "../IconMenu/IconMenu.component";
-import { redirect } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import logo from "../../assets/imgs/logo.png";
 
 type Props = {
   matches: boolean;
 };
 function NavigationIndex({ matches }: Props) {
+  const navigate = useNavigate();
   const { user, devices, connected, toggleModal } = useContext(DevicesContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const isOpen = Boolean(anchorEl);
@@ -54,13 +55,25 @@ function NavigationIndex({ matches }: Props) {
       <Box sx={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <Box>
           <img
-            style={{ width: "3rem", aspectRatio: "1" }}
+            style={{
+              width: matches ? "3rem" : "2rem",
+              aspectRatio: "1",
+              cursor: "pointer",
+            }}
             src={logo}
             alt="Majiup Logo"
+            onClick={() => navigate("/dashboard")}
           />
         </Box>
         {/* <WaterDrop style={{ fontSize: "calc(20px + 1vw)", color: "#4592F6" }} /> */}
-        <h1 style={{ fontSize: "calc(20px + 1vw)", fontWeight: "bold" }}>
+        <h1
+          onClick={() => navigate("/dashboard")}
+          style={{
+            fontSize: "calc(20px + 1vw)",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
           Majiup
         </h1>
       </Box>

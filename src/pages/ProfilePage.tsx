@@ -1,4 +1,4 @@
-import { Box, Modal } from "@mui/material";
+import { Box, CircularProgress, Modal } from "@mui/material";
 import { DevicesContext, Profile } from "../context/devices.context";
 import React, { useContext, useEffect, useState } from "react";
 import logo from "../assets/imgs/logo.png";
@@ -264,7 +264,7 @@ export default function ProfilePage() {
         </Box>
       </Modal>
       {loadingProfile ? (
-        <p>Loading...</p>
+        <CircularProgress />
       ) : (
         <Box sx={BoxStyle}>
           <Box

@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, CircularProgress, Grid } from "@mui/material";
 // import SideNavigation from "../SideNavigation";
 // import NavigationIndex from "../Navigation";
 import ItemCardComponent from "../ItemCard/ItemCard.component";
@@ -23,7 +23,6 @@ import {
 // import Copilot from "../copilot/copilot.component";
 import { formatTime, getLastSeen } from "../../utils/timeFormatter";
 // import { TbAlertHexagon } from "react-icons/tb";
-
 const BoxStyle = {
   bgcolor: "#fff",
   borderRadius: "10px",
@@ -262,7 +261,7 @@ function GridComponent() {
 
   return loading ? (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
-      <p>Loading...</p>
+      <CircularProgress />
     </Box>
   ) : (
     <Grid
