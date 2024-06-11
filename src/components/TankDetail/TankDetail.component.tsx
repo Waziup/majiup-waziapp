@@ -1,14 +1,14 @@
 import { Box, styled, Switch, useMediaQuery, useTheme } from "@mui/material";
 import {
   FireHydrantAlt,
-  WaterDrop,
+  // WaterDrop,
   // DeviceThermostatSharp,
   // AutoAwesome,
   // DeviceThermostat,
   // Opacity,
 } from "@mui/icons-material";
 import WatertankComponent from "../WaterTank/Watertank.component";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+// import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useContext, useEffect, useState } from "react";
 // import MapComponent from "../MapComponent/Map.component";
 import FrameSVG from "../../assets/not-found.svg";
@@ -22,7 +22,7 @@ import Chart from "react-apexcharts";
 import { postNewNotificationMessage } from "../../utils/consumptionHelper";
 
 import supabase from "../../config/supabaseClient";
-import { formatTime } from "../../utils/timeFormatter";
+// import { formatTime } from "../../utils/timeFormatter";
 import toast from "react-hot-toast";
 import { ImArrowUp } from "react-icons/im";
 import { ImArrowDown } from "react-icons/im";
@@ -92,20 +92,20 @@ const BoxStyle: React.CSSProperties = {
   position: "relative",
 };
 
-const TankDetails: React.CSSProperties = {
-  padding: "20px",
-  margin: "7px 0",
-  width: "100%",
-  borderRadius: "10px",
-  // boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
-  display: "flex",
-  justifyContent: "space-between",
-};
+// const TankDetails: React.CSSProperties = {
+//   padding: "20px",
+//   margin: "7px 0",
+//   width: "100%",
+//   borderRadius: "10px",
+//   // boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
+//   display: "flex",
+//   justifyContent: "space-between",
+// };
 
 function TankDetailComponent({
   id,
   capacity,
-  receiveNotifications,
+  // receiveNotifications,
   waterQuality,
   liters,
   consumption,

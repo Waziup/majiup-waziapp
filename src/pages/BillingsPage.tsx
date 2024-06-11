@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {
+import {
   useState,
   useRef,
   useContext,
@@ -63,7 +63,7 @@ export type Consumption = {
   waterTemperature: number;
 };
 function BillingsPage() {
-  const { devices, fetchInMinutes } = useContext(DevicesContext);
+  const { devices } = useContext(DevicesContext);
 
   const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({
     name: "",
@@ -324,13 +324,13 @@ function BillingsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTank.id]);
   // const CanvasJSChart = CanvasJSReact.CanvasJSChart;
-  function handleToggle(event: React.ChangeEvent<HTMLSelectElement>) {
-    if (event.target.value === "minutes") {
-      fetchInMinutes();
-    } else {
-      // fetchinHours();
-    }
-  }
+  // function handleToggle(event: React.ChangeEvent<HTMLSelectElement>) {
+  //   if (event.target.value === "minutes") {
+  //     fetchInMinutes();
+  //   } else {
+  //     // fetchinHours();
+  //   }
+  // }
   if (!devices && !selectedTableTank.consumption) {
     return <article>Loading</article>;
   }

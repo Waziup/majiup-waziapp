@@ -131,11 +131,6 @@ export interface X extends Device {
   on: boolean;
 }
 
-type TankData = {
-  consumption: [];
-  analytics: Analytics;
-};
-
 interface ContextValues {
   devices: X[];
   user: { token: string; name: string };
@@ -248,6 +243,8 @@ export const DevicesProvider = ({ children }: Props) => {
     }
   };
   const setLoadingFunc = (loading: boolean) => {
+    if (loading) {
+    }
     // setLoading(!loading);
   };
 
