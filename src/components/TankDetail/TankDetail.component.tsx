@@ -393,9 +393,10 @@ function TankDetailComponent({
         consumption?.length
           ? {
               ...BoxStyle,
-              bgcolor: "#fff",
+              bgcolor: "#f6f6f6",
               display: "flex",
               flexDirection: "column",
+              p: matches ? 2 : 0,
             }
           : {
               ...BoxStyle,
@@ -434,14 +435,9 @@ function TankDetailComponent({
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                alignContent: "center",
-                justifyContent: "center",
+                position: "relative",
                 width: matches ? "fit-content" : "100%",
                 minWidth: "40%",
-                overflow: "hidden",
-                // flexWrap: "wrap",
-                borderRadius: "4px",
-                boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
               }}
             >
               <Box
@@ -450,191 +446,244 @@ function TankDetailComponent({
                   flexDirection: "column",
                   alignContent: "center",
                   justifyContent: "center",
-                  padding: 2,
+
+                  overflow: "hidden",
+                  // flexWrap: "wrap",
+                  borderRadius: "4px",
+                  boxShadow: "1px 1px 4px  rgba(0, 0, 0, 0.15)",
                 }}
-                gap={2}
               >
                 <Box
                   sx={{
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
+                    flexDirection: "column",
+                    alignContent: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#fff",
+                    padding: 2,
                   }}
+                  gap={2}
                 >
-                  <p>Current Quantity</p>
-                  <p style={{ fontSize: "1rem" }}>{liters} Ltrs</p>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <p>Average use</p>
-                  <select
-                    name=""
-                    id=""
-                    style={{
-                      padding: "8px",
-                      borderRadius: "4px",
-                      backgroundColor: "#4592F6",
-                      border: "none",
-                      color: "#fff",
-                      outline: "none",
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
-                    onChange={(e) => setUsage(e.target.value)}
                   >
-                    <option value="d">Daily</option>
-                    <option value="h">Hourly</option>
-                  </select>
-                  <p style={{ fontSize: "1rem" }}>
-                    {" "}
-                    {usage === "d" &&
-                      device?.analytics.average.daily.toFixed(0)}{" "}
-                    {usage === "h" &&
-                      device?.analytics.average.hourly.toFixed(0)}{" "}
-                    Ltrs
-                  </p>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    transition: ".5s",
-                    borderRadius: "8px",
-                    width: "100%",
-                  }}
-                >
-                  <p>Trend</p>
-                  {/* <input type="datetime-local" /> */}
+                    <p>Current Quantity</p>
+                    <p style={{ fontSize: "1rem" }}>{liters} Ltrs</p>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <p>Average use</p>
+                    <select
+                      name=""
+                      id=""
+                      style={{
+                        padding: "8px",
+                        borderRadius: "4px",
+                        backgroundColor: "#4592F6",
+                        border: "none",
+                        color: "#fff",
+                        outline: "none",
+                      }}
+                      onChange={(e) => setUsage(e.target.value)}
+                    >
+                      <option value="d">Daily</option>
+                      <option value="h">Hourly</option>
+                    </select>
+                    <p style={{ fontSize: "1rem" }}>
+                      {" "}
+                      {usage === "d" &&
+                        device?.analytics.average.daily.toFixed(0)}{" "}
+                      {usage === "h" &&
+                        device?.analytics.average.hourly.toFixed(0)}{" "}
+                      L/
+                      {usage === "d" && "day"}
+                      {usage === "h" && "hr"}
+                    </p>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      cursor: "pointer",
+                      transition: ".5s",
+                      borderRadius: "8px",
+                      width: "100%",
+                    }}
+                  >
+                    <p>Trend</p>
+                    {/* <input type="datetime-local" /> */}
 
-                  <Box>
-                    {device?.analytics.trend.value &&
-                      (device?.analytics.trend.value > 0 ? (
-                        <ImArrowUp color="green" />
-                      ) : (
-                        <ImArrowDown color="red" />
-                      ))}
+                    <Box>
+                      {device?.analytics.trend.value &&
+                        (device?.analytics.trend.value > 0 ? (
+                          <ImArrowUp color="green" />
+                        ) : (
+                          <ImArrowDown color="red" />
+                        ))}
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <p>Tank Status</p>
+                    {device?.on ? (
+                      <p style={{ color: "green" }}>Active</p>
+                    ) : (
+                      <p style={{ color: "red" }}>Offline</p>
+                    )}
                   </Box>
                 </Box>
                 <Box
                   sx={{
+                    width: "100%",
                     display: "flex",
+                    alignItems: "center",
                     justifyContent: "space-between",
+                    backgroundColor: "#F6F6F6",
+                    padding: 1.5,
                   }}
                 >
-                  <p>Tank Status</p>
-                  {device?.on ? (
-                    <p style={{ color: "green" }}>Active</p>
+                  {refill?.status === "In Progress" ? (
+                    <>
+                      <button
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                          backgroundColor: "#FF5C00 ",
+                          border: "none",
+                          color: " #fff",
+                          padding: "0.4rem 0.7rem",
+                          fontWeight: "bold",
+                          borderRadius: "2rem",
+                          fontSize: matches ? 16 : 14,
+                          // cursor: "pointer",
+                        }}
+                      >
+                        {/* <span> */}
+                        <Box>
+                          <FaTruckDroplet size={30} />
+                        </Box>
+                        {/* </span> */}
+                        Request in Progress
+                      </button>
+                      <button
+                        onClick={() => cancelRefill(refill.id)}
+                        style={{
+                          backgroundColor: "gray",
+                          border: "none",
+                          color: " #fff",
+                          padding: "0.8rem",
+                          fontWeight: "bold",
+                          borderRadius: "2rem",
+                          fontSize: 16,
+                          cursor: "pointer",
+                          width: "6rem",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </>
                   ) : (
-                    <p style={{ color: "red" }}>Offline</p>
+                    <>
+                      {sendingReq ? (
+                        <p style={{ color: "orangegb" }}>Sending order...</p>
+                      ) : (
+                        <button
+                          onClick={() => createRefill(device)}
+                          style={{
+                            backgroundColor: "#4592F6",
+                            border: "none",
+                            color: " #fff",
+                            padding: "0.8rem",
+                            fontWeight: "bold",
+
+                            borderRadius: "2rem",
+                            fontSize: matches ? 16 : 14,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Request Refill
+                        </button>
+                      )}
+
+                      <Box
+                        style={{
+                          border: "none",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: ".5rem",
+                        }}
+                      >
+                        {device?.analytics.durationLeft &&
+                          device?.analytics?.durationLeft < 3 && (
+                            <Box>
+                              <PiWarningOctagonLight color="orange" size={26} />
+                            </Box>
+                          )}
+                        <p>
+                          Refill in {device?.analytics.durationLeft.toFixed(0)}{" "}
+                          {device?.analytics?.durationLeft &&
+                          device?.analytics?.durationLeft > 1
+                            ? "days"
+                            : "day"}
+                        </p>
+                      </Box>
+                    </>
                   )}
                 </Box>
               </Box>
               <Box
                 sx={{
-                  width: "100%",
                   display: "flex",
-                  alignItems: "center",
+                  marginTop: "10px",
                   justifyContent: "space-between",
-                  backgroundColor: "#F6F6F6",
-                  padding: 1.5,
+                  alignItems: "center",
+                  cursor: "pointer",
+                  transition: ".5s",
+                  borderRadius: "5px",
+                  width: "100%",
+                  boxShadow: "0 1px 8px rgba(0, 0, 0, 0.15)",
+                  pl: 1.25,
+                  pr: 0.5,
+                  pt: 1.25,
+                  pb: 1.25,
                 }}
               >
-                {refill?.status === "In Progress" ? (
-                  <>
-                    <button
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "1rem",
-                        backgroundColor: "#FF5C00 ",
-                        border: "none",
-                        color: " #fff",
-                        padding: "0.4rem 0.7rem",
-                        fontWeight: "bold",
-                        borderRadius: "2rem",
-                        fontSize: matches ? 16 : 14,
-                        // cursor: "pointer",
-                      }}
-                    >
-                      {/* <span> */}
-                      <Box>
-                        <FaTruckDroplet size={30} />
-                      </Box>
-                      {/* </span> */}
-                      Request in Progress
-                    </button>
-                    <button
-                      onClick={() => cancelRefill(refill.id)}
-                      style={{
-                        backgroundColor: "gray",
-                        border: "none",
-                        color: " #fff",
-                        padding: "0.8rem",
-                        fontWeight: "bold",
-                        borderRadius: "2rem",
-                        fontSize: 16,
-                        cursor: "pointer",
-                        width: "6rem",
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    {sendingReq ? (
-                      <p style={{ color: "orangegb" }}>Sending order...</p>
-                    ) : (
-                      <button
-                        onClick={() => createRefill(device)}
-                        style={{
-                          backgroundColor: "#4592F6",
-                          border: "none",
-                          color: " #fff",
-                          padding: "0.8rem",
-                          fontWeight: "bold",
-
-                          borderRadius: "2rem",
-                          fontSize: matches ? 16 : 14,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Request Refill
-                      </button>
-                    )}
-
-                    <Box
-                      style={{
-                        border: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: ".5rem",
-                      }}
-                    >
-                      {device?.analytics.durationLeft &&
-                        device?.analytics?.durationLeft < 3 && (
-                          <Box>
-                            <PiWarningOctagonLight color="orange" size={26} />
-                          </Box>
-                        )}
-                      <p>
-                        Refill in {device?.analytics.durationLeft.toFixed(0)}{" "}
-                        {device?.analytics?.durationLeft &&
-                        device?.analytics?.durationLeft > 1
-                          ? "days"
-                          : "day"}
-                      </p>
-                    </Box>
-                  </>
-                )}
+                <p
+                  style={{
+                    display: "inline-flex",
+                    padding: 2,
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  <FireHydrantAlt sx={{ fontSize: 25, color: "#4592F6" }} />
+                  <p>Pump</p>
+                  {actuator ? actuator[0]?.name : "Water Pump Control"}
+                </p>
+                <Android12Switch
+                  onClick={switchActuator}
+                  checked={pumpStatus}
+                  sx={{ color: "#FF5C00" }}
+                />
               </Box>
             </Box>
           </Box>
+
           <Box>
             <>
               {(actuator?.length as number) > 0 && (

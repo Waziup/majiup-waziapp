@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import TankDetailComponent from "../components/TankDetail/TankDetail.component";
 import { Box } from "@mui/material";
 import { DevicesContext } from "../context/devices.context";
@@ -9,7 +9,6 @@ import axios from "axios";
 function DevicesPage() {
   const { devices } = useContext(DevicesContext);
   const data = useLocation();
-  const navigate = useNavigate();
   const tdsValue = data.state.tds;
   async function toogleActuatorHandler(id: string) {
     let currentValue: boolean;

@@ -408,7 +408,7 @@ function BillingsPage() {
               fontWeight: "500",
               color: "#fff",
               padding: "5px 7px",
-              position: "absolute",
+              // position: "absolute",
               top: 0,
               // borderTopLeftRadius: "inherit",
               // borderBottomLeftRadius: "inherit",
@@ -428,6 +428,7 @@ function BillingsPage() {
               width: "65%",
               background: "none",
               color: "#4592F6",
+              right: "50%",
             }}
             name="tanks"
             id="tanks"
