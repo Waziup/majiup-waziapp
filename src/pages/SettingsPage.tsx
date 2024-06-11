@@ -1,5 +1,12 @@
 import { Delete, SaveAlt } from "@mui/icons-material";
-import { Box, Modal, Stack, SxProps, Theme } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Modal,
+  Stack,
+  SxProps,
+  Theme,
+} from "@mui/material";
 import FrameSVG from "../assets/frame.svg";
 import React, { useContext, useState } from "react";
 import {
@@ -129,7 +136,7 @@ export const fColumn: React.CSSProperties = {
 };
 
 function SettingsPage() {
-  const { devices, setTanks } = useContext(DevicesContext);
+  const { devices, setTanks, loading } = useContext(DevicesContext);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [selectedDevice, setSelectedDevice] = useState<Device>();
   const [matches] = useOutletContext<[matches: boolean]>();
@@ -775,139 +782,155 @@ function SettingsPage() {
           </form>
         </Box>
       </Modal>
-      {devices.length <= 0 && (
-        <Box sx={{ position: "relative" }}>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "10vh",
-              left: "20vw",
-            }}
-          >
-            <Box component="img" src={FrameSVG} />
-            <h3
-              style={{ fontSize: "40px", textAlign: "center", margin: "1px 0" }}
-            >
-              Hi there!
-            </h3>
-            <p style={{ color: "#888992", textAlign: "center", fontSize: 16 }}>
-              Let's create your first device.
-            </p>
-          </Box>
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <CircularProgress />
         </Box>
-      )}
-      <Box sx={matches ? { ...SensorContainer } : { ...SensorContainer }}>
-        {devices.map((device, id) => (
-          <Stack
-            key={id}
-            p={1}
-            sx={BoxStyle}
-            alignItems={"start"}
-            flexWrap="wrap"
-            direction="column"
-            alignContent={"center"}
-            spacing={2}
-            maxWidth="22rem"
-          >
-            <Stack
-              width={"100%"}
-              direction="row"
-              justifyContent={"space-between"}
-            >
-              <h3
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  color: "black",
-                  lineHeight: 1.5,
+      ) : (
+        <>
+          {devices.length <= 0 && !loading && (
+            <Box sx={{ position: "relative" }}>
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "10vh",
+                  left: "20vw",
                 }}
               >
-                {device.name}
+                <Box component="img" src={FrameSVG} />
+                <h3
+                  style={{
+                    fontSize: "40px",
+                    textAlign: "center",
+                    margin: "1px 0",
+                  }}
+                >
+                  Hi there!
+                </h3>
                 <p
                   style={{
                     color: "#888992",
-                    fontWeight: "lighter",
                     textAlign: "center",
-                    fontSize: 12,
+                    fontSize: 16,
                   }}
                 >
-                  {device.id}
+                  Let's create your first device.
                 </p>
-              </h3>
-              <Box sx={{ display: "flex" }}>
-                {/* <Android12Switch checked={device.on}/> */}
-                <MdModeEdit
-                  size={23}
-                  style={{ cursor: "pointer" }}
-                  onClick={(e: any) => handleSelectedTank(e, device)}
-                />
-              </Box>
-            </Stack>
-            <Box
-              p={1}
-              sx={{
-                borderRadius: 1,
-                width: "100%",
-                backgroundColor: "#fafafa",
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  lineHeight: 1.8,
-                }}
-              >
-                <Box>
-                  <article>Capacity </article>
-                  <article>Height</article>
-                </Box>
-                <Box>
-                  <article>
-                    {device.meta?.settings.capacity}
-                    <span> Liters</span>
-                  </article>
-                  <p>
-                    {device.height}
-                    <span> mm</span>
-                  </p>
-                </Box>
               </Box>
             </Box>
-            <Box sx={{ width: "100%" }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                }}
+          )}
+          <Box sx={matches ? { ...SensorContainer } : { ...SensorContainer }}>
+            {devices.map((device, id) => (
+              <Stack
+                key={id}
+                p={1}
+                sx={BoxStyle}
+                alignItems={"start"}
+                flexWrap="wrap"
+                direction="column"
+                alignContent={"center"}
+                spacing={2}
+                maxWidth="22rem"
               >
-                <FaLocationDot size={20} />
-                <strong style={{ color: "#E46B26" }}>Location</strong>
-              </Box>
-              <Box
-                sx={{
-                  mt: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  padding: "0.5rem",
-                  borderRadius: "4px",
-                  width: "100%",
-                  position: "inherit",
-                  gap: 1,
-                  backgroundColor: "#fafafa",
-                  flexWrap: "wrap",
-                }}
-              >
-                {device.meta?.location.address ? (
-                  <small>{device.meta?.location.address}</small>
-                ) : (
-                  <small style={{ color: "orange" }}>
-                    Add location for this tank!
-                  </small>
-                )}
-                {/* <Box sx={fRow}>
+                <Stack
+                  width={"100%"}
+                  direction="row"
+                  justifyContent={"space-between"}
+                >
+                  <h3
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                      color: "black",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {device.name}
+                    <p
+                      style={{
+                        color: "#888992",
+                        fontWeight: "lighter",
+                        textAlign: "center",
+                        fontSize: 12,
+                      }}
+                    >
+                      {device.id}
+                    </p>
+                  </h3>
+                  <Box sx={{ display: "flex" }}>
+                    {/* <Android12Switch checked={device.on}/> */}
+                    <MdModeEdit
+                      size={23}
+                      style={{ cursor: "pointer" }}
+                      onClick={(e: any) => handleSelectedTank(e, device)}
+                    />
+                  </Box>
+                </Stack>
+                <Box
+                  p={1}
+                  sx={{
+                    borderRadius: 1,
+                    width: "100%",
+                    backgroundColor: "#fafafa",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      lineHeight: 1.8,
+                    }}
+                  >
+                    <Box>
+                      <article>Capacity </article>
+                      <article>Height</article>
+                    </Box>
+                    <Box>
+                      <article>
+                        {device.meta?.settings.capacity}
+                        <span> Liters</span>
+                      </article>
+                      <p>
+                        {device.height}
+                        <span> mm</span>
+                      </p>
+                    </Box>
+                  </Box>
+                </Box>
+                <Box sx={{ width: "100%" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <FaLocationDot size={20} />
+                    <strong style={{ color: "#E46B26" }}>Location</strong>
+                  </Box>
+                  <Box
+                    sx={{
+                      mt: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      padding: "0.5rem",
+                      borderRadius: "4px",
+                      width: "100%",
+                      position: "inherit",
+                      gap: 1,
+                      backgroundColor: "#fafafa",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {device.meta?.location.address ? (
+                      <small>{device.meta?.location.address}</small>
+                    ) : (
+                      <small style={{ color: "orange" }}>
+                        Add location for this tank!
+                      </small>
+                    )}
+                    {/* <Box sx={fRow}>
                     <GoPerson />
                     <small>
                       {device.meta.profile.first_name +
@@ -919,68 +942,74 @@ function SettingsPage() {
                     <CiPhone />
                     <small>{device.meta.profile.phone}</small>
                   </Box> */}
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                gap: 1.5,
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <MdSensors size={23} />
-                <strong style={{ color: "#E46B26" }}>Sensors</strong>
-              </Box>
-              {!device?.sensors?.some?.(
-                (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
-              ) ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <TbAlertHexagon size={23} />
-                  <small style={{ color: "orange" }}>
-                    No majiup sensors detected
-                  </small>
-                </Box>
-              ) : null}
-
-              {device?.sensors
-                ?.filter((sensor: Sensor) => sensor.meta.kind === "WaterLevel")
-                ?.map((sensor, idx) => (
-                  <Box key={idx} width={"100%"} lineHeight={1.8}>
-                    <Box>
-                      <small>{sensor.name}</small>
-                      {sensor.meta.critical_max === 0 &&
-                        sensor.meta.critical_min === 0 && (
-                          <small style={{ color: "orange" }}>
-                            {" - "}
-                            {sensor.name} alerts not configured properly
-                          </small>
-                        )}
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        backgroundColor: "#fafafa",
-                        padding: "0.5rem",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <small>Max Alert: {sensor.meta?.critical_max}% </small>
-                      <small>Min Alert: {sensor.meta?.critical_min}%</small>
-                      {sensor.meta?.kind === "WaterLevel" && <small></small>}
-                      {sensor.meta?.kind === "WaterThermometer" && (
-                        <small>Deg</small>
-                      )}
-                      {sensor.meta?.kind === "WaterPollutantSensor" && (
-                        <small>PPM</small>
-                      )}
-                    </Box>
                   </Box>
-                ))}
-            </Box>
-            {/* <Box
+                </Box>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1.5,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <MdSensors size={23} />
+                    <strong style={{ color: "#E46B26" }}>Sensors</strong>
+                  </Box>
+                  {!device?.sensors?.some?.(
+                    (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+                  ) ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <TbAlertHexagon size={23} />
+                      <small style={{ color: "orange" }}>
+                        No majiup sensors detected
+                      </small>
+                    </Box>
+                  ) : null}
+
+                  {device?.sensors
+                    ?.filter(
+                      (sensor: Sensor) => sensor.meta.kind === "WaterLevel"
+                    )
+                    ?.map((sensor, idx) => (
+                      <Box key={idx} width={"100%"} lineHeight={1.8}>
+                        <Box>
+                          <small>{sensor.name}</small>
+                          {sensor.meta.critical_max === 0 &&
+                            sensor.meta.critical_min === 0 && (
+                              <small style={{ color: "orange" }}>
+                                {" - "}
+                                {sensor.name} alerts not configured properly
+                              </small>
+                            )}
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            backgroundColor: "#fafafa",
+                            padding: "0.5rem",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          <small>
+                            Max Alert: {sensor.meta?.critical_max}%{" "}
+                          </small>
+                          <small>Min Alert: {sensor.meta?.critical_min}%</small>
+                          {sensor.meta?.kind === "WaterLevel" && (
+                            <small></small>
+                          )}
+                          {sensor.meta?.kind === "WaterThermometer" && (
+                            <small>Deg</small>
+                          )}
+                          {sensor.meta?.kind === "WaterPollutantSensor" && (
+                            <small>PPM</small>
+                          )}
+                        </Box>
+                      </Box>
+                    ))}
+                </Box>
+                {/* <Box
               sx={{
                 width: "100%",
                 display: "flex",
@@ -1010,9 +1039,11 @@ function SettingsPage() {
                 </Stack>
               ))}
             </Box> */}
-          </Stack>
-        ))}
-      </Box>
+              </Stack>
+            ))}
+          </Box>
+        </>
+      )}
     </Box>
   );
 }

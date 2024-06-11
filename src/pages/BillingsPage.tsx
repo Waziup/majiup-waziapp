@@ -7,7 +7,7 @@ import {
   useLayoutEffect,
   useEffect,
 } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
 // import { ApexAxisChartSeries,ApexCharts, ApexNonAxisChartSeries } from 'apexcharts';
 // import AssessmentIcon from '@mui/icons-material/Assessment';
 // import StickyHeadTable from '../components/TableComponent/Table.component';
@@ -63,7 +63,7 @@ export type Consumption = {
   waterTemperature: number;
 };
 function BillingsPage() {
-  const { devices } = useContext(DevicesContext);
+  const { devices, loading } = useContext(DevicesContext);
 
   const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({
     name: "",
@@ -378,70 +378,81 @@ function BillingsPage() {
                 } */}
       </ModalComponent>
 
-      <Box
-        ref={reportTemplateRef}
-        sx={{
-          display: "flex",
-          margin: "10px 0",
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
+      {loading ? (
         <Box
           sx={{
-            border: "1px solid #ccc",
-            margin: "15px",
-            padding: "5px 0",
-            minWidth: "200px",
-            width: "20%",
-            borderRadius: "2rem",
-            overflow: "hidden",
-            borderColor: "#4592F6",
-            position: "relative",
-            zIndex: 1,
+            display: "flex",
+            justifyContent: "center",
           }}
         >
-          <label
-            style={{
-              background: "#4592F6",
-              fontSize: "1rem",
-              fontWeight: "500",
-              color: "#fff",
-              padding: "5px 7px",
-              // position: "absolute",
-              top: 0,
-              // borderTopLeftRadius: "inherit",
-              // borderBottomLeftRadius: "inherit",
-              // height: "100%",
-            }}
-            htmlFor="devs"
-          >
-            Tank:
-          </label>
-          <select
-            onChange={(event) => {
-              setSelectedTank({ ...selectedTank, id: event.target.value });
-            }}
-            style={{
-              border: "none",
-              outline: "none",
-              width: "65%",
-              background: "none",
-              color: "#4592F6",
-              right: "50%",
-            }}
-            name="tanks"
-            id="tanks"
-          >
-            <option value="All">All</option>
-            {devices.map((device, idx) => (
-              <option key={idx} value={device.id}>
-                {device.name}
-              </option>
-            ))}
-          </select>
+          <CircularProgress />
         </Box>
-        {/* <Box
+      ) : (
+        <>
+          <Box
+            ref={reportTemplateRef}
+            sx={{
+              display: "flex",
+              margin: "10px 0",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <Box
+              sx={{
+                border: "1px solid #ccc",
+                margin: "15px",
+                padding: "5px 0",
+                minWidth: "200px",
+                width: "20%",
+                borderRadius: "2rem",
+                overflow: "hidden",
+                borderColor: "#4592F6",
+                position: "relative",
+                zIndex: 1,
+              }}
+            >
+              <label
+                style={{
+                  background: "#4592F6",
+                  fontSize: "1rem",
+                  fontWeight: "500",
+                  color: "#fff",
+                  padding: "5px 7px",
+                  // position: "absolute",
+                  top: 0,
+                  // borderTopLeftRadius: "inherit",
+                  // borderBottomLeftRadius: "inherit",
+                  // height: "100%",
+                }}
+                htmlFor="devs"
+              >
+                Tank:
+              </label>
+              <select
+                onChange={(event) => {
+                  setSelectedTank({ ...selectedTank, id: event.target.value });
+                }}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  width: "65%",
+                  background: "none",
+                  color: "#4592F6",
+                  right: "50%",
+                }}
+                name="tanks"
+                id="tanks"
+              >
+                <option value="All">All</option>
+                {devices.map((device, idx) => (
+                  <option key={idx} value={device.id}>
+                    {device.name}
+                  </option>
+                ))}
+              </select>
+            </Box>
+            {/* <Box
           sx={{
             border: "1px solid #ccc",
             margin: "15px",
@@ -481,56 +492,61 @@ function BillingsPage() {
             <option value="hours">Hours</option>
           </select>
         </Box> */}
-      </Box>
-      <Box p={2} sx={{ width: "100%", bgcolor: "#fff", borderRadius: "8px" }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            bgcolor: "#fff",
-            borderRadius: "5px",
-            marginTop: "10px",
-          }}
-        >
-          <p style={{ color: "#9291A5", fontSize: "12px" }}>
-            Water Consumption, {todaysDate}
-          </p>
-          <Box
-            p={1}
-            sx={{
-              display: "flex",
-              bgcolor: "#F3F8FF",
-              borderRadius: "5px",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          ></Box>
-        </Box>
-        <br />
-        <strong>
-          {!isNaN(selectedTank.litres) && selectedTank?.litres.toFixed(0)}
-          {" Litres used "}
-          {selectedTank.id === "All" && " - All tanks"}
-        </strong>
-        {selectedTank.consumption ? (
-          <Chart
-            options={apexOptionsToRender.options}
-            series={apexOptionsToRender.series}
-            type={"area"}
-            height={350}
-          />
-        ) : (
-          <Box
-            sx={{
-              paddingTop: "2rem",
-            }}
-          >
-            <p style={{ color: "orange" }}>No information for this tank!</p>
           </Box>
-        )}
-      </Box>
+          <Box
+            p={2}
+            sx={{ width: "100%", bgcolor: "#fff", borderRadius: "8px" }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                bgcolor: "#fff",
+                borderRadius: "5px",
+                marginTop: "10px",
+              }}
+            >
+              <p style={{ color: "#9291A5", fontSize: "12px" }}>
+                Water Consumption, {todaysDate}
+              </p>
+              <Box
+                p={1}
+                sx={{
+                  display: "flex",
+                  bgcolor: "#F3F8FF",
+                  borderRadius: "5px",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              ></Box>
+            </Box>
+            <br />
+            <strong>
+              {!isNaN(selectedTank.litres) && selectedTank?.litres.toFixed(0)}
+              {" Litres used "}
+              {selectedTank.id === "All" && " - All tanks"}
+            </strong>
+            {selectedTank.consumption ? (
+              <Chart
+                options={apexOptionsToRender.options}
+                series={apexOptionsToRender.series}
+                type={"area"}
+                height={350}
+              />
+            ) : (
+              <Box
+                sx={{
+                  paddingTop: "2rem",
+                }}
+              >
+                <p style={{ color: "orange" }}>No information for this tank!</p>
+              </Box>
+            )}
+          </Box>
+        </>
+      )}
       {/* <Box sx={{padding: '10px 15px',margin: '10px 0',width: '100%', bgcolor: "#fff",borderRadius: "5px",}}>
                 <article>Report</article>
                 <div>
