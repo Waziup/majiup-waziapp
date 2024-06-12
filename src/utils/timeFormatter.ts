@@ -45,3 +45,64 @@ export const getLastSeen = (updated: Date | undefined) => {
     return false;
   }
 };
+
+type Time = {
+  duration: number;
+  type: string;
+};
+
+export const convertDays = (days: number): Time => {
+  if (days < 0) {
+    const r: Time = { duration: 0, type: "Hours" };
+    return r;
+  }
+
+  if (days > 1 && days < 7) {
+    const r: Time = { duration: days, type: `Day${days !== 1 ? "s" : ""}` };
+    return r;
+  }
+
+  if (days < 1) {
+    const hours = days * 24;
+    const r: Time = { duration: hours, type: `Hour${hours !== 1 ? "s" : ""}` };
+    return r;
+  }
+
+  if (days >= 90) {
+    const months = Math.floor(days / 30);
+    // const remainingDays = days % 30;
+    const r: Time = {
+      duration: months,
+      type: `Month${months !== 1 ? "s" : ""}`,
+    };
+    return r;
+  }
+
+  if (days >= 7 && days < 90) {
+    const weeks = Math.floor(days / 7);
+    const r: Time = { duration: weeks, type: `Week${weeks !== 1 ? "s" : ""}` };
+
+    return r;
+  }
+
+  return {
+    duration: 1,
+    type: "",
+  };
+};
+
+export const formatDateToISO = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  const offsetMinutes = date.getTimezoneOffset();
+  const offsetHours = Math.abs(offsetMinutes / 60);
+  const offsetSign = offsetMinutes < 0 ? "+" : "-";
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${offsetSign}${String(
+    offsetHours
+  ).padStart(2, "0")}:${String(Math.abs(offsetMinutes % 60)).padStart(2, "0")}`;
+};

@@ -1,4 +1,11 @@
-import { Box, styled, Switch, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  styled,
+  Switch,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import {
   FireHydrantAlt,
   // WaterDrop,
@@ -27,6 +34,7 @@ import toast from "react-hot-toast";
 import { ImArrowUp } from "react-icons/im";
 import { ImArrowDown } from "react-icons/im";
 import { Visibility } from "@mui/icons-material";
+import { convertDays } from "../../utils/timeFormatter";
 
 type Consumption = {
   x: number;
@@ -171,6 +179,7 @@ function TankDetailComponent({
   };
 
   async function switchActuator() {
+    toast.error("This action is coming soon");
     if (actuator && toggleActuator) {
       await toggleActuator(id);
       const pumpUpdate = !pumpStatus;
@@ -273,41 +282,47 @@ function TankDetailComponent({
   }
 
   const createRefill = async (tankDetails: any) => {
-    try {
-      setSendingReq(true);
-      const { data, error } = await supabase
-        .from("refills")
-        .insert({
-          tank_id: tankDetails.id,
-          tank_capacity: tankDetails.capacity,
-          current_amount: tankDetails.liters,
-          amount_liters: tankDetails.capacity - tankDetails.liters,
-          tank_name: tankDetails.name,
-          owner: "Josee",
-          amount_ksh: tankDetails.capacity - tankDetails.liters * 0.4,
-          location: {
-            lat: -1.252535,
-            lng: 36.686418,
-          },
-          status: "In Progress",
-          confirmed: false,
-          vendor: null,
-        })
-        .select()
-        .single();
-      if (data) {
-        setRefill((prev) => {
-          return {
-            ...prev,
-            status: data.status,
-          };
-        });
-      } else {
-        console.log(error);
+    if (navigator.onLine) {
+      try {
+        setSendingReq(true);
+        const { data, error } = await supabase
+          .from("refills")
+          .insert({
+            tank_id: tankDetails.id,
+            tank_capacity: tankDetails.capacity,
+            current_amount: tankDetails.liters,
+            amount_liters: tankDetails.capacity - tankDetails.liters,
+            tank_name: tankDetails.name,
+            owner: "Josee",
+            amount_ksh: tankDetails.capacity - tankDetails.liters * 0.4,
+            location: {
+              lat: -1.252535,
+              lng: 36.686418,
+            },
+            status: "In Progress",
+            confirmed: false,
+            vendor: null,
+          })
+          .select()
+          .single();
+        if (data) {
+          setRefill((prev) => {
+            return {
+              ...prev,
+              status: data.status,
+            };
+          });
+          toast.success("Water refill order placed!");
+        } else {
+          console.log(error);
+          toast.error("Failed to place order. Try again later!");
+        }
+      } catch (err) {
+      } finally {
+        setSendingReq(false);
       }
-    } catch (err) {
-    } finally {
-      setSendingReq(false);
+    } else {
+      toast.error("Connect to internet and try again!");
     }
   };
 
@@ -349,6 +364,7 @@ function TankDetailComponent({
         toast.success("Order cancelled!");
       }
     } catch (error) {
+      toast.error("Failed to cancel. Try again.");
       console.log("Error");
     }
   };
@@ -410,10 +426,10 @@ function TankDetailComponent({
           <Box
             sx={{
               display: "flex",
-              gap: "0.5rem",
               flexWrap: "wrap",
               justifyContent: !matches && "center",
               alignItems: "center",
+              gap: matches ? "2rem" : "0.5rem",
             }}
           >
             <Box
@@ -429,6 +445,7 @@ function TankDetailComponent({
                 waterQuality={waterQuality}
                 percentage={Math.round((liters / capacity) * 100)}
                 consumption={device?.consumption}
+                matches={matches}
               />
             </Box>
             <Box
@@ -501,9 +518,9 @@ function TankDetailComponent({
                     <p style={{ fontSize: "1rem" }}>
                       {" "}
                       {usage === "d" &&
-                        device?.analytics.average.daily.toFixed(0)}{" "}
+                        device?.analytics?.average?.daily?.toFixed(0)}{" "}
                       {usage === "h" &&
-                        device?.analytics.average.hourly.toFixed(0)}{" "}
+                        device?.analytics?.average?.hourly?.toFixed(0)}{" "}
                       L/
                       {usage === "d" && "day"}
                       {usage === "h" && "hr"}
@@ -524,8 +541,8 @@ function TankDetailComponent({
                     {/* <input type="datetime-local" /> */}
 
                     <Box>
-                      {device?.analytics.trend.value &&
-                        (device?.analytics.trend.value > 0 ? (
+                      {device?.analytics?.trend?.value &&
+                        (device?.analytics?.trend?.value > 0 ? (
                           <ImArrowUp color="green" />
                         ) : (
                           <ImArrowDown color="red" />
@@ -600,7 +617,15 @@ function TankDetailComponent({
                   ) : (
                     <>
                       {sendingReq ? (
-                        <p style={{ color: "orangegb" }}>Sending order...</p>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            width: "100%",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <CircularProgress size={20} />{" "}
+                        </Box>
                       ) : (
                         <button
                           onClick={() => createRefill(device)}
@@ -628,18 +653,19 @@ function TankDetailComponent({
                           gap: ".5rem",
                         }}
                       >
-                        {device?.analytics.durationLeft &&
+                        {device?.analytics?.durationLeft &&
                           device?.analytics?.durationLeft < 3 && (
                             <Box>
                               <PiWarningOctagonLight color="orange" size={26} />
                             </Box>
                           )}
                         <p>
-                          Refill in {device?.analytics.durationLeft.toFixed(0)}{" "}
-                          {device?.analytics?.durationLeft &&
-                          device?.analytics?.durationLeft > 1
-                            ? "days"
-                            : "day"}
+                          Refill in{" "}
+                          {
+                            convertDays(device?.analytics?.durationLeft)
+                              .duration
+                          }{" "}
+                          {convertDays(device?.analytics?.durationLeft).type}
                         </p>
                       </Box>
                     </>

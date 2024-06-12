@@ -34,12 +34,14 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
   return (
     <Box
       sx={{
-        ":hover": { bgcolor: "#FFE6D9" },
+        ":hover": {
+          bgcolor: "#FFE6D9",
+          // boxShadow: "0 4px 26px rgba(0, 0, 0, 0.25)",
+        },
         cursor: "pointer",
         transition: ".5s",
         borderRadius: "5px",
         width: "100%",
-        // boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
       }}
     >
       <Box

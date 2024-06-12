@@ -151,40 +151,43 @@ function BillingsPage() {
             return acc;
           }, 0),
         });
-        setApexOptionsToRender({
-          series: [
-            ...devices.map((d) => ({
-              name: d.name,
-              data: d.consumption
-                ? d?.consumption.map((device4) => device4.y)
-                : [],
-            })),
-          ],
-          options: {
-            chart: {
-              height: 350,
-              type: "area",
-            },
-            // colors:['#4592F6','#00e396',"orange","black","purple"],
-            dataLabels: {
-              enabled: false,
-            },
+        setApexOptionsToRender((prev) => {
+          return {
+            ...prev,
+            series: [
+              ...devices.map((d) => ({
+                name: d.name,
+                data: d.consumption
+                  ? d?.consumption.map((device4) => device4.y)
+                  : [],
+              })),
+            ],
+            options: {
+              chart: {
+                height: matches ? 500 : 380,
+                type: "rangeArea",
+              },
+              // colors:['#4592F6','#00e396',"orange","black","purple"],
+              dataLabels: {
+                enabled: false,
+              },
 
-            stroke: {
-              curve: "smooth",
-              width: 2,
+              stroke: {
+                curve: "smooth",
+                width: 2,
+              },
+              title: {
+                text: "Water Consumption",
+                align: "left",
+              },
+              xaxis: {
+                categories: devices[0]?.consumption
+                  ? devices[0]?.consumption.map((d) => d.x)
+                  : [],
+                tickAmount: matches ? 10 : 4,
+              },
             },
-            title: {
-              text: "Water Consumption",
-              align: "left",
-            },
-            xaxis: {
-              categories: devices[0]?.consumption
-                ? devices[0]?.consumption.map((d) => d.x)
-                : [],
-              tickAmount: matches ? 10 : 4,
-            },
-          },
+          };
         });
         return;
       }
@@ -197,31 +200,35 @@ function BillingsPage() {
           litres: deviceFound.liters,
           analytics: deviceFound.analytics,
         });
-        setApexOptionsToRender({
-          series: [
-            {
-              name: deviceFound.name,
-              data: deviceFound.consumption
-                ? deviceFound.consumption.map((x) => x.y)
-                : [],
+        setApexOptionsToRender((prev) => {
+          return {
+            ...prev,
+            series: [
+              {
+                name: deviceFound.name,
+                data: deviceFound.consumption
+                  ? deviceFound.consumption.map((x) => x.y)
+                  : [],
+              },
+            ],
+            options: {
+              chart: {
+                height: matches ? 500 : 380,
+                type: "rangeArea",
+              },
+              // colors: ["#4592F6"],
+              xaxis: {
+                categories: deviceFound?.consumption
+                  ? deviceFound?.consumption.map((d) => d.x)
+                  : [2, 4, 5, 7, 8],
+                tickAmount: matches ? 10 : 4,
+              },
+              stroke: {
+                curve: "smooth",
+                width: 2,
+              },
             },
-          ],
-          options: {
-            chart: {
-              height: 350,
-              type: "rangeArea",
-            },
-            // colors: ["#4592F6"],
-            xaxis: {
-              categories: deviceFound?.consumption
-                ? deviceFound?.consumption.map((d) => d.x)
-                : [2, 4, 5, 7, 8],
-            },
-            stroke: {
-              curve: "smooth",
-              width: 2,
-            },
-          },
+          };
         });
         return;
       }
@@ -241,44 +248,45 @@ function BillingsPage() {
           return acc;
         }, 0),
       });
-      setApexOptionsToRender({
-        series: [
-          ...devices.map((d) => ({
-            name: d.name,
-            data: d.consumption
-              ? d?.consumption.map((device4) => device4.y)
-              : [],
-          })),
-        ],
-        options: {
-          chart: {
-            height: 350,
-            type: "area",
-            width: "100%",
-            // toolbar: {
-            //     show: false
-            // }
-          },
-          //   colors: ["#4592F6", "#00e396"],
-          dataLabels: {
-            enabled: false,
-          },
+      setApexOptionsToRender((prev) => {
+        return {
+          ...prev,
 
-          stroke: {
-            curve: "smooth",
-            width: 2,
-          },
+          series: [
+            ...devices.map((d) => ({
+              name: d.name,
+              data: d.consumption
+                ? d?.consumption.map((device4) => device4.y)
+                : [],
+            })),
+          ],
+          options: {
+            chart: {
+              height: matches ? 500 : 380,
+              type: "area",
+            },
+            //   colors: ["#4592F6", "#00e396"],
+            dataLabels: {
+              enabled: false,
+            },
 
-          title: {
-            // text: 'Water Consumption',
-            align: "left",
+            stroke: {
+              curve: "smooth",
+              width: 2,
+            },
+
+            title: {
+              // text: 'Water Consumption',
+              align: "left",
+            },
+            xaxis: {
+              categories: devices[0]?.consumption
+                ? devices[0]?.consumption.map((d) => d.x)
+                : [],
+              tickAmount: matches ? 10 : 4,
+            },
           },
-          xaxis: {
-            categories: devices[0]?.consumption
-              ? devices[0]?.consumption.map((d) => d.x)
-              : [],
-          },
-        },
+        };
       });
       return;
     }
@@ -291,32 +299,36 @@ function BillingsPage() {
         litres: deviceFound.analytics?.trend.amountUsed,
         analytics: deviceFound.analytics,
       });
-      setApexOptionsToRender({
-        series: [
-          {
-            name: deviceFound.name,
-            data: deviceFound.consumption
-              ? deviceFound.consumption.map((x) => x.y)
-              : [],
+      setApexOptionsToRender((prev) => {
+        return {
+          ...prev,
+
+          series: [
+            {
+              name: deviceFound.name,
+              data: deviceFound.consumption
+                ? deviceFound.consumption.map((x) => x.y)
+                : [],
+            },
+          ],
+          options: {
+            chart: {
+              height: matches ? 500 : 380,
+              type: "rangeArea",
+            },
+            //   colors: ["#4592F6"],
+            xaxis: {
+              categories: deviceFound?.consumption
+                ? deviceFound?.consumption.map((d) => d.x)
+                : [2, 4, 5, 7, 8],
+              tickAmount: matches ? 10 : 4,
+            },
+            stroke: {
+              curve: "smooth",
+              width: 2,
+            },
           },
-        ],
-        options: {
-          chart: {
-            height: 350,
-            width: "100%",
-            type: "rangeArea",
-          },
-          //   colors: ["#4592F6"],
-          xaxis: {
-            categories: deviceFound?.consumption
-              ? deviceFound?.consumption.map((d) => d.x)
-              : [2, 4, 5, 7, 8],
-          },
-          stroke: {
-            curve: "smooth",
-            width: 2,
-          },
-        },
+        };
       });
       return;
     }
@@ -362,7 +374,7 @@ function BillingsPage() {
               options={apexOptionsToRender.options}
               series={apexOptionsToRender.series}
               type={"area"}
-              height={350}
+              height={matches ? 500 : 380}
             />
           </div>
         </div>
@@ -533,7 +545,7 @@ function BillingsPage() {
                 options={apexOptionsToRender.options}
                 series={apexOptionsToRender.series}
                 type={"area"}
-                height={350}
+                height={matches ? 500 : 380}
               />
             ) : (
               <Box

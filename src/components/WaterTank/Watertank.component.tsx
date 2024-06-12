@@ -7,6 +7,7 @@ type Props = {
   percentage: number;
   waterQuality: string;
   consumption: any;
+  matches?: boolean;
 };
 
 function mapNumberToPercentage(number: number): number {
@@ -17,11 +18,15 @@ function mapNumberToPercentage(number: number): number {
   return mappedValue;
 }
 
-function WatertankComponent({ percentage }: Props) {
-  // const theme = useTheme();
-  // const matches = useMediaQuery(theme.breakpoints.up("md"));
+function WatertankComponent({ percentage, matches }: Props) {
   return (
-    <div className="circle" style={{ width: "175px", height: "175px" }}>
+    <div
+      className="circle"
+      style={{
+        width: `${matches ? "300px" : "175px"}`,
+        height: `${matches ? "300px" : "175px"}`,
+      }}
+    >
       <style>
         {`
                     .wave:before,

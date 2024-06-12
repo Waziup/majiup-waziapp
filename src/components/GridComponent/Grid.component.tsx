@@ -21,7 +21,11 @@ import {
   // postNewNotificationMessage,
 } from "../../utils/consumptionHelper";
 // import Copilot from "../copilot/copilot.component";
-import { formatTime, getLastSeen } from "../../utils/timeFormatter";
+import {
+  convertDays,
+  formatTime,
+  getLastSeen,
+} from "../../utils/timeFormatter";
 // import { TbAlertHexagon } from "react-icons/tb";
 const BoxStyle = {
   bgcolor: "#fff",
@@ -265,22 +269,23 @@ function GridComponent() {
     </Box>
   ) : (
     <Grid
-      // overflow={"hidden"}
       height={"100dvh"}
       container
       style={{ background: "#F6F6F6" }}
       spacing={2}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         <Grid
           style={{
             position: "relative",
             display: "flex",
             marginLeft: `${matches ? "0" : "2rem"}`,
             gap: `${matches ? "0" : "1rem"}`,
-            marginTop: "1rem",
+            marginTop: "0",
             alignItems: "center",
             flexDirection: "column",
+            backgroundColor: "#fff",
+            padding: matches ? "1.5rem 2rem" : "",
           }}
           item
           xs={12}
@@ -334,6 +339,10 @@ function GridComponent() {
                     tank.isSelect
                       ? { bgcolor: "#FFE6D9" }
                       : { bgcolor: "#fff" },
+                    {
+                      overflow: "hidden",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
+                    },
                   ]}
                 >
                   <ItemCardComponent
@@ -460,12 +469,23 @@ function GridComponent() {
                       </Box>
                       <Box
                         sx={{
-                          color: `${
-                            tank?.analytics?.durationLeft &&
-                            tank?.analytics?.durationLeft < 3
-                              ? "orange"
-                              : ""
-                          }`,
+                          color:
+                            `${
+                              convertDays(tank?.analytics.durationLeft).type ===
+                                "Days" &&
+                              convertDays(tank?.analytics.durationLeft)
+                                .duration < 3
+                                ? "orange"
+                                : ""
+                            }` ||
+                            `${
+                              convertDays(tank?.analytics.durationLeft).type ===
+                                "Hours" &&
+                              convertDays(tank?.analytics.durationLeft)
+                                .duration < 24
+                                ? "orange"
+                                : ""
+                            }`,
                         }}
                       >
                         <h1
@@ -473,13 +493,10 @@ function GridComponent() {
                             fontWeight: 400,
                           }}
                         >
-                          {tank?.analytics.durationLeft.toFixed(0)}{" "}
+                          {convertDays(tank?.analytics.durationLeft).duration}
                         </h1>
                         <small>
-                          {tank?.analytics?.durationLeft &&
-                          tank?.analytics?.durationLeft > 1
-                            ? "Days left"
-                            : "Day left"}
+                          {convertDays(tank?.analytics.durationLeft).type} Left
                         </small>
                       </Box>
                     </Box>
@@ -521,6 +538,7 @@ function GridComponent() {
             item
             style={{
               position: "relative",
+              backgroundColor: "#f6f6f6",
             }}
             xs={9}
           >

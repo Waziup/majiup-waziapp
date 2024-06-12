@@ -3,11 +3,12 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 import mqtt from "precompiled-mqtt";
 // import toast from "react-hot-toast";
 // import { User } from "@supabase/supabase-js";
-// const brokerUrl = `mqtt://wazigate.local`;
-import { formatTime } from "../utils/timeFormatter";
+const brokerUrl = `mqtt://wazigate.local`;
+import { formatDateToISO, formatTime } from "../utils/timeFormatter";
 import { Analytics } from "@mui/icons-material";
+import toast from "react-hot-toast";
 // const brokerUrl = `mqtt://localhost`;
-const brokerUrl = `mqtt://192.168.0.104`;
+// const brokerUrl = `mqtt://192.168.0.104`;
 
 type Props = {
   children: ReactNode;
@@ -189,12 +190,13 @@ function isActiveDevice(modifiedTime: any): boolean {
 function subscriberFn(client: mqtt.MqttClient, topic: string) {
   client.subscribe(topic, (err) => {
     if (err) {
+      // toast.error("Failed to connect!");
       console.log(err);
     }
   });
 }
 
-export const client = mqtt.connect(brokerUrl);
+export const client: mqtt.MqttClient = mqtt.connect(brokerUrl);
 
 export const DevicesProvider = ({ children }: Props) => {
   const [loadingProfile, setLoadingProfile] = useState<boolean>(true);
@@ -272,12 +274,22 @@ export const DevicesProvider = ({ children }: Props) => {
     }
   };
 
-  const getAnalytics = async (
-    tankID: string
-  ): Promise<Analytics | undefined> => {
+  type AnalyticsParams = {
+    tankID: string;
+    from: string;
+    to: string;
+  };
+
+  const getAnalytics = async ({
+    tankID,
+    from,
+    to,
+  }: AnalyticsParams): Promise<Analytics | undefined> => {
     try {
       const req: AxiosResponse = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/tanks/${tankID}/analytics`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/tanks/${tankID}/analytics?from=${from}&to=${to}`,
         {
           headers: {
             Accept: "application/json",
@@ -306,10 +318,16 @@ export const DevicesProvider = ({ children }: Props) => {
       .then(async (response) => {
         const tankValues: any = response.data.map(async (device: Device) => {
           if (device.sensors) {
+            const toTime = new Date();
+            const fromTime = new Date(toTime);
+            fromTime.setHours(fromTime.getHours() - 168);
+
             const sensorResponse = await axios.get(
               `${import.meta.env.VITE_BACKEND_URL}/tanks/${
                 device.id
-              }/tank-sensors/waterlevel/values`,
+              }/tank-sensors/waterlevel/values?from=${formatDateToISO(
+                fromTime
+              )}&to=${formatDateToISO(toTime)}`,
               {
                 headers: {
                   Accept: "application/json",
@@ -327,9 +345,17 @@ export const DevicesProvider = ({ children }: Props) => {
               }
             );
 
-            const analytics: Analytics | undefined = await getAnalytics(
-              device.id
-            );
+            const to = new Date();
+            const from = new Date(to);
+            from.setHours(from.getHours() - 1);
+
+            // console.log(formatDateToISO(from), formatDateToISO(to));
+
+            const analytics: Analytics | undefined = await getAnalytics({
+              tankID: device.id,
+              from: formatDateToISO(from),
+              to: formatDateToISO(to),
+            });
 
             return { plotVals, analytics };
           }
@@ -343,12 +369,11 @@ export const DevicesProvider = ({ children }: Props) => {
         };
       })
       .then(({ res, tankData }) => {
-        console.log(tankData);
         setDevices(
           res.map(function (device: X, index: number) {
-            subscriberFn(client, `devices/${device.id}/meta/#`);
+            // subscriberFn(client, `devices/${device.id}/meta/#`);
             subscriberFn(client, `devices/${device.id}/sensors/#`);
-            subscriberFn(client, `devices/${device.id}/actuators/#`);
+            // subscriberFn(client, `devices/${device.id}/actuators/#`);
 
             const sensor = device.sensors?.find((sensor: Sensor) =>
               sensor.meta.kind.toLowerCase().includes("waterlevel")
@@ -448,10 +473,18 @@ export const DevicesProvider = ({ children }: Props) => {
   // }
   client.on("connect", () => {
     console.log("MQTT Connected");
+    toast.success("Connected!");
   });
-  // client.on("disconnect", () => {
-  //   client.reconnect();
-  // });
+
+  client.on("error", () => {
+    toast.error("Disconnected!");
+  });
+
+  client.on("disconnect", () => {
+    client.reconnect();
+    toast.error("Disconnected!");
+  });
+
   useEffect(() => {
     fetchInMinutes();
     setFilteredDevices(devices);
