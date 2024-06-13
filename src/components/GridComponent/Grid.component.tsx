@@ -446,15 +446,24 @@ function GridComponent() {
                         <h1
                           style={{
                             fontWeight: 400,
-                            color: `${
-                              tank.sensors &&
-                              Math.round((tank.liters / tank.capacity) * 100) <=
-                                tank?.sensors?.find(
-                                  (sensor) => sensor.meta.kind === "WaterLevel"
-                                )?.meta.critical_min
-                                ? "orange"
-                                : ""
-                            }`,
+                            color: (() => {
+                              const percentage = Math.round(
+                                (tank.liters / tank.capacity) * 100
+                              );
+                              const waterLevelSensor = tank?.sensors?.find(
+                                (sensor) => sensor?.meta?.kind === "WaterLevel"
+                              );
+
+                              if (
+                                waterLevelSensor &&
+                                typeof waterLevelSensor.meta?.critical_min ===
+                                  "number" &&
+                                percentage <= waterLevelSensor.meta.critical_min
+                              ) {
+                                return "orange";
+                              }
+                              return "";
+                            })(),
                           }}
                         >
                           {Math.round((tank.liters / tank.capacity) * 100)}%

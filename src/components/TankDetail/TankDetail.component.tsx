@@ -427,7 +427,7 @@ function TankDetailComponent({
             sx={{
               display: "flex",
               flexWrap: "wrap",
-              justifyContent: !matches && "center",
+              justifyContent: matches ? undefined : "center",
               alignItems: "center",
               gap: matches ? "2rem" : "0.5rem",
             }}
@@ -662,10 +662,13 @@ function TankDetailComponent({
                         <p>
                           Refill in{" "}
                           {
-                            convertDays(device?.analytics?.durationLeft)
+                            convertDays(device?.analytics?.durationLeft ?? 0)
                               .duration
                           }{" "}
-                          {convertDays(device?.analytics?.durationLeft).type}
+                          {
+                            convertDays(device?.analytics?.durationLeft ?? 0)
+                              .type
+                          }
                         </p>
                       </Box>
                     </>

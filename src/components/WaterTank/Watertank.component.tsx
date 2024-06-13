@@ -1,6 +1,4 @@
-import { useTheme } from "@emotion/react";
 import "./Watertank.styles.css";
-import { useMediaQuery } from "@mui/material";
 // import BacteriaSVG from "../../assets/bacteria.svg";
 // import DirtSVG from "../../assets/dirt.svg";
 type Props = {
