@@ -9,7 +9,7 @@ export const formatTime = (date: Date): string => {
 };
 
 export const getLastSeen = (updated: Date | undefined) => {
-  const date = new Date(updated);
+  const date = updated ? new Date(updated) : new Date();
   const now = new Date();
   const timeDifference = now.getTime() - date.getTime();
   // Define time intervals in milliseconds
