@@ -37,7 +37,15 @@ function DevicesPage() {
     return false;
   }
   return (
-    <Box pl={3} pr={1}>
+    <Box
+      pl={3}
+      pr={1}
+      sx={
+        {
+          // minHeight: "105vh",
+        }
+      }
+    >
       {/*   */}
       <TankDetailComponent
         liters={data.state.liters}

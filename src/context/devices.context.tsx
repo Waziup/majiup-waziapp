@@ -4,7 +4,7 @@ import mqtt from "precompiled-mqtt";
 // import toast from "react-hot-toast";
 // import { User } from "@supabase/supabase-js";
 import { formatDateToISO, formatTime } from "../utils/timeFormatter";
-import { Analytics } from "@mui/icons-material";
+import { Analytics, TimeToLeave } from "@mui/icons-material";
 import toast from "react-hot-toast";
 // const brokerUrl = `mqtt://localhost`;
 // const brokerUrl = `mqtt://192.168.0.104`;
@@ -88,7 +88,7 @@ export type UserProfile = {
   profile: Profile;
 };
 
-interface Device {
+export interface Device {
   actuators: Actuator[];
   capacity: number;
   created: Date;
@@ -133,6 +133,11 @@ export interface X extends Device {
   on: boolean;
 }
 
+export type Time = {
+  from?: Date;
+  to?: Date;
+};
+
 interface ContextValues {
   devices: X[];
   user: { token: string; name: string };
@@ -148,7 +153,7 @@ interface ContextValues {
   setLoadingFunc: (loading: boolean) => void;
   // fetchinHours: ()=>void,
   searchDevices: (name: string) => void;
-  fetchInMinutes: () => void;
+  fetchData: ({}) => void;
   profile?: Profile;
   loadingProfile?: boolean;
   connected?: boolean;
@@ -168,7 +173,7 @@ export const DevicesContext = createContext<ContextValues>({
   loading: true,
   setLoadingFunc: () => {},
   // fetchinHours: ()=>{console.log('');},
-  fetchInMinutes: () => {},
+  fetchData: ({}: Time) => {},
   searchDevices: () => {},
   profile: {} as Profile,
   loadingProfile: true,
@@ -221,7 +226,7 @@ export const DevicesProvider = ({ children }: Props) => {
   const getWifiStatus = async () => {
     try {
       const getStatus = await axios.get(
-        "http://wazigate.local/apps/waziup.wazigate-system/internet",
+        `${import.meta.env.VITE_BACKEND_URL}/wifi-status`,
         {
           headers: {
             Accept: "application/json",
@@ -230,8 +235,8 @@ export const DevicesProvider = ({ children }: Props) => {
         }
       );
       if (getStatus.status === 200) {
-        const wifiStatus: boolean = await getStatus.data;
-        setConnected(wifiStatus);
+        const wifiStatus: { status: boolean } = await getStatus.data;
+        setConnected(wifiStatus.status);
       } else {
         setConnected(false);
       }
@@ -307,7 +312,21 @@ export const DevicesProvider = ({ children }: Props) => {
     }
   };
 
-  function fetchInMinutes() {
+  async function fetchData({ from, to }: Time): Promise<X[]> {
+    const time: Time = {};
+
+    if (from && to) {
+      time.from = from;
+      time.to = to;
+    } else {
+      const toTime = new Date();
+      const fromTime = new Date(toTime);
+      fromTime.setHours(fromTime.getHours() - 168);
+
+      time.from = fromTime;
+      time.to = toTime;
+    }
+
     axios
       .get(`${import.meta.env.VITE_BACKEND_URL}/tanks`, {
         headers: {
@@ -318,16 +337,12 @@ export const DevicesProvider = ({ children }: Props) => {
       .then(async (response) => {
         const tankValues: any = response.data.map(async (device: Device) => {
           if (device.sensors) {
-            const toTime = new Date();
-            const fromTime = new Date(toTime);
-            fromTime.setHours(fromTime.getHours() - 168);
-
             const sensorResponse = await axios.get(
               `${import.meta.env.VITE_BACKEND_URL}/tanks/${
                 device.id
               }/tank-sensors/waterlevel/values?from=${formatDateToISO(
-                fromTime
-              )}&to=${formatDateToISO(toTime)}`,
+                time?.from as Date
+              )}&to=${formatDateToISO(time?.to as Date)}`,
               {
                 headers: {
                   Accept: "application/json",
@@ -340,14 +355,14 @@ export const DevicesProvider = ({ children }: Props) => {
                 const date: string = formatTime(new Date(val.timestamp));
                 return {
                   x: date,
-                  y: val.liters,
+                  y: val.liters.toFixed(0),
                 };
               }
             );
 
             const to = new Date();
             const from = new Date(to);
-            from.setHours(from.getHours() - 1);
+            from.setHours(from.getHours() - 168);
 
             // console.log(formatDateToISO(from), formatDateToISO(to));
 
@@ -369,6 +384,7 @@ export const DevicesProvider = ({ children }: Props) => {
         };
       })
       .then(({ res, tankData }) => {
+        // console.log(tankData[0].plotVals.length);
         setDevices(
           res.map(function (device: X, index: number) {
             // subscriberFn(client, `devices/${device.id}/meta/#`);
@@ -418,59 +434,10 @@ export const DevicesProvider = ({ children }: Props) => {
         console.log(err);
         setLoading(false);
       });
+
+    return devices;
   }
-  // function fetchinHours(){
-  //     axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks`,{
-  //         headers:{
-  //             'Accept': 'application/json',
-  //             'Content-Type':'application/json'
-  //         }
-  //     })
-  //     .then(async (response)=>{
-  //         const devicePromises = response.data.map(async (device:Device) => {
-  //             const sensorResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/tanks/${device.id}/tank-sensors/waterlevel/values`, {
-  //                 headers: {
-  //                     'Accept': 'application/json',
-  //                 }
-  //             });
-  //             return sensorResponse.data.map((sensor:Sensor) => {
-  //                 const date = new Date(sensor.time);
-  //                 return {
-  //                     y: sensor.value,
-  //                     x: date.getHours(),
-  //                 };
-  //             });
-  //         });
-  //         const consumption = await Promise.all(devicePromises);
 
-  //         return {
-  //             consumption: consumption[0] as Consumption[],
-  //             res: response.data,
-  //         };
-  //     })
-  //     .then(({res,consumption})=>{
-  //         setDevices(res.map(function(device: X){
-
-  //             return{
-  //                 ...device,
-  //                 capacity: device.meta.settings.capacity,
-  //                 height: device.meta.settings.height,
-  //                 consumption: consumption,
-  //                 liters: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterlevel'))?.value,
-  //                 tds: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterpollutantsensor'))?.value,
-  //                 temp: device.sensors.find((sensor: Sensor)=>sensor.meta.kind.toLowerCase().includes('waterthermometer'))?.value,
-  //                 isSelect: false,
-  //                 notification: device.meta.notifications,
-  //                 on: isActiveDevice(device.modified),
-  //             }
-
-  //         }));
-  //         setLoading(false);
-  //     })
-  //     .catch((err)=>{
-  //         console.log(err);
-  //     })
-  // }
   client.on("connect", () => {
     console.log("MQTT Connected");
     toast.success("Connected!");
@@ -486,7 +453,7 @@ export const DevicesProvider = ({ children }: Props) => {
   });
 
   useEffect(() => {
-    fetchInMinutes();
+    fetchData({});
     setFilteredDevices(devices);
     getUserProfile();
     getWifiStatus();
@@ -524,7 +491,7 @@ export const DevicesProvider = ({ children }: Props) => {
     loading,
     setLoadingFunc,
     // fetchinHours,
-    fetchInMinutes,
+    fetchData,
     searchDevices,
     profile,
     loadingProfile,

@@ -89,7 +89,7 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
               isOn ? (
                 "Active"
               ) : (
-                `Last Active, ${lastSeen}`
+                `${lastSeen}`
               )
             ) : (
               <Box

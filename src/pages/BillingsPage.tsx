@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import {
+import React, {
   useState,
   useRef,
   useContext,
@@ -14,7 +14,7 @@ import { Box, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
 // import DownloadSVG from '../assets/download.svg';
 import ModalComponent from "../components/Modal/Modal.component";
 // import jsPDF from 'jspdf';
-import { Analytics, DevicesContext } from "../context/devices.context";
+import { Analytics, DevicesContext, Time } from "../context/devices.context";
 // import CanvasJSReact from '@canvasjs/react-charts';
 import Chart from "react-apexcharts";
 // import { X as Device } from '../context/devices.context';
@@ -62,8 +62,25 @@ export type Consumption = {
   waterQuality: string;
   waterTemperature: number;
 };
+
+const dateStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.5rem",
+};
+
+const dateInput: React.CSSProperties = {
+  padding: "6px",
+  borderRadius: "2rem",
+  outline: "none",
+  border: "none",
+  backgroundColor: "#4592F6",
+  color: "#fff",
+};
 function BillingsPage() {
-  const { devices, loading } = useContext(DevicesContext);
+  const { devices, loading, fetchData } = useContext(DevicesContext);
+
+  const [fromTo, setFromTo] = useState<Time>({});
 
   const [selectedTank, setSelectedTank] = useState<SelectedTankInfo>({
     name: "",
@@ -184,7 +201,7 @@ function BillingsPage() {
                 categories: devices[0]?.consumption
                   ? devices[0]?.consumption.map((d) => d.x)
                   : [],
-                tickAmount: matches ? 10 : 4,
+                tickAmount: matches ? 4 : 4,
               },
             },
           };
@@ -220,8 +237,8 @@ function BillingsPage() {
               xaxis: {
                 categories: deviceFound?.consumption
                   ? deviceFound?.consumption.map((d) => d.x)
-                  : [2, 4, 5, 7, 8],
-                tickAmount: matches ? 10 : 4,
+                  : [],
+                tickAmount: matches ? 4 : 4,
               },
               stroke: {
                 curve: "smooth",
@@ -283,7 +300,7 @@ function BillingsPage() {
               categories: devices[0]?.consumption
                 ? devices[0]?.consumption.map((d) => d.x)
                 : [],
-              tickAmount: matches ? 10 : 4,
+              tickAmount: matches ? 4 : 4,
             },
           },
         };
@@ -320,8 +337,8 @@ function BillingsPage() {
             xaxis: {
               categories: deviceFound?.consumption
                 ? deviceFound?.consumption.map((d) => d.x)
-                : [2, 4, 5, 7, 8],
-              tickAmount: matches ? 10 : 4,
+                : [],
+              tickAmount: matches ? 4 : 4,
             },
             stroke: {
               curve: "smooth",
@@ -346,6 +363,35 @@ function BillingsPage() {
   if (!devices && !selectedTableTank.consumption) {
     return <article>Loading</article>;
   }
+
+  const refetchData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.name === "from") {
+      setFromTo((prev) => {
+        return {
+          ...prev,
+          from: new Date(e.target.value + "+03:00"),
+        };
+      });
+    } else if (e.target.name === "to") {
+      setFromTo((prev) => {
+        return {
+          ...prev,
+          to: new Date(e.target.value + "+03:00"),
+        };
+      });
+    }
+
+    if (fromTo.to && fromTo.to) {
+      // if (difference )
+      // toast.error("Duration should be more than 1 hour");
+      fetchData({ from: fromTo.from, to: fromTo.to });
+      // setSelectedTank({
+      //   ...selectedTank,
+      //   id: "All",
+      // });
+    }
+  };
+
   return (
     <Box pl={3} pr={1}>
       <ModalComponent
@@ -405,15 +451,15 @@ function BillingsPage() {
             ref={reportTemplateRef}
             sx={{
               display: "flex",
-              margin: "10px 0",
+              gap: matches ? "2rem" : "0.5rem",
               flexWrap: "wrap",
               alignItems: "center",
+              mb: "8px",
             }}
           >
             <Box
               sx={{
                 border: "1px solid #ccc",
-                margin: "15px",
                 padding: "5px 0",
                 minWidth: "200px",
                 width: "20%",
@@ -439,7 +485,7 @@ function BillingsPage() {
                 }}
                 htmlFor="devs"
               >
-                Tank:
+                Tank
               </label>
               <select
                 onChange={(event) => {
@@ -464,46 +510,31 @@ function BillingsPage() {
                 ))}
               </select>
             </Box>
-            {/* <Box
-          sx={{
-            border: "1px solid #ccc",
-            margin: "15px",
-            padding: "5px 0",
-            minWidth: "200px",
-            width: "20%",
-            borderRadius: "20px",
-          }}
-        >
-          <label
-            style={{
-              background: "#E8E8E8",
-              fontWeight: "500",
-              color: "#2C2D38",
-              fontSize: "18",
-              padding: "5px 5px",
-              borderTopLeftRadius: "inherit",
-              borderBottomLeftRadius: "inherit",
-              height: "100%",
-            }}
-            htmlFor="devs"
-          >
-            Plots:
-          </label>
-          <select
-            onChange={(event) => handleToggle(event)}
-            style={{
-              border: "none",
-              outline: "none",
-              width: "70%",
-              background: "none",
-            }}
-            name="devs"
-            id="devs"
-          >
-            <option value="minutes">Minutes</option>
-            <option value="hours">Hours</option>
-          </select>
-        </Box> */}
+            <Box sx={dateStyle}>
+              <label style={{ width: "2.5rem" }} htmlFor="from">
+                From
+              </label>
+              <input
+                style={dateInput}
+                name="from"
+                id="from"
+                type="datetime-local"
+                onChange={(e): void => refetchData(e)}
+              />
+            </Box>
+            <Box sx={dateStyle}>
+              <label style={{ width: "2.5rem" }} htmlFor="to">
+                To
+              </label>
+              <input
+                // defaultValue={formatTime(new Date())}
+                style={dateInput}
+                name="to"
+                id="to"
+                type="datetime-local"
+                onChange={(e): void => refetchData(e)}
+              />
+            </Box>
           </Box>
           <Box
             p={2}

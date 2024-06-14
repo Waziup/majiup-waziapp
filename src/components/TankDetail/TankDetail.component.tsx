@@ -96,7 +96,6 @@ export const Android12Switch = styled(Switch)(({ theme }) => ({
 
 const BoxStyle: React.CSSProperties = {
   borderRadius: "10px",
-  margin: "10px 0",
   position: "relative",
 };
 
@@ -145,7 +144,6 @@ function TankDetailComponent({
     ],
     options: {
       chart: {
-        height: 350,
         type: "rangeArea",
         zoom: {
           enabled: true,
@@ -172,7 +170,7 @@ function TankDetailComponent({
           shadeIntensity: 1,
           opacityFrom: 0.7,
           opacityTo: 0.9,
-          stops: [0, 90, 100],
+          // stops: [0, 90, 100],
         },
       },
     },
@@ -409,7 +407,7 @@ function TankDetailComponent({
         consumption?.length
           ? {
               ...BoxStyle,
-              bgcolor: "#f6f6f6",
+              // bgcolor: "#f6f6f6",
               display: "flex",
               flexDirection: "column",
               p: matches ? 2 : 0,
@@ -463,7 +461,6 @@ function TankDetailComponent({
                   flexDirection: "column",
                   alignContent: "center",
                   justifyContent: "center",
-
                   overflow: "hidden",
                   // flexWrap: "wrap",
                   borderRadius: "4px",
@@ -710,9 +707,51 @@ function TankDetailComponent({
                   sx={{ color: "#FF5C00" }}
                 />
               </Box>
+              <Box
+                sx={{
+                  marginTop: "10px",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  transition: ".5s",
+                  borderRadius: "5px",
+                  width: "100%",
+                  overflow: "hidden",
+                  boxShadow: "0 1px 8px rgba(0, 0, 0, 0.15)",
+                }}
+              >
+                <h4
+                  style={{
+                    padding: "0.5rem 0.8rem",
+                    backgroundColor: "#d4d4d4",
+                  }}
+                >
+                  Device Health
+                </h4>
+                <Box
+                  sx={{
+                    padding: "0.5rem 0.8rem",
+                    display: "flex",
+                    gap: "0.5rem",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <p>Battery</p>
+                    <p>76%</p>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <p>Charging</p>
+                    <p>Yes</p>
+                  </Box>
+                </Box>
+              </Box>
             </Box>
           </Box>
-
           <Box>
             <>
               {(actuator?.length as number) > 0 && (
@@ -779,13 +818,12 @@ function TankDetailComponent({
                         shadeIntensity: 1,
                         opacityFrom: 0.5,
                         opacityTo: 0.5,
-                        stops: [0, 90, 100],
                       },
                     },
                   }}
                   series={apexChartOptions.series}
                   type="line"
-                  height={matches ? 500 : 250}
+                  height={matches ? 450 : 250}
                 />
               ) : (
                 <Box
@@ -794,7 +832,7 @@ function TankDetailComponent({
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    marginTop: "2rem",
+                    marginTop: "0.8rem",
                   }}
                 >
                   <p

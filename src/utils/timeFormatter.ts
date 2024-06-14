@@ -1,9 +1,26 @@
 export const formatTime = (date: Date): string => {
-  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
-  const dayOfWeek = daysOfWeek[date.getUTCDay()];
-  const hours: string = String(date.getUTCHours()).padStart(2, "0");
-  const minutes: string = String(date.getUTCMinutes()).padStart(2, "0");
-  const time: string = `${dayOfWeek}, ${hours}:${minutes}`;
+  const daysOfMonth = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const day = date.getUTCDate();
+  const month = daysOfMonth[date.getUTCMonth()];
+  const year = date.getUTCFullYear();
+  const hours = date.getUTCHours();
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  const period = hours >= 12 ? "PM" : "AM";
+  const displayHours = hours % 12 || 12;
+  const time = `${day} ${month} ${year} - ${displayHours}:${minutes}${period}`;
 
   return time;
 };
