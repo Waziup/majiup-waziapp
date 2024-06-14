@@ -340,7 +340,7 @@ function GridComponent() {
                       ? { bgcolor: "#FFE6D9" }
                       : { bgcolor: "#fff" },
                     {
-                      overflow: "hidden",
+                      overflow: "auto",
                       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
                     },
                   ]}
@@ -377,7 +377,7 @@ function GridComponent() {
                     paddingBottom: `${!tank.consumption && "1rem"}`,
                     borderRadius: "4px",
                     gap: "4px",
-                    overflow: "hidden",
+                    // overflow: "hidden",
                   }}
                 >
                   <Box
