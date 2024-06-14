@@ -10,11 +10,11 @@ function LayoutComponent() {
   const { isOpenNav } = useContext(DevicesContext);
   return (
     <Grid
-      overflow={"hidden"}
+      // overflow={"hidden"}
       height={"100vh"}
       container
       sx={{
-        background: "#F6F6F6",
+        // background: "#F6F6F6",
         scrollbarWidth: ".5rem",
         "::-webkit-slider-thumb": { backgroundColor: "transparent" },
       }}
