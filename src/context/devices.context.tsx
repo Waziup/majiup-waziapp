@@ -4,7 +4,7 @@ import mqtt from "precompiled-mqtt";
 // import toast from "react-hot-toast";
 // import { User } from "@supabase/supabase-js";
 import { formatDateToISO, formatTime } from "../utils/timeFormatter";
-import { Analytics, TimeToLeave } from "@mui/icons-material";
+import { Analytics } from "@mui/icons-material";
 import toast from "react-hot-toast";
 // const brokerUrl = `mqtt://localhost`;
 // const brokerUrl = `mqtt://192.168.0.104`;
@@ -223,27 +223,27 @@ export const DevicesProvider = ({ children }: Props) => {
   const updateProfile = (profileDetails: Profile) => {
     setProfile(profileDetails);
   };
-  const getWifiStatus = async () => {
-    try {
-      const getStatus = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/wifi-status`,
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (getStatus.status === 200) {
-        const wifiStatus: { status: boolean } = await getStatus.data;
-        setConnected(wifiStatus.status);
-      } else {
-        setConnected(false);
-      }
-    } catch (err) {
-    } finally {
-    }
-  };
+  // const getWifiStatus = async () => {
+  //   try {
+  //     const getStatus = await axios.get(
+  //       `${import.meta.env.VITE_BACKEND_URL}/wifi-status`,
+  //       {
+  //         headers: {
+  //           Accept: "application/json",
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     if (getStatus.status === 200) {
+  //       const wifiStatus: { status: boolean } = await getStatus.data;
+  //       setConnected(wifiStatus.status);
+  //     } else {
+  //       setConnected(false);
+  //     }
+  //   } catch (err) {
+  //   } finally {
+  //   }
+  // };
 
   const setReportRef = (ref: HTMLDivElement) => {
     if (ref !== null) {
@@ -456,7 +456,13 @@ export const DevicesProvider = ({ children }: Props) => {
     fetchData({});
     setFilteredDevices(devices);
     getUserProfile();
-    getWifiStatus();
+    Notification.requestPermission().then(function (permission) {
+      if (permission === "granted") {
+        // User has granted permission
+      }
+    });
+
+    // getWifiStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   function searchDevices(name: string) {
