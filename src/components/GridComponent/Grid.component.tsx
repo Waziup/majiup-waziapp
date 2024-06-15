@@ -26,6 +26,7 @@ import {
   formatTime,
   getLastSeen,
 } from "../../utils/timeFormatter";
+import AlarmSound from "../../assets/audio/alarm.wav";
 // import { TbAlertHexagon } from "react-icons/tb";
 const BoxStyle = {
   bgcolor: "#fff",
@@ -68,7 +69,8 @@ function GridComponent() {
     if (topicArr.includes("sensors") && devices.length > 0) {
       // const arr = topic.split('/');
       // console.log(filteredDevices);
-      const val: { value: string } = JSON.parse(message.toString());
+      const val: any = JSON.parse(message.toString());
+      console.log(JSON.parse(message.toString()));
       const device = devices.find(
         (device: Device) => device.id === topicArr[1]
       );
@@ -81,10 +83,11 @@ function GridComponent() {
           sensorV.meta.kind.toLowerCase().includes("WaterLevel".toLowerCase())
         ) {
           const liters = getLiters(
-            val.value,
+            val,
             device.meta.settings.height,
             device.meta.settings.capacity
           );
+          console.log("Liters: ", liters);
           device.liters = liters;
           device.on = true;
           const date = formatTime(new Date());
@@ -98,12 +101,33 @@ function GridComponent() {
 
           const maxSensor = sensorV.meta.critical_max;
           const minSensor = sensorV.meta.critical_min;
+          const percentage = Math.round(
+            (liters / device.meta.settings.capacity) * 100
+          );
           // const pumpStatus = device.actuators[0].value;
 
           // Generate notifiction for extreme water levels
-          if (liters >= maxSensor) {
-            // If pump is on
-            // const pumpStatus = device.actuators[0].value;
+          if (percentage < maxSensor || percentage > minSensor) {
+            localStorage.setItem("max-notified", "0");
+            localStorage.setItem("min-notified", "0");
+          }
+          if (
+            percentage >= maxSensor &&
+            localStorage.getItem("max-notified") === "0"
+          ) {
+            localStorage.setItem("max-notified", "1");
+            if (Notification.permission === "granted") {
+              const audio = new Audio(AlarmSound);
+              audio.play();
+              new Notification(
+                `${device.name} almost above maximum level. You're advised to turn pump off!`
+              );
+            }
+
+            // alert(
+            //   `${device.name} almost above maximum level. You're advised to turn pump off!`
+            // );
+
             // if (pumpStatus === true) {
             //   postNewNotificationMessage(
             //     device.id,
@@ -114,74 +138,26 @@ function GridComponent() {
             //   toogleActuatorHandler(device.id);
             //   return;
             // }
-          } else if (liters <= minSensor) {
-            // If pump is off
-            // if (pumpStatus === false) {
-            //   postNewNotificationMessage(
-            //     device.id,
-            //     devices,
-            //     `Tank almost empty, turning pump ON`,
-            //     "HIGH"
-            //   );
-            //   toogleActuatorHandler(device.id);
-            //   return;
-            // }
+          } else if (
+            percentage <= minSensor &&
+            localStorage.getItem("min-notified") === "0"
+          ) {
+            localStorage.setItem("min-notified", "1");
+            const audio = new Audio(AlarmSound);
+            audio.play();
+            new Notification(
+              `${device.name} almost above maximum level. You're advised to turn pump off!`
+            );
+            // postNewNotificationMessage(
+            //   device.id,
+            //   devices,
+            //   `Tank almost empty, turning pump ON`,
+            //   "HIGH"
+            // );
+            // toogleActuatorHandler(device.id);
+            // return;
           }
-        }
-        //  else if (
-        //   sensorV &&
-        //   sensorV.meta.kind
-        //     .toLowerCase()
-        //     .includes("WaterPollutantSensor".toLowerCase())
-        // ) {
-        //   device.on = true;
-        //   setTanks([...devices]);
-        //   const maxSensor = sensorV.meta.critical_max;
-
-        //   if (parseInt(message.toString()) >= maxSensor) {
-        //     postNewNotificationMessage(
-        //       device.id,
-        //       devices,
-        //       `Poor water quality detected`,
-        //       "HIGH"
-        //     );
-        //     return;
-        //   }
-        // } else if (
-        //   sensorV &&
-        //   sensorV.meta.kind
-        //     .toLowerCase()
-        //     .includes("WaterThermometer".toLowerCase())
-        // ) {
-        //   // console.log('Water thermometer');
-        //   device.temp = parseInt(message.toString());
-        //   // device.modified = new Date().toISOString();
-        //   device.on = true;
-
-        //   setTanks([...devices]);
-
-        //   const maxSensor = sensorV.meta.critical_max;
-        //   const minSensor = sensorV.meta.critical_min;
-
-        //   if (parseInt(message.toString()) >= maxSensor) {
-        //     postNewNotificationMessage(
-        //       device.id,
-        //       devices,
-        //       `Extreme hot temperatures`,
-        //       "HIGH"
-        //     );
-        //     return;
-        //   } else if (parseInt(message.toString()) <= minSensor) {
-        //     postNewNotificationMessage(
-        //       device.id,
-        //       devices,
-        //       `Extreme cold temperatures`,
-        //       "HIGH"
-        //     );
-        //     return;
-        //   }
-        // }
-        else {
+        } else {
           device.on = true;
           return;
         }
@@ -377,6 +353,7 @@ function GridComponent() {
                     paddingBottom: `${!tank.consumption && "1rem"}`,
                     borderRadius: "4px",
                     gap: "4px",
+                    mt: 1,
                     // overflow: "hidden",
                   }}
                 >
@@ -472,7 +449,10 @@ function GridComponent() {
                       </Box>
                       <Box>
                         <h1 style={{ fontWeight: 400 }}>
-                          {(tank.analytics?.average?.daily).toFixed(0)} Ltrs
+                          {tank.analytics?.average?.daily
+                            ? (tank.analytics?.average?.daily).toFixed(0)
+                            : "---"}{" "}
+                          Ltrs
                         </h1>
                         <small>Average daily usage</small>
                       </Box>
@@ -502,10 +482,15 @@ function GridComponent() {
                             fontWeight: 400,
                           }}
                         >
-                          {convertDays(tank?.analytics.durationLeft).duration}
+                          {convertDays(tank?.analytics.durationLeft).duration
+                            ? convertDays(tank?.analytics.durationLeft).duration
+                            : "---"}
                         </h1>
                         <small>
-                          {convertDays(tank?.analytics.durationLeft).type} Left
+                          {convertDays(tank?.analytics.durationLeft).type
+                            ? convertDays(tank?.analytics.durationLeft).type
+                            : "Days"}{" "}
+                          Left
                         </small>
                       </Box>
                     </Box>
