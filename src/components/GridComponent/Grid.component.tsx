@@ -61,6 +61,7 @@ function GridComponent() {
     setSelectedDevice,
     selectedDevice,
   } = useContext(DevicesContext);
+
   const navigate = useNavigate();
 
   client.on("message", (topic, message) => {
@@ -87,7 +88,6 @@ function GridComponent() {
             device.meta.settings.height,
             device.meta.settings.capacity
           );
-          console.log("Liters: ", liters);
           device.liters = liters;
           device.on = true;
           const date = formatTime(new Date());
@@ -188,6 +188,7 @@ function GridComponent() {
       }
     }
   });
+
   const handleSelectedTank = (tank: Device) => {
     const newTanks = devices.map((item: Device) => {
       if (item.name === tank.name) {
@@ -208,6 +209,7 @@ function GridComponent() {
     // setSelectedTank(tank);
     setSelectedDevice(tank);
   };
+
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
 

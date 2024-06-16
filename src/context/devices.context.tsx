@@ -189,7 +189,7 @@ function isActiveDevice(modifiedTime: any): boolean {
   const modified = new Date(modifiedTime);
   const diff = now.getTime() - modified.getTime();
   const diffInMinutes = Math.floor(diff / 1000 / 60);
-  return diffInMinutes < 7;
+  return diffInMinutes < 10;
 }
 
 function subscriberFn(client: mqtt.MqttClient, topic: string) {
@@ -362,7 +362,7 @@ export const DevicesProvider = ({ children }: Props) => {
 
             const to = new Date();
             const from = new Date(to);
-            from.setHours(from.getHours() - 168);
+            from.setHours(from.getHours() - 24);
 
             // console.log(formatDateToISO(from), formatDateToISO(to));
 
@@ -454,6 +454,7 @@ export const DevicesProvider = ({ children }: Props) => {
 
   useEffect(() => {
     fetchData({});
+    setConnected(false);
     setFilteredDevices(devices);
     getUserProfile();
     Notification.requestPermission().then(function (permission) {

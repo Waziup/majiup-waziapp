@@ -197,6 +197,10 @@ function BillingsPage() {
                 text: "Water Consumption",
                 align: "left",
               },
+              yaxis: {
+                min: 0,
+                // max: deviceFound?.meta.settings.capacity,
+              },
               xaxis: {
                 categories: devices[0]?.consumption
                   ? devices[0]?.consumption.map((d) => d.x)
@@ -234,6 +238,10 @@ function BillingsPage() {
                 type: "rangeArea",
               },
               // colors: ["#4592F6"],
+              yaxis: {
+                min: 0,
+                max: deviceFound?.meta.settings.capacity,
+              },
               xaxis: {
                 categories: deviceFound?.consumption
                   ? deviceFound?.consumption.map((d) => d.x)
@@ -296,6 +304,10 @@ function BillingsPage() {
               // text: 'Water Consumption',
               align: "left",
             },
+            yaxis: {
+              min: 0,
+              // max: deviceFound?.meta.settings.capacity,
+            },
             xaxis: {
               categories: devices[0]?.consumption
                 ? devices[0]?.consumption.map((d) => d.x)
@@ -339,6 +351,10 @@ function BillingsPage() {
                 ? deviceFound?.consumption.map((d) => d.x)
                 : [],
               tickAmount: matches ? 4 : 4,
+            },
+            yaxis: {
+              min: 0,
+              max: deviceFound?.meta.settings.capacity,
             },
             stroke: {
               curve: "smooth",

@@ -35,6 +35,7 @@ import { ImArrowUp } from "react-icons/im";
 import { ImArrowDown } from "react-icons/im";
 import { Visibility } from "@mui/icons-material";
 import { convertDays } from "../../utils/timeFormatter";
+import axios from "axios";
 
 type Consumption = {
   x: number;
@@ -109,6 +110,11 @@ const BoxStyle: React.CSSProperties = {
 //   justifyContent: "space-between",
 // };
 
+export type BatteryInfo = {
+  charging: boolean;
+  percentage: number;
+};
+
 function TankDetailComponent({
   id,
   capacity,
@@ -124,7 +130,7 @@ function TankDetailComponent({
     Consumption[]
   >([]);
   const [pumpStatus, setPumpStatus] = useState(false);
-  const { devices } = useContext(DevicesContext);
+  const { devices, profile } = useContext(DevicesContext);
   const device = devices.find((device: X) => device.id === id);
   const [usage, setUsage] = useState<string>("d");
 
@@ -163,6 +169,10 @@ function TankDetailComponent({
       xaxis: {
         categories: temperatureConsumption?.map((item) => item.x),
         tickAmount: 10,
+      },
+      yaxis: {
+        min: 0,
+        max: device?.meta.settings.capacity,
       },
       fill: {
         type: "gradient",
@@ -291,7 +301,9 @@ function TankDetailComponent({
             current_amount: tankDetails.liters,
             amount_liters: tankDetails.capacity - tankDetails.liters,
             tank_name: tankDetails.name,
-            owner: "Josee",
+            owner: profile
+              ? profile?.first_name + profile?.last_name
+              : "unkown",
             amount_ksh: tankDetails.capacity - tankDetails.liters * 0.4,
             location: {
               lat: -1.252535,
@@ -325,6 +337,8 @@ function TankDetailComponent({
   };
 
   const [refill, setRefill] = useState<RefillType>({});
+
+  const [battery, setBattery] = useState<BatteryInfo>();
 
   const getRefill = async (tankID: string) => {
     try {
@@ -367,6 +381,23 @@ function TankDetailComponent({
     }
   };
 
+  const getBattery = async () => {
+    const retrieveBatt = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/tanks/${id}/battery-info`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (retrieveBatt.status === 200) {
+      const battInfo: BatteryInfo = retrieveBatt.data;
+      setBattery(battInfo);
+    }
+  };
+
   const handleUpdates = (data: any) => {
     setRefill((prev) => {
       return {
@@ -395,6 +426,9 @@ function TankDetailComponent({
 
   useEffect(() => {
     device && getRefill(device.id);
+    if (device) {
+      getBattery();
+    }
     listenToUpdateRefills();
   }, [device]);
 
@@ -650,12 +684,16 @@ function TankDetailComponent({
                           gap: ".5rem",
                         }}
                       >
-                        {device?.analytics?.durationLeft &&
-                          device?.analytics?.durationLeft < 3 && (
-                            <Box>
-                              <PiWarningOctagonLight color="orange" size={26} />
-                            </Box>
-                          )}
+                        {device?.analytics?.durationLeft.toString
+                          ? device?.analytics?.durationLeft < 3 && (
+                              <Box>
+                                <PiWarningOctagonLight
+                                  color="orange"
+                                  size={26}
+                                />
+                              </Box>
+                            )
+                          : ""}
                         <p>
                           Refill in{" "}
                           {
@@ -740,13 +778,31 @@ function TankDetailComponent({
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <p>Battery</p>
-                    <p>76%</p>
+                    <p
+                      style={{
+                        color:
+                          battery?.percentage &&
+                          battery?.percentage < 15 &&
+                          !battery?.charging
+                            ? "red"
+                            : battery?.charging && device?.on
+                            ? "green"
+                            : battery?.percentage && battery?.percentage < 20
+                            ? "orange"
+                            : "",
+                      }}
+                    >
+                      {battery?.percentage ? battery?.percentage : "---"}
+                      {"  "}%
+                    </p>
                   </Box>
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <p>Charging</p>
-                    <p>Yes</p>
+                    <p>
+                      {device?.on ? (battery?.charging ? "Yes" : "No") : "No"}
+                    </p>
                   </Box>
                 </Box>
               </Box>
@@ -811,6 +867,10 @@ function TankDetailComponent({
                     xaxis: {
                       categories: temperatureConsumption?.map((item) => item.x),
                       tickAmount: matches ? 5 : 3,
+                    },
+                    yaxis: {
+                      min: 0,
+                      max: device?.meta.settings.capacity,
                     },
                     fill: {
                       type: "gradient",
