@@ -792,7 +792,9 @@ function TankDetailComponent({
                             : "",
                       }}
                     >
-                      {battery?.percentage ? battery?.percentage : "---"}
+                      {battery?.percentage
+                        ? battery?.percentage.toFixed(0)
+                        : "---"}
                       {"  "}%
                     </p>
                   </Box>
