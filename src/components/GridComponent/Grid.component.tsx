@@ -86,7 +86,8 @@ function GridComponent() {
           const liters = getLiters(
             val,
             device.meta.settings.height,
-            device.meta.settings.capacity
+            device.meta.settings.capacity,
+            device.meta.settings.offset
           );
           device.liters = liters;
           device.on = true;

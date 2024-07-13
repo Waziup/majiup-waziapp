@@ -16,7 +16,7 @@ export const formatTime = (date: Date): string => {
   const day = date.getUTCDate();
   const month = daysOfMonth[date.getUTCMonth()];
   const year = date.getUTCFullYear();
-  const hours = date.getUTCHours();
+  const hours = date.getUTCHours() + 3;
   const minutes = String(date.getUTCMinutes()).padStart(2, "0");
   const period = hours >= 12 ? "PM" : "AM";
   const displayHours = hours % 12 || 12;

@@ -89,7 +89,7 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
               isOn ? (
                 "Active"
               ) : (
-                `${lastSeen}`
+                amount && `${lastSeen}`
               )
             ) : (
               <Box
@@ -117,16 +117,19 @@ function ItemCardComponent({ name, modified, amount, isOn }: Props) {
                 alignSelf: "flex-end",
               }}
             >
-              <p
-                style={{
-                  float: "inline-end",
-                  paddingTop: "16px",
-                  fontSize: "18px",
-                  alignSelf: "flex-end",
-                }}
-              >
-                {amount} Litres
-              </p>
+              {amount && (
+                <p
+                  style={{
+                    float: "inline-end",
+                    paddingTop: "16px",
+                    fontSize: "18px",
+                    alignSelf: "flex-end",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {amount?.toLocaleString()} Litres
+                </p>
+              )}
               {/* <p
                 style={{
                   float: "inline-end",

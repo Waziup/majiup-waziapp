@@ -549,9 +549,12 @@ function TankDetailComponent({
                     <p style={{ fontSize: "1rem" }}>
                       {" "}
                       {usage === "d" &&
-                        device?.analytics?.average?.daily?.toFixed(0)}{" "}
+                        device?.analytics?.average?.daily &&
+                        Math.round(
+                          device?.analytics?.average?.daily
+                        )?.toLocaleString()}{" "}
                       {usage === "h" &&
-                        device?.analytics?.average?.hourly?.toFixed(0)}{" "}
+                        device?.analytics?.average?.hourly?.toLocaleString()}{" "}
                       L/
                       {usage === "d" && "day"}
                       {usage === "h" && "hr"}

@@ -69,9 +69,12 @@ export async function getConsumption(
 export const getLiters = (
   waterLevel: any,
   tankHeight: number,
-  tankCapacity: number
+  tankCapacity: number,
+  offset: number
 ) => {
-  return Math.round(((tankHeight - waterLevel) / tankHeight) * tankCapacity);
+  return Math.round(
+    ((tankHeight - (waterLevel - offset)) / tankHeight) * tankCapacity
+  );
 };
 export const postNewNotificationMessage = async (
   deviceId: string,
